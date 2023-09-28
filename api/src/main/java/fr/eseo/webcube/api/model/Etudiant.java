@@ -42,8 +42,11 @@ public class Etudiant implements Serializable{
     @Column(name = "mode")
     private String mode;
 
-    @OneToMany(mappedBy = "etudiant")
+    @Column(name = "path")
+    private String path;
+
+    /*@OneToMany(mappedBy = "etudiant")
     @JsonIgnore
-    private TP tp;
+    private TP tp;*/
     
 }
