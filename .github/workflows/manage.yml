@@ -1,5 +1,5 @@
-name: vagrant up vm-jobe
-run-name: vagrant up vm-jobe
+name: manage VM-jobe
+run-name: manage VM-jobe
 
 on:
   workflow_dispatch:
@@ -20,5 +20,6 @@ jobs:
     uses: ./.github/workflows/vagrant.yml
     secrets: inherit
     with:
-      env-name: manual-list
-      list-bucket: ${{ inputs.list-bucket || false }}
+      env-name: vagrant
+      up: ${{ inputs.up || false }}
+      down: ${{ inputs.down || false }}
