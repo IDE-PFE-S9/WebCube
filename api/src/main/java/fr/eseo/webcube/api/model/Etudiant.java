@@ -44,9 +44,5 @@ public class Etudiant implements Serializable{
 
     @Column(name = "path")
     private String path;
-
-    /*@OneToMany(mappedBy = "etudiant")
-    @JsonIgnore
-    private TP tp;*/
     
 }

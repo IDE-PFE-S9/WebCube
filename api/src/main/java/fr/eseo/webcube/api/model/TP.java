@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +27,11 @@ public class TP implements Serializable{
     @Column(name = "avancement")
     private Integer avancement;
 
-    @Column(name = "etudiant")
+    @ManyToOne
+    @JoinColumn(name = "idEtudiant")
     private Etudiant etudiant;
+
+    @Column(name = "isExam")
+    private boolean isExam;
     
 }
