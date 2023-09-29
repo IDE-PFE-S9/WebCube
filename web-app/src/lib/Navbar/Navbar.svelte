@@ -6,29 +6,36 @@
     import exec_icon from "/src/lib/assets/navbarIcon/exec_icon.svelte";
     import uml_icon from "/src/lib/assets/navbarIcon/uml_icon.svelte";
 
+    let activeItem = "Explorer";
+
     function manageExplorerClick() {
+        activeItem = "Explorer";
     }
 
     function manageFilesClick() {
+        activeItem = "Fichiers";
     }
 
-    function manageExecutionClick() { 
+    function manageExecutionClick() {
+        activeItem = "Execution"; 
     }
 
     function manageUmlClick() {  
+        activeItem = "Uml";
     }
 
     function manageParametersClick() {  
+        activeItem = "Paramètres";
     }
 </script>
 
 
 <div class="navbar">
-    <NavbarItem text="Explorer" icon={file_icon} onClick={manageExplorerClick}/>
-    <NavbarItem text="Fichiers" icon={git_icon} onClick={manageFilesClick}/>
-    <NavbarItem text="Execution" icon={exec_icon} onClick={manageExecutionClick}/>
-    <NavbarItem text="Uml" icon={uml_icon} onClick={manageUmlClick}/>
-    <NavbarItem text="Paramètres" icon={parameter_icon} onClick={manageParametersClick}/>
+    <NavbarItem text="Explorer" icon={file_icon} onClick={manageExplorerClick} activeItem={activeItem}/>
+    <NavbarItem text="Fichiers" icon={git_icon} onClick={manageFilesClick} activeItem={activeItem}/>
+    <NavbarItem text="Execution" icon={exec_icon} onClick={manageExecutionClick} activeItem={activeItem}/>
+    <NavbarItem text="Uml" icon={uml_icon} onClick={manageUmlClick} activeItem={activeItem}/>
+    <NavbarItem text="Paramètres" icon={parameter_icon} onClick={manageParametersClick} activeItem={activeItem}/>
 </div>
 
 

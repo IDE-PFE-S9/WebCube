@@ -2,7 +2,7 @@
     export let onClick;
     export let text;
     export let icon;
-    export let active;
+    export let activeItem;
 
     let showText = false;
 
@@ -24,7 +24,8 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="navbar-item" on:mouseover={handleMouseOver} on:mouseout={handleMouseOut} on:click={handleClick}>
+<div class="navbar-item" on:mouseover={handleMouseOver} on:mouseout={handleMouseOut} on:click={handleClick} class:selected={activeItem === text}>
+    <div class="indicator" class:selected={activeItem === text}></div>
     {#if showText}
         <div class="tooltip">
             {text}
@@ -40,15 +41,41 @@
         align-items: center;
         cursor: pointer;
         margin-top: 1rem;
-        fill:white;
+        fill:rgb(133, 133, 133);
+
+        &:hover {
+                fill:lightgray;
+            &.selected {
+                fill:white;
+            }
+        }
+
+        &.selected {
+            fill:white;
+        }
+    }
+    
+    .indicator {
+        position: relative;
+        left:-0.5rem;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        background-color: white;
+        opacity: 0;
+
+        &.selected{
+            opacity: 1;
+        }
     }
 
     .tooltip {
         position: absolute;
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgba(0, 0, 0, 0.4);
         color: white;
         padding: 0.5rem;
         border-radius: 10px;
         pointer-events: none;
+        left: 4rem;
     }
 </style>
