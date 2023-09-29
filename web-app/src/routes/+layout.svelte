@@ -1,8 +1,10 @@
 <script>
 	import FileExplorer from '$lib/FileExplorer/FileExplorer.svelte';
+  import Navbar from "$lib/Navbar/Navbar.svelte";
 </script>
 
 <div class="main">
+   <Navbar />
 	<FileExplorer />
 	<slot />
 </div>
@@ -20,7 +22,6 @@
 		font-family: "Roboto", sans-serif;
         height: 100%;
         width: 100%;
-
 
         position: absolute;
         top: 0;
