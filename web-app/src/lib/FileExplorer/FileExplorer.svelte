@@ -1,13 +1,51 @@
 <script>
-	import FileItem from './FileItem.svelte';
+	import DirectoryItem from './DirectoryItem.svelte';
 
-	let path;
-	let files = ['test.java', 'index.java', 'main.java'];
+	$: directoryObject = {};
 
-	let selectedFile = null;
+	async function openAndListDirectoryRecursive() {
+		try {
+			const directoryHandle = await window.showDirectoryPicker();
+			const directoryStructure = await listFilesRecursive(directoryHandle);
+			console.log(JSON.stringify(directoryStructure, null, 2));
+			directoryObject = directoryStructure;
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
 
-	function selectFile(file) {
-		selectedFile = file;
+	async function listFilesRecursive(handle, path = '') {
+		if (!handle) {
+			console.error('No directory selected');
+			return;
+		}
+
+		const directoryObject = {
+			type: 'directory',
+			name: handle.name || 'root',
+			children: []
+		};
+
+		// Get an iterator for the entries in the directory
+		const iterator = handle.values();
+
+		// Iterate through the entries
+		for await (const entry of iterator) {
+			const entryObject = {
+				type: entry.kind,
+				name: entry.name
+			};
+
+			// If the entry is a directory, recurse into it
+			if (entry.kind === 'directory') {
+				const childDirectoryObject = await listFilesRecursive(entry, `${path}/${entry.name}`);
+				directoryObject.children.push(childDirectoryObject);
+			} else {
+				directoryObject.children.push(entryObject);
+			}
+		}
+
+		return directoryObject;
 	}
 </script>
 
@@ -15,11 +53,13 @@
 	<div id="title-container">
 		<h1 id="title">Explorateur</h1>
 	</div>
-	<div class="files">
-		{#each files as file}
-			<FileItem {file} {selectFile} {selectedFile} />
-		{/each}
-	</div>
+	{#if directoryObject.name}
+		<DirectoryItem directory={directoryObject} />
+	{:else}
+		<button on:click={openAndListDirectoryRecursive} class="button-open-directory"
+			>Open Directory</button
+		>
+	{/if}
 </div>
 
 <style lang="scss">
@@ -41,9 +81,23 @@
 			}
 		}
 
-		.files {
-			display: flex;
-			flex-direction: column;
+		.button-open-directory {
+			font-size: 1rem;
+			padding: 1rem 0.5rem;
+			width: 70%;
+			align-self: center;
+			background-color: rgb(54, 117, 182);
+			border: none;
+			color: white;
+			border-radius: 0.1rem;
+
+			&:hover {
+				background-color: rgb(41, 100, 158);
+			}
+
+			&:active {
+				background-color: rgb(30, 75, 118);
+			}
 		}
 	}
 </style>

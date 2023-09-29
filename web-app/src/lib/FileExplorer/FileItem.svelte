@@ -1,17 +1,22 @@
 <script>
 	export let file;
-	export let selectFile;
-	export let selectedFile;
+
+	import FileIcon from './FileIcon.svelte';
+	import { selectedFile } from './selectedFileStore.js';
+
+	function openFile() {
+		selectedFile.set(file);
+		console.log($selectedFile);  // Note the $ to access the value
+	}
 </script>
 
-
 <button
-	on:click={() => selectFile(file)}
-	on:keypress={() => selectFile(file)}
-	class:selected={file === selectedFile}
+	on:click={openFile}
+	on:keypress={openFile}
+	class:selected={file === $selectedFile}
 	class="file"
 >
-    <!-- TODO add icon-->
+	<svelte:component this={FileIcon} />
 	{file}
 </button>
 
@@ -19,12 +24,13 @@
 	.file {
 		all: unset;
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
 		color: rgb(204, 204, 204);
 		padding: 0.3rem;
-		padding-left: 1rem;
+		padding-left: 0;
 		font-size: 0.9rem;
+        gap: 0.3rem;
+		width: 100%;
 
 		&:hover {
 			background-color: rgb(43, 45, 46);
