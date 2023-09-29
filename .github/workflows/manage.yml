@@ -22,4 +22,4 @@ jobs:
     with:
       env-name: vagrant
       up: ${{ inputs.up || false }}
-      down: ${{ inputs.down || false }}
+      destroy: ${{ inputs.destroy || false }}
