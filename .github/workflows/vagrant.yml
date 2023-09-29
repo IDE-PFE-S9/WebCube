@@ -1,0 +1,56 @@
+name: vagrant
+
+on:
+  workflow_call:
+    inputs:
+      env-name:
+        required: true
+        type: string
+      up:
+        required: true
+        type: boolean
+        default: false
+      destroy:
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  vagrant:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        component-name:
+          - vagrant
+    environment:
+      name: ${{ inputs.env-name }}
+    steps:
+      # pull the source code
+      - uses: actions/checkout@v3
+
+      # config ssh on remote VM-jobe server
+      - name: Run SSH
+        id: ssh
+        run: >
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} etudis@${{ secrets.SSH_IP }}
+
+      # change directory
+      - name: navigate to VM-jobe directory
+        id: directory
+        run: >
+          cd /home/etudis/Documents/WebCube/VM-jobe
+
+      # vagrant up
+      - name: vagrant up VM-jobe
+        if: steps.ssh.outcome == 'success' && steps.directory.outcome == 'success'
+        id: up
+        run: >
+          vagrant up
+
+      # vagrant destroy
+      - name: vagrant destroy VM-jobe
+        if: steps.ssh.outcome == 'success' && steps.directory.outcome == 'success'
+        id: destroy
+        run: >
+          vagrant destroy -f
