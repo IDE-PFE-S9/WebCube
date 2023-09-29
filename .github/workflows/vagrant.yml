@@ -29,28 +29,20 @@ jobs:
       # pull the source code
       - uses: actions/checkout@v3
 
-      # config ssh on remote VM-jobe server
-      - name: Run SSH
-        id: ssh
-        run: >
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} etudis@${{ secrets.SSH_IP }}
-
-      # change directory
-      - name: navigate to VM-jobe directory
-        id: directory
-        run: >
-          cd /home/etudis/Documents/WebCube/VM-jobe
-
-      # vagrant up
-      - name: vagrant up VM-jobe
-        if: steps.ssh.outcome == 'success' && steps.directory.outcome == 'success'
-        id: up
-        run: >
-          vagrant up
-
-      # vagrant destroy
-      - name: vagrant destroy VM-jobe
-        if: steps.ssh.outcome == 'success' && steps.directory.outcome == 'success'
-        id: destroy
-        run: >
-          vagrant destroy -f
+      # execute vagrant up and destroy on remote VM-jobe server
+      - name: Run SSH and Execute Commands
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_IP: ${{ secrets.SSH_IP }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -o StrictHostKeyChecking=no -i private_key.pem etudis@$SSH_IP <<EOF
+            cd /home/etudis/Documents/WebCube/VM-jobe
+            if [ "${{ inputs.up }}" = "true" ] && [ "${{ inputs.down }}" = "false" ]; then
+              vagrant up
+            fi
+            if [ "${{ inputs.up }}" = "false" ] && [ "${{ inputs.down }}" = "true" ]; then
+              vagrant destroy -f
+            fi
+          EOF
