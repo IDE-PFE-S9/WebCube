@@ -31,7 +31,7 @@
     }
 
     function manageUserClick() {  
-        activeItem = "Utilisateurs";
+        activeItem = "Utilisateur";
     }
     
     function manageParametersClick() {  
