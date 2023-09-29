@@ -33,7 +33,8 @@
 		for await (const entry of iterator) {
 			const entryObject = {
 				type: entry.kind,
-				name: entry.name
+				name: entry.name,
+				handle: entry 
 			};
 
 			// If the entry is a directory, recurse into it

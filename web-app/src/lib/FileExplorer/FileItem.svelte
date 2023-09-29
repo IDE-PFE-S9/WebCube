@@ -2,11 +2,23 @@
 	export let file;
 
 	import FileIcon from './FileIcon.svelte';
-	import { selectedFile } from './selectedFileStore.js';
+	import { selectedFile, openedCode } from './selectedFileStore.js';
 
-	function openFile() {
+	async function openFile() {
 		selectedFile.set(file);
-		console.log($selectedFile);  // Note the $ to access the value
+		const fileHandle = file.handle;
+        try {
+            if (fileHandle) {
+                const file = await fileHandle.getFile();
+                const contents = await file.text();
+				openedCode.set(contents);
+                console.log(contents);  // Log the file contents to the console
+            } else {
+                console.error('File handle is not available');
+            }
+        } catch (error) {
+            console.error('Error reading file:', error);
+        }
 	}
 </script>
 
@@ -17,7 +29,7 @@
 	class="file"
 >
 	<svelte:component this={FileIcon} />
-	{file}
+	{file.name}
 </button>
 
 <style lang="scss">
@@ -29,7 +41,7 @@
 		padding: 0.3rem;
 		padding-left: 0;
 		font-size: 0.9rem;
-        gap: 0.3rem;
+		gap: 0.3rem;
 		width: 100%;
 
 		&:hover {

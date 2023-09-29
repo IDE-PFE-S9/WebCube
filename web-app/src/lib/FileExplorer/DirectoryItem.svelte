@@ -18,14 +18,14 @@
 	</button>
 	{#if expanded}
 		<ul class="files">
-			{#each directory.children as item (item.name)}
+			{#each directory.children as item }
 				{#if item.type === 'directory'}
 					<li>
 						<DirectoryItem directory={item} />
 					</li>
 				{:else}
 					<li class="file-item-li">
-						<FileItem file={item.name} />
+						<FileItem file={item} />
 					</li>
 				{/if}
 			{/each}
