@@ -1,0 +1,24 @@
+name: vagrant up vm-jobe
+run-name: vagrant up vm-jobe
+
+on:
+  workflow_dispatch:
+    inputs:
+      up:
+        description: Vagrant up VM-jobe
+        required: true
+        default: false
+        type: boolean
+      destroy:
+        description: Vagrant destroy VM-jobe
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  vagrant:
+    uses: ./.github/workflows/vagrant.yml
+    secrets: inherit
+    with:
+      env-name: manual-list
+      list-bucket: ${{ inputs.list-bucket || false }}
