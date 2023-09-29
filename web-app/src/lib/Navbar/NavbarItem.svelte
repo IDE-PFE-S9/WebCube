@@ -40,7 +40,7 @@
         display: flex;
         align-items: center;
         cursor: pointer;
-        margin-top: 1rem;
+        margin-top: 2rem;
         fill:rgb(133, 133, 133);
 
         &:hover {

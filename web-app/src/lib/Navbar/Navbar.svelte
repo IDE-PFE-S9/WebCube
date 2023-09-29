@@ -5,6 +5,8 @@
     import git_icon from "/src/lib/assets/navbarIcon/git_icon.svelte";
     import exec_icon from "/src/lib/assets/navbarIcon/exec_icon.svelte";
     import uml_icon from "/src/lib/assets/navbarIcon/uml_icon.svelte";
+    import gitlab_icon from "/src/lib/assets/navbarIcon/gitlab_icon.svelte";
+    import user_icon from "/src/lib/assets/navbarIcon/user_icon.svelte";
 
     let activeItem = "Explorer";
 
@@ -24,6 +26,14 @@
         activeItem = "Uml";
     }
 
+    function manageGitlabClick() {  
+        window.open("https://172.24.7.8/", "_blank");
+    }
+
+    function manageUserClick() {  
+        activeItem = "Utilisateurs";
+    }
+    
     function manageParametersClick() {  
         activeItem = "Paramètres";
     }
@@ -35,6 +45,8 @@
     <NavbarItem text="Fichiers" icon={git_icon} onClick={manageFilesClick} activeItem={activeItem}/>
     <NavbarItem text="Execution" icon={exec_icon} onClick={manageExecutionClick} activeItem={activeItem}/>
     <NavbarItem text="Uml" icon={uml_icon} onClick={manageUmlClick} activeItem={activeItem}/>
+    <NavbarItem text="Gitlab" icon={gitlab_icon} onClick={manageGitlabClick} activeItem={activeItem}/>
+    <NavbarItem text="Utilisateur" icon={user_icon} onClick={manageUserClick} activeItem={activeItem}/>
     <NavbarItem text="Paramètres" icon={parameter_icon} onClick={manageParametersClick} activeItem={activeItem}/>
 </div>
 
