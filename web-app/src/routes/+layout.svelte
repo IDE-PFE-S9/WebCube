@@ -1,11 +1,13 @@
 <script>
 	import FileExplorer from '$lib/FileExplorer/FileExplorer.svelte';
-  import Navbar from "$lib/Navbar/Navbar.svelte";
+  	import Navbar from "$lib/Navbar/Navbar.svelte";
+	import MonacoEditor from '$lib/MonacoEditor/MonacoEditor.svelte';
 </script>
 
 <div class="main">
-   <Navbar />
+    <Navbar />
 	<FileExplorer />
+	<MonacoEditor />
 	<slot />
 </div>
 

@@ -35,7 +35,6 @@
 
 <style lang="scss">
 	#container {
-		overflow: scroll;
 		width: 100%;
 
 		.header {
