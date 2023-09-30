@@ -12,7 +12,7 @@
                 const file = await fileHandle.getFile();
                 const contents = await file.text();
 				openedCode.set(contents);
-                console.log(contents);  // Log the file contents to the console
+                // console.log(contents);  // Log the file contents to the console
             } else {
                 console.error('File handle is not available');
             }

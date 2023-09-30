@@ -71,6 +71,8 @@
 		width: 20rem;
 		height: 100%;
 
+		overflow: scroll;
+
 		#title-container {
 			align-self: self-start;
 			#title {
