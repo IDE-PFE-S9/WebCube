@@ -1,7 +1,7 @@
 <script>
 	export let file;
 
-	import FileIcon from './FileIcon.svelte';
+	import FileIcon from '$lib/assets/FileExplorerIcons/FileIcon.svelte';
 	import { selectedFile, openedCode } from './selectedFileStore.js';
 
 	async function openFile() {

@@ -1,7 +1,7 @@
 <script>
 	import DirectoryItem from './DirectoryItem.svelte';
 	import FileItem from './FileItem.svelte';
-	import DirectoryIcon from './DirectoryIcon.svelte';
+	import DirectoryIcon from '$lib/assets/FileExplorerIcons/DirectoryIcon.svelte';
 
 	export let directory;
 	let expanded = false;
