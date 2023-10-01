@@ -13,23 +13,19 @@
 
 <div id="container">
 	<button class="header" on:click={toggleExpand}>
-		<svelte:component this={DirectoryIcon} />
+		<DirectoryIcon />
 		{directory.name}
 	</button>
 	{#if expanded}
-		<ul class="files">
-			{#each directory.children as item }
+		<div class="files">
+			{#each directory.children as item}
 				{#if item.type === 'directory'}
-					<li>
-						<DirectoryItem directory={item} />
-					</li>
+					<DirectoryItem directory={item} />
 				{:else}
-					<li class="file-item-li">
-						<FileItem file={item} />
-					</li>
+					<FileItem file={item} />
 				{/if}
 			{/each}
-		</ul>
+		</div>
 	{/if}
 </div>
 
@@ -45,7 +41,7 @@
 			gap: 0.3rem;
 			color: rgb(204, 204, 204);
 			padding: 0.3rem;
-			padding-left: 0;
+			padding-left: 0.7rem;
 			font-size: 0.9rem;
 			width: 100%;
 
@@ -57,8 +53,7 @@
 		.files {
 			list-style: None;
 			margin: 0;
-			padding-left: 1.5rem;
-		
+			padding-left: 0.7rem;
 		}
 	}
 </style>
