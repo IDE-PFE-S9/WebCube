@@ -34,7 +34,7 @@
 			const entryObject = {
 				type: entry.kind,
 				name: entry.name,
-				handle: entry 
+				handle: entry
 			};
 
 			// If the entry is a directory, recurse into it
@@ -46,13 +46,23 @@
 			}
 		}
 
+		// sort the files by alphabetical order and by type
+		directoryObject.children.sort((a, b) => {
+			// If both are the same type, compare by name
+			if (a.type === b.type) {
+				return a.name.localeCompare(b.name);
+			}
+			// Otherwise, directories come first
+			return a.type === 'directory' ? -1 : 1;
+		});
+
 		return directoryObject;
 	}
 </script>
 
 <div class="file-explorer">
 	<div id="title-container">
-		<h1 id="title">Explorateur</h1>
+		<h1 id="title">Explorateur de fichiers</h1>
 	</div>
 	{#if directoryObject.name}
 		<DirectoryItem directory={directoryObject} />
@@ -68,10 +78,14 @@
 		display: flex;
 		flex-direction: column;
 		background-color: rgb(37, 37, 38);
-		width: 20rem;
+		min-width: 20rem;
 		height: 100%;
 
 		overflow: scroll;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
 
 		#title-container {
 			align-self: self-start;
@@ -87,6 +101,7 @@
 		.button-open-directory {
 			font-size: 1rem;
 			padding: 1rem 0.5rem;
+			margin-top: 1rem;
 			width: 70%;
 			align-self: center;
 			background-color: rgb(54, 117, 182);
