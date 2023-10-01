@@ -2,7 +2,7 @@
 	export let file;
 
 	import FileIcon from '$lib/assets/FileExplorerIcons/FileIcon.svelte';
-	import { selectedFile, openedCode } from './selectedFileStore.js';
+	import { selectedFile, openedCode } from '$lib/stores.js';
 
 	let fileExtension = file?.name.split('.').pop();
 
