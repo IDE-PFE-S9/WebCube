@@ -44,6 +44,7 @@
 			padding-left: 0.7rem;
 			font-size: 0.9rem;
 			width: 100%;
+			cursor: pointer;
 
 			&:hover {
 				background-color: rgb(43, 45, 46);

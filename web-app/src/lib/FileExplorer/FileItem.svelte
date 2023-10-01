@@ -3,7 +3,6 @@
 
 	import FileIcon from '$lib/assets/FileExplorerIcons/FileIcon.svelte';
 	import { selectedFile, openedCode } from './selectedFileStore.js';
-	import { onMount } from 'svelte';
 
 	let fileExtension = file?.name.split('.').pop();
 
@@ -50,6 +49,7 @@
 			font-size: 0.9rem;
 			gap: 0.3rem;
 			width: 100%;
+			cursor: pointer;
 
 			&:hover {
 				background-color: rgb(43, 45, 46);
