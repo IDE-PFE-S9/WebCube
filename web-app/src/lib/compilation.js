@@ -62,4 +62,5 @@ export async function compilation(file) {
     }
 }
 
-compilation('/Users/ronanmornet/Document/annee_I3/PFE/WebCube/web-app/src/lib/my-code.java')
+compilation('/Users/ronanmornet/Downloads/CodeRunner/my-code.java')
+//compilation('/Users/ronanmornet/Document/annee_I3/PFE/WebCube/web-app/src/testJava/JavaMainTest.java')
