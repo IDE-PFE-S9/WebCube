@@ -4,7 +4,8 @@
 
 <style>
     svg {
-        width: 2.5rem;
-        height: 2.5rem
+        width: 1rem;
+        height: 1rem;
+        fill: white;
     }
 </style>

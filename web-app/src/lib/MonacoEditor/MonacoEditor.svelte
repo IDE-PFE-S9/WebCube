@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import { openedCode } from '../FileExplorer/selectedFileStore.js';
+    import { openedCode } from '$lib/stores.js';
 
     let editor;
     let editorContainer;
@@ -16,7 +16,7 @@
                     value,  // Use the value from the store
                     language: 'java',
                     theme: 'vs-dark',
-                    automaticLayout: true
+                    automaticLayout: true,
                 });
             }
         });
@@ -28,7 +28,7 @@
 
 <style lang="scss">
     #editor-container {
-        height: 100%;
+        height: 70%;
         width: 100%;
     }
 </style>
