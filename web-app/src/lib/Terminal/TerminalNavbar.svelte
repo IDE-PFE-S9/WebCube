@@ -3,6 +3,7 @@
 	import { terminalNavbarActiveItem, terminalOutput } from '$lib/stores.js';
 	import TerminalNavbarClearButton from './TerminalNavbarClearButton.svelte';
 	import TerminalNavbarRunButton from './TerminalNavbarRunButton.svelte';
+	import TerminalNavbarSaveButton from './TerminalNavbarSaveButton.svelte';
 
 	const navbarItems = [{ text: 'Problèmes' }, { text: 'Sortie' }];
 
@@ -19,6 +20,7 @@
 	</div>
 	{#if $terminalNavbarActiveItem === 'Sortie'}
 		<div class="navbar-buttons">
+			<TerminalNavbarSaveButton />
 			<TerminalNavbarRunButton />
 			<TerminalNavbarClearButton />
 		</div>
