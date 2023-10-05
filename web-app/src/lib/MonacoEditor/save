@@ -1,0 +1,235 @@
+<script>
+	import { onMount } from 'svelte';
+	import { openedCode } from '$lib/stores.js';
+
+	let editor;
+	let editorContainer;
+
+	onMount(async () => {
+		const monaco = await import('monaco-editor');
+
+		editor = monaco.editor.create(editorContainer, {
+			value: '', // initial value can be an empty string
+			language: 'java',
+			theme: 'vs-dark',
+			automaticLayout: true
+		});
+
+		const url = 'ws://localhost:3000';
+		const webSocket = new WebSocket(url);
+
+		// Listen for messages from the LSP server and handle them here
+		webSocket.onmessage = (event) => {
+			const message = JSON.parse(event.data);
+			console.log(message);
+		};
+
+		// Send LSP client messages to the LSP server via the WebSocket
+		// Here you would typically send the LSP initialize request, etc.
+		webSocket.onopen = () => {
+			const initializeMessage = JSON.stringify({
+				jsonrpc: '2.0',
+				id: 1,
+				method: 'initialize',
+				params: {
+					processId: null, // Assume this is available, otherwise set to null
+					clientInfo: {
+						name: 'WebCube',
+						version: '1.0.0' // Replace with your editor's version
+					},
+					rootUri: 'file:///path/to/your/project', // The root URI of the workspace
+					initializationOptions: {}, // Language specific initialization options
+					capabilities: {
+						workspace: {
+							applyEdit: true,
+							workspaceEdit: {
+								documentChanges: true
+							},
+							didChangeConfiguration: {
+								dynamicRegistration: true
+							},
+							didChangeWatchedFiles: {
+								dynamicRegistration: true
+							},
+							symbol: {
+								dynamicRegistration: true,
+								symbolKind: {
+									valueSet: [
+										1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+										23, 24, 25
+									]
+								}
+							},
+							executeCommand: {
+								dynamicRegistration: true
+							},
+							configuration: true,
+							workspaceFolders: true
+						},
+						textDocument: {
+							synchronization: {
+								dynamicRegistration: true,
+								willSave: true,
+								willSaveWaitUntil: true,
+								didSave: true
+							},
+							completion: {
+								dynamicRegistration: true,
+								completionItem: {
+									snippetSupport: true
+								}
+							},
+							hover: {
+								dynamicRegistration: true,
+								contentFormat: ['markdown', 'plaintext']
+							},
+							signatureHelp: {
+								dynamicRegistration: true,
+								signatureInformation: {
+									documentationFormat: ['markdown', 'plaintext']
+								}
+							},
+							definition: {
+								dynamicRegistration: true
+							},
+							typeDefinition: {
+								dynamicRegistration: true
+							},
+							implementation: {
+								dynamicRegistration: true
+							},
+							references: {
+								dynamicRegistration: true
+							},
+							documentHighlight: {
+								dynamicRegistration: true
+							},
+							documentSymbol: {
+								dynamicRegistration: true
+							},
+							codeAction: {
+								dynamicRegistration: true
+							},
+							codeLens: {
+								dynamicRegistration: true
+							},
+							documentLink: {
+								dynamicRegistration: true
+							},
+							colorProvider: {
+								dynamicRegistration: true
+							},
+							formatting: {
+								dynamicRegistration: true
+							},
+							rangeFormatting: {
+								dynamicRegistration: true
+							},
+							onTypeFormatting: {
+								dynamicRegistration: true
+							},
+							rename: {
+								dynamicRegistration: true
+							},
+							foldingRange: {
+								dynamicRegistration: true
+							}
+						}
+					},
+					trace: 'off',
+					workspaceFolders: [
+						{
+							uri: 'file:///path/to/your/project',
+							name: 'YourProject'
+						}
+					] // Initial configured workspace folders
+				}
+			});
+
+			webSocket.send(initializeMessage);
+		};
+
+		webSocket.onmessage = (event) => {
+			// Split the message by double newline to separate headers from body
+			const [headers, body] = event.data.split('\r\n\r\n');
+			// Now `body` should contain just the JSON-RPC message
+
+			if (body && body.length > 0) {
+				// Check if body exists and is not empty
+				try {
+					const message = JSON.parse(body);
+					console.log(message);
+
+					if (message.method === 'window/logMessage') {
+						// Handle log messages
+						console.log('Log message from LSP server:', message.params.message);
+					} else if (message.method === 'textDocument/publishDiagnostics') {
+						// Handle diagnostics messages
+						const diagnostics = message.params.diagnostics;
+						// TODO: Display diagnostics in the editor
+					}
+					// ... handle other message types
+				} catch (e) {
+					console.error('Failed to parse JSON message:', e);
+					console.error('Raw message body:', body); // Log raw body data
+				}
+			} else {
+				console.error('Empty or undefined message body received:', body);
+			}
+		};
+
+		const updateOpenedCode = () => {
+			const newValue = editor.getValue();
+			openedCode.set(newValue); // Update the store with new content
+		};
+
+		const handleEditorContentChange = () => {
+			// Update the store with new content
+			updateOpenedCode();
+
+			// Send the textDocument/didOpen message to the LSP server
+			const didOpenMessage = JSON.stringify({
+				jsonrpc: '2.0',
+				method: 'textDocument/didOpen',
+				params: {
+					textDocument: {
+						uri: 'file:///path/to/your/document.java',
+						languageId: 'java',
+						version: 1,
+						text: editor.getValue()
+					}
+				}
+			});
+
+			webSocket.send(didOpenMessage);
+		};
+
+		// Listen for changes in the editor content and update the store
+		editor.onDidChangeModelContent(handleEditorContentChange);
+
+		// Subscribe to the store to get its current value
+		const unsubscribe = openedCode.subscribe((value) => {
+			if (editor) {
+				// Avoid updating the editor value if it's already the same as the store value
+				if (value !== editor.getValue()) {
+					editor.setValue(value ? value.toString() : '');
+				}
+			}
+		});
+
+		// Return a cleanup function to unsubscribe from the store when the component is destroyed
+		return () => {
+			unsubscribe();
+			webSocket.close();
+		};
+	});
+</script>
+
+<div id="editor-container" bind:this={editorContainer} />
+
+<style lang="scss">
+	#editor-container {
+		height: 70%;
+		width: 100%;
+	}
+</style>
