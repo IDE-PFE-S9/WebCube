@@ -5,7 +5,6 @@
     import GitIcon from "/src/lib/assets/NavbarIcons/GitIcon.svelte";
     import ExecutionIcon from "/src/lib/assets/NavbarIcons/ExecutionIcon.svelte";
     import UmlIcon from "/src/lib/assets/NavbarIcons/UmlIcon.svelte";
-    import GitlabIcon from "/src/lib/assets/NavbarIcons/GitlabIcon.svelte";
     import UserIcon from "/src/lib/assets/NavbarIcons/UserIcon.svelte";
 
     let activeItem = "Explorer";
@@ -14,7 +13,6 @@
         { text: "Fichiers", icon: GitIcon },
         { text: "Exécution", icon: ExecutionIcon },
         { text: "Uml", icon: UmlIcon },
-        { text: "Gitlab", icon: GitlabIcon, link: "https://172.24.7.8/" },
         { text: "Utilisateur", icon: UserIcon },
         { text: "Paramètres", icon: ParametersIcon },
     ];
