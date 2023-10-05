@@ -1,4 +1,0 @@
-rootProject.name = 'subprojects'
-
-include 'project1'
-include 'project2'
