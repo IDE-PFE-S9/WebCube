@@ -8,11 +8,10 @@
 	onMount(async () => {
 		if (fileExtension) {
 			try {
-                console.log(fileExtension)
 				const module = await import(`./icons/${fileExtension}.svelte`);
 				IconComponent = module.default;
 			} catch (error) {
-				console.error(`Icon component for extension ${fileExtension} not found.`);
+				// console.error(`Icon component for extension ${fileExtension} not found.`);
 			}
 		}
 	});
