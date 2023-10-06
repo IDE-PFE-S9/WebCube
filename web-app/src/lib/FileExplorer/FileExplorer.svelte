@@ -79,7 +79,7 @@
 		flex-direction: column;
 		background-color: rgb(37, 37, 38);
 		min-width: 20rem;
-		height: 100%;
+		height: 70%;
 
 		overflow: scroll;
 

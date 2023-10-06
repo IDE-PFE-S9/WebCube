@@ -3,11 +3,15 @@
   	import Navbar from "$lib/Navbar/Navbar.svelte";
 	import MonacoEditor from '$lib/MonacoEditor/MonacoEditor.svelte';
 	import Terminal from '../lib/Terminal/Terminal.svelte';
+	import StructureParser from '../lib/StructureParser/StructureParser.svelte';
 </script>
 
 <div class="main">
     <Navbar />
-	<FileExplorer />
+	<div class="mid">
+		<FileExplorer />
+		<StructureParser />
+	</div>
 	<div class="right">
 		<MonacoEditor />
 		<Terminal />
@@ -32,6 +36,13 @@
         position: absolute;
         top: 0;
         left: 0;
+
+		.mid{
+			display: flex;
+			flex-direction: column;
+			width: 20rem;
+			height: 100%;
+		}
 
 		.right {
 			display: flex;
