@@ -3,7 +3,7 @@
 
     let activeItem = "fichier1.svelte";
 
-    const files = [
+    let files = [
         {name:"fichier1.svelte"}, 
         {name:"fichier2.py"},
         {name:"fichier.js"},
@@ -12,6 +12,11 @@
 
     function manageItemClick(name) {
         activeItem = name;
+        console.log("coucou");
+    }
+
+    function deleteFile(name) {
+        files = files.filter(file => file.name !== name);
     }
 
 </script>
@@ -22,16 +27,16 @@
             name={name}
             onClick={() => manageItemClick(name)}
             activeItem={activeItem}
+            onDelete={() => deleteFile(name)}
         />
     {/each}
 </div>
 
 <style lang="scss">    
     .tab-manager {
-        min-height: 4%;
-        max-height: 4%;
+        height: 5%;
         width: 100%;
         display: flex;
-        background-color: rgb(51,51,51);
+        background-color: rgb(45,45,45);
     }
 </style>
