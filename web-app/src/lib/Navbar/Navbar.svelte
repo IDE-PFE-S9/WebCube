@@ -21,7 +21,7 @@
 </script>
 
 <div class="navbar">
-    {#each navbarItems as { text, icon, link }}
+    {#each navbarItems as { text, icon}}
         <NavbarItem
             text={text}
             icon={icon}
