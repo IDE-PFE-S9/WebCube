@@ -2,12 +2,16 @@
 	import FileExplorer from '$lib/FileExplorer/FileExplorer.svelte';
   	import Navbar from "$lib/Navbar/Navbar.svelte";
 	import MonacoEditor from '$lib/MonacoEditor/MonacoEditor.svelte';
+	import Terminal from '../lib/Terminal/Terminal.svelte';
 </script>
 
 <div class="main">
     <Navbar />
 	<FileExplorer />
-	<MonacoEditor />
+	<div class="right">
+		<MonacoEditor />
+		<Terminal />
+	</div>
 	<slot />
 </div>
 
@@ -28,5 +32,12 @@
         position: absolute;
         top: 0;
         left: 0;
+
+		.right {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			height: 100%;
+		}
 	}
 </style>

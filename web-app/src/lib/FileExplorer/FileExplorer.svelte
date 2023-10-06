@@ -62,7 +62,7 @@
 
 <div class="file-explorer">
 	<div id="title-container">
-		<h1 id="title">Explorateur de fichiers</h1>
+		<h1 id="title">Explorateur</h1>
 	</div>
 	{#if directoryObject.name}
 		<DirectoryItem directory={directoryObject} />
@@ -93,7 +93,7 @@
 				padding-left: 1rem;
 				font-size: 0.7rem;
 				text-transform: uppercase;
-				letter-spacing: 0.1rem;
+				font-weight: 300;
 				color: rgb(187, 187, 187);
 			}
 		}
