@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg fill="none" version="1.1" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
  <g transform="translate(-.13312 3.9738)">
   <g transform="matrix(.87246 0 0 .87246 14.047 13.523)">

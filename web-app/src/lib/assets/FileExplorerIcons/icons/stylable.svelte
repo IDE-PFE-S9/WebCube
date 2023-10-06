@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg class="mainLogo_Gh97" role="img" version="1.1" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
  <title>96-logo-horizontal</title>
  <g fill-rule="evenodd" stroke-width=".24671">
