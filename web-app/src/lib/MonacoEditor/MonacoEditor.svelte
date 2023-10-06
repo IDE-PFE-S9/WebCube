@@ -43,7 +43,7 @@
 
 <style lang="scss">
     #editor-container {
-        height: 70%;
+        height: 66%;
         width: 100%;
     }
 </style>

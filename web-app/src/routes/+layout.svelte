@@ -1,5 +1,6 @@
 <script>
 	import FileExplorer from '$lib/FileExplorer/FileExplorer.svelte';
+	import TabManager from '$lib/TabManager/TabManager.svelte';
   	import Navbar from "$lib/Navbar/Navbar.svelte";
 	import MonacoEditor from '$lib/MonacoEditor/MonacoEditor.svelte';
 	import Terminal from '../lib/Terminal/Terminal.svelte';
@@ -9,6 +10,7 @@
     <Navbar />
 	<FileExplorer />
 	<div class="right">
+		<TabManager />
 		<MonacoEditor />
 		<Terminal />
 	</div>
