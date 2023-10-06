@@ -16,7 +16,6 @@ import com.rabbitmq.client.*;
 @RestController
 @RequestMapping("/api")
 public class JobProducer {
-    private final static String RESULT_QUEUE_PREFIX = "results_";
 
     @GetMapping("/compileAndRun")
     public String compileAndRun(@RequestParam String projectPath) throws Exception {
@@ -38,18 +37,20 @@ public class JobProducer {
     }
 
     public String retrieveResult(String requestId) throws Exception {
-        String resultQueueName = RESULT_QUEUE_PREFIX + requestId;
         final String RESULT_EXCHANGE_NAME = "results_exchange";
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         BlockingQueue<String> resultQueue = new ArrayBlockingQueue<>(1); // Queue to hold the result
         CountDownLatch latch = new CountDownLatch(1); // Latch to manage blocking/unblocking
-
+    
         try (Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel()) {
             channel.exchangeDeclare(RESULT_EXCHANGE_NAME, "direct", true);
-            channel.queueDeclare(resultQueueName, false, false, false, null);
-            channel.queueBind(resultQueueName, RESULT_EXCHANGE_NAME, requestId);
+    
+            // Declare an anonymous queue
+            String anonymousQueueName = channel.queueDeclare().getQueue();
+            channel.queueBind(anonymousQueueName, RESULT_EXCHANGE_NAME, requestId);
+    
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String result = new String(delivery.getBody(), "UTF-8");
                 System.out.println(" [x] Received result: \n" + result);
@@ -57,9 +58,9 @@ public class JobProducer {
                 resultQueue.offer(result); // Put the result in the queue
                 latch.countDown(); // Unblock the method
             };
-            channel.basicConsume(resultQueueName, false, deliverCallback, consumerTag -> {
-            });
-
+    
+            channel.basicConsume(anonymousQueueName, false, deliverCallback, consumerTag -> {});
+    
             // Wait for the result, with a timeout to prevent infinite blocking
             boolean received = latch.await(5, TimeUnit.MINUTES); // Wait up to 5 minutes for the result
             if (received) {
@@ -68,5 +69,5 @@ public class JobProducer {
                 throw new Exception("Timed out waiting for result");
             }
         }
-    }
+    }    
 }

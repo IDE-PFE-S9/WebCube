@@ -6,7 +6,6 @@ import java.io.*;
 
 public class JobWorker {
     private static final String RESULT_EXCHANGE_NAME = "results_exchange";
-    private final static String RESULT_QUEUE_PREFIX = "results_";
 
     public static void main(String[] argv) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
@@ -171,11 +170,8 @@ public class JobWorker {
     }
 
     private static void sendOutput(String output, String requestId, Channel channel) throws Exception {
-        String resultQueueName = RESULT_QUEUE_PREFIX + requestId;
         channel.exchangeDeclare(RESULT_EXCHANGE_NAME, "direct", true);
-        channel.queueDeclare(resultQueueName, false, false, false, null);
-        channel.queueBind(resultQueueName, RESULT_EXCHANGE_NAME, requestId);
         channel.basicPublish(RESULT_EXCHANGE_NAME, requestId, null, output.getBytes());
-        System.out.println(" [x] Sent result to " + resultQueueName);
+        System.out.println(" [x] Sent result with routing key: " + requestId);
     }
 }
