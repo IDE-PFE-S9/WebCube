@@ -1,11 +1,14 @@
 <script>
-
+    import {selectedFile,openedCode} from "$lib/stores.js";
 </script>
 
 <div class="structure-parser">
     <div id="title-container">
 		<h1 id="title">Structure</h1>
 	</div>
+    <div class="project-structure">
+        {selectedFile}
+    </div>
 </div>
 
 <style lang="scss">
