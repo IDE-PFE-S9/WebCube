@@ -4,6 +4,7 @@
 	import TerminalNavbarClearButton from './TerminalNavbarClearButton.svelte';
 	import TerminalNavbarRunButton from './TerminalNavbarRunButton.svelte';
 	import TerminalNavbarSaveButton from './TerminalNavbarSaveButton.svelte';
+	import TerminalNavbarSaveAllButton from './TerminalNavbarSaveAllButton.svelte';
 
 	const navbarItems = [{ text: 'Problèmes' }, { text: 'Sortie' }];
 
