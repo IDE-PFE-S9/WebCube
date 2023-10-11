@@ -1,13 +1,21 @@
 <script>
 	import { terminalOutput } from '$lib/stores.js';
+	import { onMount, afterUpdate } from 'svelte';
 
-	console.log($terminalOutput);
+    let terminal;
+
+    function scrollToBottom() {
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    onMount(scrollToBottom);
+    afterUpdate(scrollToBottom);
 </script>
 
-<div class="out">
+<div class="out" bind:this={terminal}>
 	{#each $terminalOutput as entry}
 		<p class="out-text">
-			{entry}
+			{@html entry.replace(/\n/g, '<br>')}
 		</p>
 	{/each}
 </div>

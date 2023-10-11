@@ -25,6 +25,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"jszip": "^3.10.1",
 		"monaco-editor": "^0.43.0"
 	}
 }

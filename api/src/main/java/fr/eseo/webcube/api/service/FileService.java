@@ -19,7 +19,7 @@ public class FileService {
 
     private static final String DOWNLOAD_DIRECTORY = "main/downloadFile";
 
-    public ResponseEntity<FileUploadResponse> uploadFile(MultipartFile multipartFile, String fileName)
+    public ResponseEntity<FileUploadResponse> uploadFile(MultipartFile multipartFile, String fileName, String directory)
             throws IOException {
 
         long size = multipartFile.getSize(); // en octets

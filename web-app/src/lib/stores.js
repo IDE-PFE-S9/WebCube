@@ -5,8 +5,9 @@ export const openedCodes = writable([]);
 export const openedTabs = writable([]);
 export const terminalNavbarActiveItem = writable('Problèmes');
 export const terminalOutput = writable([]);
-export const editorUpdateTrigger = writable(null);
 
+export const editorUpdateTrigger = writable(null);
+export const openedDirectory = writable(null);
 
 /*
 openedCodes : {

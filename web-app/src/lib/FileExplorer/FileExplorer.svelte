@@ -1,5 +1,6 @@
 <script>
 	import DirectoryItem from './DirectoryItem.svelte';
+	import { openedDirectory } from '$lib/stores.js';
 
 	$: directoryObject = {};
 
@@ -56,6 +57,7 @@
 			return a.type === 'directory' ? -1 : 1;
 		});
 
+		openedDirectory.set(directoryObject);
 		return directoryObject;
 	}
 </script>
