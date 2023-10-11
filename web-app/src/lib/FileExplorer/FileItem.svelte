@@ -2,24 +2,48 @@
 	export let file;
 
 	import FileIcon from '$lib/assets/FileExplorerIcons/FileIcon.svelte';
-	import { selectedFile, openedCode } from '$lib/stores.js';
+	import { selectedFile, openedCodes, openedTabs, editorUpdateTrigger } from '$lib/stores.js';
 
 	let fileExtension = file?.name.split('.').pop();
 
 	async function openFile() {
 		selectedFile.set(file);
+
+		openedTabs.update((tabs) => {
+			if (!tabs.includes(file)) {
+				return [...tabs, file];
+			}
+			return tabs;
+		});
+
 		const fileHandle = file.handle;
 		try {
 			if (fileHandle) {
 				const file = await fileHandle.getFile();
 				const contents = await file.text();
-				openedCode.set(contents);
+				openedCodes.update((codes) => {
+					// Check if the code from this file is already opened
+					const isAlreadyOpened = codes.some((code) => code.name === file.name);
+					if (!isAlreadyOpened) {
+						return [
+							...codes,
+							{
+								name: file.name,
+								code: contents,
+								status: 'saved'
+							}
+						];
+					}
+					console.log($openedCodes);
+					return codes;
+				});
 			} else {
 				console.error('File handle is not available');
 			}
 		} catch (error) {
 			console.error('Error reading file:', error);
 		}
+		editorUpdateTrigger.set(file);
 	}
 </script>
 
@@ -30,7 +54,7 @@
 		class:selected={file === $selectedFile}
 		class="file"
 	>
-		<FileIcon fileExtension={fileExtension} />
+		<FileIcon {fileExtension} />
 		{file.name}
 	</button>
 </div>

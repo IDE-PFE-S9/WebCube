@@ -1,16 +1,23 @@
 <script>
-	import { openedCode, selectedFile } from '$lib/stores.js';
+	import { openedCodes, selectedFile } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
 
 	async function saveFile() {
-		const fileHandle = $selectedFile.handle; // $selectedFile to access the value of selectedFile store.
+		const fileHandle = $selectedFile.handle; // Access the file handle from the selectedFile store.
 
 		if (!fileHandle) {
 			console.error('File handle is not available');
 			return;
 		}
 
-		const contents = $openedCode; // $openedCode to access the value of openedCode store.
+		// Find the code object for the currently selected file.
+		const codeObj = $openedCodes.find(code => code.name === $selectedFile.name);
+		if (!codeObj) {
+			console.error('Code not found for the selected file');
+			return;
+		}
+
+		const contents = codeObj.code;  // Access the code from the code object.
         console.log('Contents to be written:', contents);
 
 		try {
