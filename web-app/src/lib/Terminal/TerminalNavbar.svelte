@@ -4,7 +4,7 @@
 	import TerminalNavbarClearButton from './TerminalNavbarClearButton.svelte';
 	import TerminalNavbarRunButton from './TerminalNavbarRunButton.svelte';
 	import TerminalNavbarSaveButton from './TerminalNavbarSaveButton.svelte';
-	import TerminalNavbarSaveAllButton from './TerminalNavbarSaveAllButton.svelte';
+	import TerminalNavbarCompilButton from './TerminalNavbarCompilButton.svelte';
 
 	const navbarItems = [{ text: 'Problèmes' }, { text: 'Sortie' }];
 
@@ -22,6 +22,7 @@
 	{#if $terminalNavbarActiveItem === 'Sortie'}
 		<div class="navbar-buttons">
 			<TerminalNavbarSaveButton />
+			<TerminalNavbarCompilButton />
 			<TerminalNavbarRunButton />
 			<TerminalNavbarClearButton />
 		</div>
