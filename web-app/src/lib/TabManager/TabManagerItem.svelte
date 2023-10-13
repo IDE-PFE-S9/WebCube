@@ -36,27 +36,30 @@
 	}
 </script>
 
-<!-- TODO: change the code to use button instead of div -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="tab-item" on:click={selectTab} class:selected={$selectedFile.name === currentFile.name}>
+<button
+	class="tab-item"
+	on:click={selectTab}
+	class:selected={$selectedFile.name === currentFile.name}
+>
 	<FileIcon {fileExtension} />
-	<div class="tab-item-name">{currentFile.name}</div>
-	<div
+	<div class="tab-item-name">{currentFile.name.split('/').pop()}</div>
+	<button
 		class="delete-icon"
 		on:click={closeTab}
 		class:selected={$selectedFile.name === currentFile.name}
 	>
 		<DeleteIcon />
-	</div>
-</div>
+	</button>
+</button>
 
 <style lang="scss">
 	.tab-item {
+		all: unset;
 		display: flex;
 		flex-direction: row;
-		align-items: center;
-		padding: 0 10px;
+        align-items: center;
+        justify-content: center;
+		padding: 0px 10px;
 		cursor: pointer;
 		color: rgb(136, 136, 136);
 		border-left: 1px solid rgb(41, 41, 41);
@@ -79,28 +82,29 @@
 				fill: rgb(158, 158, 158);
 			}
 		}
-	}
 
-	.tab-item-name {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		margin: 0 10px;
-	}
+		.tab-item-name {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin: 0 10px;
+			font-size: 0.85rem;
+		}
 
-	.delete-icon {
-		display: flex;
-		align-items: center;
-		fill: rgb(45, 45, 45);
-
-		&:hover {
-			width: 1.5rem;
-			height: 1.5rem;
-			background-color: rgb(60, 60, 60);
+		.delete-icon {
+			all: unset;
+			display: flex;
+			align-items: center;
+            justify-content: center;
+			fill: rgb(45, 45, 45);
 			border-radius: 5px;
 
-			&.selected {
-				background-color: (50, 50, 50);
+			&:hover {
+				background-color: rgb(60, 60, 60);
+			
+				&.selected {
+					background-color: (50, 50, 50);
+				}
 			}
 		}
 	}

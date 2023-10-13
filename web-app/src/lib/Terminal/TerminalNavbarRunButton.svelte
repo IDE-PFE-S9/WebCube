@@ -61,7 +61,8 @@
 
 		// API call to compile the code and get the API response
 		let compilationResponse = await fetch(
-			`http://localhost:8090/api/compileAndRun?projectPath=%2FUsers%2Farthur%2FLibrary%2FMobile%20Documents%2Fcom~apple~CloudDocs%2FDocuments%2FESEO%2FCours-i3%2FS9%2FPFE%2FWebCube%2Farthur/${$openedDirectory.name}`,
+			// TODO: CHANGE USERNAME
+			`http://localhost:8090/api/compileAndRun?projectPath=/code/${username}/${$openedDirectory.name}`,
 			{
 				method: 'GET',
 				headers: headersList
