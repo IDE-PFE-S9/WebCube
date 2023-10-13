@@ -6,6 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.json.simple.JSONObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,20 +23,29 @@ import com.rabbitmq.client.DeliverCallback;
 public class JobProducer {
 
     @GetMapping("/compileAndRun")
-    public String compileAndRun(@RequestParam String projectPath) throws Exception {
+    public String compileAndRun(@RequestParam String projectPath, @RequestParam boolean isTest) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
-        sendJob(projectPath, requestId);
+        sendJob(projectPath, requestId, isTest);
         return retrieveResult(requestId);
     }
 
-    public void sendJob(String projectPath, String requestId) throws Exception {
+    public void sendJob(String projectPath, String requestId, boolean isTest) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         try (Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel()) {
             String exchangeName = "jobs_exchange";
             channel.exchangeDeclare(exchangeName, BuiltinExchangeType.TOPIC);
-            channel.basicPublish(exchangeName, "jobs." + requestId, null, projectPath.getBytes());
+            // Créez un objet JSON pour encapsuler les données que vous souhaitez envoyer
+            JSONObject jobData = new JSONObject();
+            jobData.put("projectPath", projectPath);
+            jobData.put("isTest", isTest);
+
+
+            // Convertissez l'objet JSON en une chaîne de caractères
+            String messageBody = jobData.toString();
+
+            channel.basicPublish(exchangeName, "jobs." + requestId, null, messageBody.getBytes());
             System.out.println(" [x] Sent job to compile and run");
         }
     }
