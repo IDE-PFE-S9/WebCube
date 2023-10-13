@@ -1,5 +1,5 @@
 <script>
-    import {selectedFile,openedCode} from "$lib/stores.js";
+    import {openedCode} from "$lib/stores.js";
 </script>
 
 <div class="structure-parser">
@@ -7,7 +7,7 @@
 		<h1 id="title">Structure</h1>
 	</div>
     <div class="project-structure">
-        {selectedFile}
+        {openedCode}
     </div>
 </div>
 
