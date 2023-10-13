@@ -23,18 +23,17 @@
 				const contents = await file.text();
 				openedCodes.update((codes) => {
 					// Check if the code from this file is already opened
-					const isAlreadyOpened = codes.some((code) => code.name === file.name);
+					const isAlreadyOpened = codes.some((code) => code.name === $selectedFile.name);
 					if (!isAlreadyOpened) {
 						return [
 							...codes,
 							{
-								name: file.name,
+								name: $selectedFile.name,
 								code: contents,
 								status: 'saved'
 							}
 						];
 					}
-					console.log($openedCodes);
 					return codes;
 				});
 			} else {
@@ -55,7 +54,7 @@
 		class="file"
 	>
 		<FileIcon {fileExtension} />
-		{file.name}
+		{file.name.split('/').pop()}
 	</button>
 </div>
 
