@@ -3,13 +3,20 @@
   	import Navbar from "$lib/Navbar/Navbar.svelte";
 	import MonacoEditor from '$lib/MonacoEditor/MonacoEditor.svelte';
 	import Terminal from '../lib/Terminal/Terminal.svelte';
+	import LoginAzure from '../lib/LoginAzure/LoginAzure.svelte';
+
+	import { currentTab } from '$lib/stores.js';
 </script>
 
 <div class="main">
     <Navbar />
 	<FileExplorer />
 	<div class="right">
-		<MonacoEditor />
+		{#if $currentTab !== "Utilisateur"}
+			<MonacoEditor />
+		{:else}
+			<LoginAzure />
+		{/if}
 		<Terminal />
 	</div>
 	<slot />

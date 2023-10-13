@@ -1,8 +1,8 @@
 <script>
-    export let onClick;
     export let text;
     export let icon;
-    export let activeItem;
+
+    import { currentTab } from '$lib/stores.js'
 
     let showText = false;
 
@@ -15,17 +15,15 @@
     }
 
     function handleClick() {
-        if (onClick) {
-            onClick();
-        }
+        currentTab.set(text);
     }
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="navbar-item" on:mouseover={handleMouseOver} on:mouseout={handleMouseOut} on:click={handleClick} class:selected={activeItem === text}>
-    <div class="indicator" class:selected={activeItem === text}></div>
+<div class="navbar-item" on:mouseover={handleMouseOver} on:mouseout={handleMouseOut} on:click={handleClick} class:selected={$currentTab === text}>
+    <div class="indicator" class:selected={$currentTab === text}></div>
     {#if showText}
         <div class="tooltip">
             {text}

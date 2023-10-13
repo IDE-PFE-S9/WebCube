@@ -26,15 +26,12 @@
  * ```
  */
 declare module '$env/static/private' {
-	export const NVM_INC: string;
 	export const LC_FIG_SET_PARENT: string;
 	export const FIG_PID: string;
 	export const MANPATH: string;
 	export const TERM_PROGRAM: string;
 	export const NODE: string;
 	export const INIT_CWD: string;
-	export const PYENV_ROOT: string;
-	export const NVM_CD_FLAGS: string;
 	export const TERM: string;
 	export const SHELL: string;
 	export const FIGTERM_SESSION_ID: string;
@@ -52,7 +49,7 @@ declare module '$env/static/private' {
 	export const ZSH: string;
 	export const FIG_SET_PARENT_CHECK: string;
 	export const USER: string;
-	export const NVM_DIR: string;
+	export const LS_COLORS: string;
 	export const COMMAND_MODE: string;
 	export const npm_config_globalconfig: string;
 	export const SSH_AUTH_SOCK: string;
@@ -71,7 +68,6 @@ declare module '$env/static/private' {
 	export const npm_command: string;
 	export const TTY: string;
 	export const PWD: string;
-	export const JENV_LOADED: string;
 	export const VSCODE_NONCE: string;
 	export const npm_lifecycle_event: string;
 	export const EDITOR: string;
@@ -93,9 +89,7 @@ declare module '$env/static/private' {
 	export const LOGNAME: string;
 	export const LESS: string;
 	export const npm_lifecycle_script: string;
-	export const JENV_SHELL: string;
 	export const VSCODE_GIT_IPC_HANDLE: string;
-	export const NVM_BIN: string;
 	export const npm_config_user_agent: string;
 	export const VSCODE_GIT_ASKPASS_NODE: string;
 	export const INFOPATH: string;
@@ -135,15 +129,12 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
-		NVM_INC: string;
 		LC_FIG_SET_PARENT: string;
 		FIG_PID: string;
 		MANPATH: string;
 		TERM_PROGRAM: string;
 		NODE: string;
 		INIT_CWD: string;
-		PYENV_ROOT: string;
-		NVM_CD_FLAGS: string;
 		TERM: string;
 		SHELL: string;
 		FIGTERM_SESSION_ID: string;
@@ -161,7 +152,7 @@ declare module '$env/dynamic/private' {
 		ZSH: string;
 		FIG_SET_PARENT_CHECK: string;
 		USER: string;
-		NVM_DIR: string;
+		LS_COLORS: string;
 		COMMAND_MODE: string;
 		npm_config_globalconfig: string;
 		SSH_AUTH_SOCK: string;
@@ -180,7 +171,6 @@ declare module '$env/dynamic/private' {
 		npm_command: string;
 		TTY: string;
 		PWD: string;
-		JENV_LOADED: string;
 		VSCODE_NONCE: string;
 		npm_lifecycle_event: string;
 		EDITOR: string;
@@ -202,9 +192,7 @@ declare module '$env/dynamic/private' {
 		LOGNAME: string;
 		LESS: string;
 		npm_lifecycle_script: string;
-		JENV_SHELL: string;
 		VSCODE_GIT_IPC_HANDLE: string;
-		NVM_BIN: string;
 		npm_config_user_agent: string;
 		VSCODE_GIT_ASKPASS_NODE: string;
 		INFOPATH: string;
