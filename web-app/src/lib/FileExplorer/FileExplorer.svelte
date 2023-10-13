@@ -1,5 +1,6 @@
 <script>
 	import DirectoryItem from './DirectoryItem.svelte';
+	import { openedDirectory } from '$lib/stores.js';
 
 	$: directoryObject = {};
 
@@ -7,7 +8,7 @@
 		try {
 			const directoryHandle = await window.showDirectoryPicker();
 			const directoryStructure = await listFilesRecursive(directoryHandle);
-			console.log(JSON.stringify(directoryStructure, null, 2));
+			// console.log(JSON.stringify(directoryStructure, null, 2));
 			directoryObject = directoryStructure;
 		} catch (error) {
 			console.error('Error:', error);
@@ -56,6 +57,7 @@
 			return a.type === 'directory' ? -1 : 1;
 		});
 
+		openedDirectory.set(directoryObject);
 		return directoryObject;
 	}
 </script>

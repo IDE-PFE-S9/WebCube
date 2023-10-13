@@ -15,21 +15,17 @@
         { text: "Paramètres", icon: ParametersIcon },
     ];
 
-    function manageItemClick(itemText, link) {
-        if (link) {
-            window.open(link, "_blank");
-        } else {
-            activeItem = itemText;
-        }
+    function manageItemClick(itemText) {
+        activeItem = itemText;
     }
 </script>
 
 <div class="navbar">
-    {#each navbarItems as { text, icon, link }}
+    {#each navbarItems as { text, icon}}
         <NavbarItem
             text={text}
             icon={icon}
-            onClick={() => manageItemClick(text, link)}
+            onClick={() => manageItemClick(text)}
             activeItem={activeItem}
         />
     {/each}

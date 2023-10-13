@@ -1,46 +1,52 @@
 package fr.eseo.webcube.api.controller;
 
-import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import fr.eseo.webcube.api.Response.FileUploadResponse;
-import fr.eseo.webcube.api.service.FileService;
-import lombok.RequiredArgsConstructor;
+import java.io.*;
+import java.nio.file.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @RestController
-@RequestMapping("/file")
-@RequiredArgsConstructor
+@RequestMapping("/api/files")
 public class FileController {
 
-    @Autowired
-    private final FileService fileService;
+    @PostMapping("/upload")
+    public String uploadFile(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("directory") String directory) {
+        try {
+            // Validate the directory path
+            Path dirPath = Paths.get(directory);
+            if (!Files.exists(dirPath)) {
+                Files.createDirectories(dirPath);
+            }
 
-
-     /**
-     * Uploads a file to the server.
-     *
-     * @param multipartFile The file to be uploaded as a {@link MultipartFile}.
-     * @param name          The name of the file.
-     * @return A {@link ResponseEntity} containing a {@link FileUploadResponse}
-     *         object with the file upload details.
-     * @throws IOException If there is an issue with file I/O during the upload
-     *                     process.
-     */
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<FileUploadResponse> uploadFile(@RequestParam("file") MultipartFile multipartFile,
-            @RequestParam("name") String name)
-            throws IOException {
-        return fileService.uploadFile(multipartFile, name);
+            // Open the ZIP file
+            try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(file.getBytes()))) {
+                ZipEntry zipEntry;
+                while ((zipEntry = zis.getNextEntry()) != null) {
+                    File entryDestination = new File(directory, zipEntry.getName());
+                    if (zipEntry.isDirectory()) {
+                        entryDestination.mkdirs();
+                    } else {
+                        entryDestination.getParentFile().mkdirs();
+                        try (OutputStream os = new FileOutputStream(entryDestination)) {
+                            byte[] buffer = new byte[1024];
+                            int length;
+                            while ((length = zis.read(buffer)) > 0) {
+                                os.write(buffer, 0, length);
+                            }
+                        }
+                    }
+                }
+            }
+            return "File uploaded and extracted successfully!";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "An error occurred while processing the file: " + e.getMessage();
+        }
     }
-    
 }
+
