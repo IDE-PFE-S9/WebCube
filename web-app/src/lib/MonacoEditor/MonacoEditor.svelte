@@ -6,7 +6,7 @@
 	let editorContainer;
 
 	const updateEditorContent = () => {
-		console.log('updateEditorContent', $selectedFile, $openedCodes);
+		// console.log('updateEditorContent', $selectedFile, $openedCodes);
 		if (!$selectedFile) {
 			editor.setValue(''); // Clear the editor content if selectedFile is null
 			return;
