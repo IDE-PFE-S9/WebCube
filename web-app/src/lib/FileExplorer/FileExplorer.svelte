@@ -1,6 +1,6 @@
 <script>
 	import DirectoryItem from './DirectoryItem.svelte';
-	import { openedDirectory } from '$lib/stores.js';
+	import { openedDirectory, archiveMode } from '$lib/stores.js';
 
 	$: directoryObject = {};
 
@@ -58,6 +58,7 @@
 		});
 
 		openedDirectory.set(directoryObject);
+		archiveMode.set(false)
 		return directoryObject;
 	}
 </script>

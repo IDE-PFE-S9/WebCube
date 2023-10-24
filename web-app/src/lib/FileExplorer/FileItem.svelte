@@ -6,6 +6,8 @@
 
 	let fileExtension = file?.name.split('.').pop();
 
+	console.log(file);
+
 	async function openFile() {
 		selectedFile.set(file);
 

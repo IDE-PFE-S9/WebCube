@@ -2,55 +2,56 @@
 	import FileIcon from '$lib/assets/FileExplorerIcons/FileIcon.svelte';
 	import DeleteIcon from '/src/lib/assets/TabManagerIcons/DeleteIcon.svelte';
 	import {
-		openedTabs,
 		openedCodes,
-		selectedFile,
 		editorUpdateTrigger,
+		openedArchiveTabs,
+		selectedArchiveFile
 	} from '$lib/stores.js';
 
 	export let currentFile;
 
-	let fileExtension = currentFile.name.split('.').pop();
+	let fileExtension = currentFile.split('.').pop();
+    let relativeName = currentFile.split('/').pop();
 
 	function selectTab() {
-		selectedFile.set(currentFile);
-		editorUpdateTrigger.set($selectedFile);
+		selectedArchiveFile.set(currentFile);
+		editorUpdateTrigger.set($selectedArchiveFile);
 	}
 
 	function closeTab() {
 		// Keep a reference to the current selected file name before updating the stores
-		const currentSelectedFileName = $selectedFile?.name;
+		const currentSelectedFileName = $selectedArchiveFile;
 
 		// Update the openedTabs and openedCodes stores to remove the closed tab
-		openedTabs.update((tabs) => tabs.filter((file) => file.name !== currentFile.name));
-		openedCodes.update((codes) => codes.filter((code) => code.name !== currentFile.name));
+		openedArchiveTabs.update((tabs) => tabs.filter((file) => file !== currentFile));
+		openedCodes.update((codes) => codes.filter((code) => code.name !== currentFile));
 
 		// Get the updated list of tabs
-		const updatedTabs = $openedTabs;
+		const updatedTabs = $openedArchiveTabs;
 
 		// If the closed tab was the currently selected tab, select the last tab if it exists
-		if (currentSelectedFileName === currentFile.name) {
+		if (currentSelectedFileName === currentFile) {
 			if (updatedTabs.length > 0) {
-				selectedFile.set(updatedTabs[updatedTabs.length - 1]);
+				selectedArchiveFile.set(updatedTabs[updatedTabs.length - 1]);
 			} else {
-				selectedFile.set(null); // Set selectedFile to null if there are no more tabs
+				selectedArchiveFile.set(null); // Set selectedFile to null if there are no more tabs
 			}
 		}
 		// Trigger an update to the editor content
-		editorUpdateTrigger.set($selectedFile);
+		editorUpdateTrigger.set($selectedArchiveFile);
 	}
 </script>
 
 <!-- TODO: change the code to use button instead of div -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="tab-item" on:click={selectTab} class:selected={$selectedFile.name === currentFile.name}>
+<div class="tab-item" on:click={selectTab} class:selected={$selectedArchiveFile === currentFile}>
 	<FileIcon {fileExtension} />
-	<div class="tab-item-name">{currentFile.name}</div>
+	<div class="tab-item-name">{relativeName}</div>
 	<div
 		class="delete-icon"
 		on:click={closeTab}
-		class:selected={$selectedFile.name === currentFile.name}
+		class:selected={$selectedArchiveFile === currentFile}
 	>
 		<DeleteIcon />
 	</div>
