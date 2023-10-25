@@ -13,6 +13,7 @@ export const terminalOutput = writable([]);
 
 // editor store
 export const editorUpdateTrigger = writable(null);
+export const readOnly = writable(false);
 
 // archive explorer stores
 export const archiveMode = writable(true);

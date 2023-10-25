@@ -6,7 +6,8 @@
 		selectedArchiveFile,
 		openedCodes,
 		openedArchiveTabs,
-		editorUpdateTrigger
+		editorUpdateTrigger, 
+		readOnly
 	} from '$lib/stores.js';
 
 	let fileExtension = file?.name.split('.').pop();
@@ -14,6 +15,7 @@
 
 	async function openFile() {
 		selectedArchiveFile.set(file.name);
+		readOnly.set(!file.write);
 
 		openedArchiveTabs.update((tabs) => {
 			if (!tabs.includes(file.name)) {
@@ -43,7 +45,7 @@
 	}
 </script>
 
-<div class="container">
+<div class="container" class:hidden={!file.visible}>
 	<button on:click={openFile} on:keypress={openFile} class:selected={file.name === $selectedArchiveFile} class="file">
 		<FileIcon {fileExtension} />
 		{relativeName}
@@ -74,5 +76,9 @@
 				background-color: rgb(55, 55, 60);
 			}
 		}
+	}
+
+	.container.hidden {
+		display: none;
 	}
 </style>

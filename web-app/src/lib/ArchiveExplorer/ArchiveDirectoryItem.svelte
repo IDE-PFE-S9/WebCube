@@ -11,7 +11,7 @@
 	}
 </script>
 
-<div id="container">
+<div id="container" class:hidden={!directory.visible}>
 	<button class="header" on:click={toggleExpand}>
 		<DirectoryIcon />
 		{directory.name}
@@ -57,4 +57,8 @@
 			padding-left: 0.7rem;
 		}
 	}
+
+    #container.hidden {
+        display: none;
+    }
 </style>

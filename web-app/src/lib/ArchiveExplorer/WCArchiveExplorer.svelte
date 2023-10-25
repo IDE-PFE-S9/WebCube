@@ -8,20 +8,17 @@
 
 	/*
         A WebCube Archive must contain different things:
-
-        A descriptor.json that describes all the files and directories in the archive
-        A directory named "src" that contains all the source files
-        A directory named "lib" that contains all the libraries
-        A directory named "test" that contains all the test files
-        A directory named "res" that contains all the resources
-        A directory named "web" that contains all the web files
-
-        for each file, we need to know:
-        - the name of the file
-        - the path of the file
-        - the type of the file (src, lib, test, res, web)
-        - its visibility
-        - the modification rights
+		- descriptor.xml
+		- src folder for Java source files
+		- lib folder for Java .jar libs
+		- test folder for Java 
+		- assets folder for assets
+	
+	
+	<Folder name="folderName" visible="true" write="true" modifDate="2023-11-15">
+		<File name="fileName1" visible="false" read="true" write="true" modifDate="2023-11-15" />
+		<File name="fileName2" visible="true" read="true" write="false" modifDate="2023-11-15" />
+	</Folder>
     */
 
 	async function handleArchive(file) {
@@ -34,6 +31,7 @@
 			const directoryObject = {
 				type: 'directory',
 				name: path ? path.slice(0, -1).split('/').pop() : 'root',
+				visible: false,
 				children: []
 			};
 
@@ -65,7 +63,9 @@
 					directoryObject.children.push({
 						type: 'file',
 						name: name,
-						data: await zipObject.files[name].async('text') // Change "text" to other types as needed
+						data: await zipObject.files[name].async('text'), // Change "text" to other types as needed
+						visible: false,
+						write: false
 					});
 				}
 			}
@@ -103,15 +103,96 @@
 				console.error('Invalid file type selected.');
 				return;
 			}
-			const archiveStructure = await handleArchive(archive);
-			console.log(JSON.stringify(archiveStructure, null, 2));
-			// You can set your directory object here
-			directoryObject = archiveStructure;
+			let archiveStructure = await handleArchive(archive);
+
+			const xmlDescriptorString = findDescriptor(archiveStructure);
+
+			if (!xmlDescriptorString) {
+				console.error('Descriptor not found in the archive.');
+				return;
+			}
+
+			const description = parseXMLToJson(xmlDescriptorString);
+			console.log("descriptor file: ", description);
+
+			console.log("directory before mergin:", archiveStructure.children[0])
+			directoryObject = mergeObjects(description, archiveStructure.children[0]);
+
 			openedArchive.set(directoryObject);
-            archiveMode.set(true);
+			archiveMode.set(true);
+			console.log("directory object:", directoryObject);
 		} catch (err) {
 			console.error('Error reading file:', err);
 		}
+	}
+
+	function findDescriptor(data) {
+		if (data.type === 'file' && data.name.endsWith('descriptor.xml')) {
+			return data.data;
+		}
+		if (data.type === 'directory' && data.children) {
+			for (let child of data.children) {
+				const descriptor = findDescriptor(child);
+				if (descriptor) return descriptor;
+			}
+		}
+		return null;
+	}
+
+	const parseXMLToJson = (xmlString) => {
+		const parser = new DOMParser();
+		const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+
+		const traverseNode = (node, path) => {
+			let result = {};
+			let nodeName = node.nodeName;
+			let nameAttr = node.getAttribute('name');
+			let visibleAttr = node.getAttribute('visible') === 'true';
+			let writeAttr = node.getAttribute('write') === 'true';
+
+			if (nodeName === 'Folder') {
+				result.type = 'directory';
+				result.name = nameAttr;
+				result.visible = visibleAttr;
+				result.children = [];
+
+				for (let i = 0; i < node.childNodes.length; i++) {
+					let child = node.childNodes[i];
+					if (child.nodeType === 1) {
+						// Check if node is an Element node
+						result.children.push(traverseNode(child, path ? path + '/' + nameAttr : nameAttr));
+					}
+				}
+			} else if (nodeName === 'File') {
+				result.type = 'file';
+				result.name = (path ? path + '/' : '') + nameAttr;
+				result.data = 'test'; // Placeholder as specific data for each file isn't provided in XML
+				result.visible = visibleAttr;
+				result.write = writeAttr;
+			}
+
+			return result;
+		};
+		return traverseNode(xmlDoc.childNodes[0], '');
+	};
+
+	function mergeObjects(obj1, obj2) {
+		for (let key in obj1) {
+			if (obj1.hasOwnProperty(key)) {
+				if (
+					obj2.hasOwnProperty(key) &&
+					typeof obj1[key] === 'object' &&
+					typeof obj2[key] === 'object'
+				) {
+					mergeObjects(obj1[key], obj2[key]);
+				} else if (key === 'write' || key === 'visible') {
+					obj2[key] = obj1[key];
+				} else if (!obj2.hasOwnProperty(key)) {
+					obj2[key] = obj1[key];
+				}
+			}
+		}
+		return obj2;
 	}
 </script>
 
@@ -122,7 +203,7 @@
 	{#if directoryObject.name}
 		<ArchiveDirectoryItem directory={directoryObject} />
 	{:else}
-		<button on:click={openArchive} class="button-open-directory">Open WebCube Project</button>
+		<button on:click={openArchive} class="button-open-directory">Open WebCube Archive</button>
 	{/if}
 </div>
 

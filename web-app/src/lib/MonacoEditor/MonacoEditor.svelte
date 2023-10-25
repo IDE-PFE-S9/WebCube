@@ -5,7 +5,8 @@
 		selectedFile,
 		editorUpdateTrigger,
 		archiveMode,
-		selectedArchiveFile
+		selectedArchiveFile,
+		readOnly
 	} from '$lib/stores.js';
 
 	let editor;
@@ -41,6 +42,7 @@
 			value: '', // initial value can be an empty string
 			language: 'java',
 			theme: 'vs-dark',
+			readOnly: $readOnly, // Set initial value based on the store
 			automaticLayout: true
 		});
 
@@ -97,8 +99,20 @@
 			updateEditorContent();
 		});
 
+		const updateReadOnlyStatus = (status) => {
+			if (editor) {
+				editor.updateOptions({ readOnly: status });
+			}
+		};
+
+		// Subscribe to the readOnly store
+		const unsubscribeReadOnly = readOnly.subscribe(updateReadOnlyStatus);
+
 		// Return a cleanup function to unsubscribe when the component is destroyed
-		return () => unsubscribe();
+		return () => {
+			unsubscribeReadOnly();
+			unsubscribe();
+		};
 	});
 </script>
 
