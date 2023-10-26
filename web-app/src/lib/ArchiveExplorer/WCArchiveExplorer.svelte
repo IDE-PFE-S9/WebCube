@@ -117,6 +117,8 @@
 			directoryObject = mergeObjects(description, archiveStructure.children[0]);
 			openedArchive.set(directoryObject);
 			archiveMode.set(true);
+
+			console.log($openedArchive)
 		} catch (err) {
 			console.error('Error reading file:', err);
 		}

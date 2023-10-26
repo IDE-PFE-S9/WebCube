@@ -16,13 +16,14 @@ export const editorUpdateTrigger = writable(null);
 export const readOnly = writable(false);
 
 // archive explorer stores
-export const archiveMode = writable(true);
+export const archiveMode = writable(false);
 export const openedArchive = writable(null);
 export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
 export const archiveHandle = writable(null);
 
-
+// navbar stores
+export const currentTab = writable("Explorer");
 
 /*
 openedCodes : {
