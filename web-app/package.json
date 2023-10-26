@@ -26,6 +26,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"antlr4": "^4.13.0",
 		"jszip": "^3.10.1",
 		"monaco-editor": "^0.43.0"
 	}
