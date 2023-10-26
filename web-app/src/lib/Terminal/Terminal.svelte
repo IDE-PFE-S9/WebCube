@@ -18,7 +18,7 @@
 	.terminal {
 		min-height: 30%;
 		max-height: 30%;
-		width: 100%;
+		max-width: 100%;
 		display: flex;
 		flex-direction: column;
 		background-color: #1e1e1e;

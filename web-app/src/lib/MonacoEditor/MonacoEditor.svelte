@@ -6,13 +6,13 @@
 	let editorContainer;
 
 	const updateEditorContent = () => {
-		// console.log('updateEditorContent', $selectedFile, $openedCodes);
 		if (!$selectedFile) {
 			editor.setValue(''); // Clear the editor content if selectedFile is null
 			return;
 		}
 		const codes = $openedCodes;
 		const selectedFileName = $selectedFile?.name;
+        console.log(codes)
 		const codeObj = codes.find((code) => code.name === selectedFileName);
 		if (codeObj && editor && codeObj.code !== editor.getValue()) {
 			editor.setValue(codeObj.code);

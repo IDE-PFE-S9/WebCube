@@ -1,7 +1,7 @@
 version: "3.2"
 services:
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:latest
     container_name: 'rabbitmq'
     ports:
         - 5672:5672
@@ -10,8 +10,8 @@ services:
         - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
-        - rabbitmq_net
+        - worker-rabbitmq
 
 networks:
-  rabbitmq_net:
-    driver: bridge
+  worker-rabbitmq:
+    external: true

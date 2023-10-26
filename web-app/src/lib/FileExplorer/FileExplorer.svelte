@@ -23,7 +23,7 @@
 
 		const directoryObject = {
 			type: 'directory',
-			name: handle.name || 'root',
+			name: handle.name ? `${path}/${handle.name}` : 'root', // Adjusted here for the root
 			children: []
 		};
 
@@ -32,15 +32,16 @@
 
 		// Iterate through the entries
 		for await (const entry of iterator) {
+			const entryPath = `${path}/${handle.name}/${entry.name}`; // Construct the full path here
 			const entryObject = {
 				type: entry.kind,
-				name: entry.name,
+				name: entryPath, // Use the full path as the name
 				handle: entry
 			};
 
 			// If the entry is a directory, recurse into it
 			if (entry.kind === 'directory') {
-				const childDirectoryObject = await listFilesRecursive(entry, `${path}/${entry.name}`);
+				const childDirectoryObject = await listFilesRecursive(entry, entryPath); // Pass the full path for recursion
 				directoryObject.children.push(childDirectoryObject);
 			} else {
 				directoryObject.children.push(entryObject);
@@ -82,11 +83,38 @@
 		background-color: rgb(37, 37, 38);
 		min-width: 20rem;
 		height: 70%;
-
 		overflow: scroll;
 
+		// Base styles for the scrollbar
 		&::-webkit-scrollbar {
-			display: none;
+			width: 12px;
+			background-color: rgba(255, 255, 255, 0); // Fully transparent track
+		}
+
+		// Styling the thumb (the draggable scrolling element)
+		&::-webkit-scrollbar-thumb {
+			background-color: rgba(255, 255, 255, 0); // Fully transparent by default
+			border: 2px solid transparent;
+			background-clip: content-box; // Makes the thumb smaller than the track
+			transition: background-color 1s ease; // Transition effect for the hover state
+		}
+
+		// Hiding the corner where horizontal and vertical scrollbars meet
+		&::-webkit-scrollbar-corner {
+			background-color: transparent;
+		}
+
+		// Styles when the container is hovered
+		&:hover {
+			// Make the thumb semi-transparent white on hover
+			&::-webkit-scrollbar-thumb {
+				background-color: rgba(255, 255, 255, 0.1);
+			}
+
+			// Hide the horizontal scrollbar on hover
+			&::-webkit-scrollbar:horizontal {
+				display: none;
+			}
 		}
 
 		#title-container {
