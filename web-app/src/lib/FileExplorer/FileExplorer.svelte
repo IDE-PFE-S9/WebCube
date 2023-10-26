@@ -84,7 +84,6 @@
 		background-color: rgb(37, 37, 38);
 		min-width: 20rem;
 		height: 70%;
-
 		overflow: scroll;
 
 		// Base styles for the scrollbar

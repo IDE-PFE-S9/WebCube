@@ -58,6 +58,13 @@
 			height: 100%;
 		}
 
+		.mid{
+			display: flex;
+			flex-direction: column;
+			width: 20rem;
+			height: 100%;
+		}
+
 		.right {
 			display: flex;
 			flex-direction: column;
