@@ -14,7 +14,7 @@
 <div id="container">
 	<button class="header" on:click={toggleExpand}>
 		<DirectoryIcon />
-		{directory.name}
+		{directory.name.split('/').pop()}
 	</button>
 	{#if expanded}
 		<div class="files">
