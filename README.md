@@ -1,5 +1,20 @@
 # Dépôt du PFE WebCube 2023/2024
 
+## Overview
+
+- `LSP/`: Contains Docker container that set up **LSP** server (for autocompletion, linter ...)
+  
+- `api/`: Houses for **api** code & Dockerfile to build a container.
+
+- `java-workers/`: Comprises **java compiler** which is ready to launch as Docker container.
+  
+- `mariadb/`: Holds docker-compose to deploy **mariadb database** server.
+  
+- `rabbitmq/`: Contains docker-compose to deploy **rabbitmq** server.
+  
+- `web-app/`: Houses for **web-app** source code.
+
+
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
