@@ -20,6 +20,7 @@ export const archiveMode = writable(true);
 export const openedArchive = writable(null);
 export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
+export const archiveHandle = writable(null);
 
 
 

@@ -1,40 +1,47 @@
 <script>
-    // TODO: MAKE THIS WORK
+	// TODO: MAKE THIS WORK
 
-	import { openedCodes, openedTabs } from '$lib/stores.js';
+	import { openedArchive, archiveHandle } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
 
-	async function saveAllFiles() {
-		for (const codeObj of $openedCodes) {
-			// Find the corresponding tab object for the current code object
-			const tabObj = $openedTabs.find(tab => tab.name === codeObj.name);
+	import JSZip from 'jszip';
 
-			if (!tabObj || !tabObj.fileHandle) {
-				console.error('File handle is not available for', codeObj.name);
-				continue;  // Skip to the next codeObj if the fileHandle is not available.
-			}
+	async function saveArchiveFiles() {
+		const zip = new JSZip();
 
-			const contents = codeObj.code;
-			console.log('Contents to be written to', codeObj.name, ':', contents);
-
-			try {
-				// Create a writable stream using the file handle from the tab object.
-				const writable = await tabObj.fileHandle.createWritable();
-				// Write the contents back to the file.
-				await writable.write(contents);
-				// Close the stream.
-				await writable.close();
-				console.log('File', codeObj.name, 'has been saved');
-			} catch (error) {
-				console.error('Error writing file', codeObj.name, ':', error);
-			}
+		async function processDirectory(directory, zipFolder) {
+			await Promise.all(
+				directory.children.map(async (item) => {
+					if (item.type === 'directory') {
+						const newFolder = zipFolder.folder(item.name);
+						await processDirectory(item, newFolder);
+					} else if (item.type === 'file') {
+						const fileHandle = item.handle;
+						const file = await fileHandle.getFile();
+						if (item.name.endsWith('.jar')) {
+							// Handle JAR files as binary
+							zipFolder.file(item.name, file);
+						} else {
+							// Handle other files as text
+							const contents = await file.text();
+							zipFolder.file(item.name, contents);
+						}
+					}
+				})
+			);
 		}
+
+		await processDirectory(directoryStructure, zip); // awaiting this call as well
+
+		const content = await zip.generateAsync({ type: 'blob' });
+		
+		console.log($archiveHandle)
 	}
 </script>
 
-<button class="save-button" on:click={saveAllFiles}>
+<button class="save-button" on:click={saveArchiveFiles}>
 	<SaveIcon />
-    save all
+	save all
 </button>
 
 <style lang="scss">

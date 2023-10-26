@@ -1,6 +1,6 @@
 <script>
 	import ArchiveDirectoryItem from './ArchiveDirectoryItem.svelte';
-	import { openedArchive, archiveMode } from '$lib/stores.js';
+	import { openedArchive, archiveMode, archiveHandle } from '$lib/stores.js';
 
 	$: directoryObject = {};
 
@@ -98,6 +98,7 @@
 					}
 				]
 			});
+			archiveHandle.set(fileHandle);
 			let archive = await fileHandle.getFile();
 			if (!archive.name.endsWith('.wc')) {
 				console.error('Invalid file type selected.');
@@ -113,14 +114,9 @@
 			}
 
 			const description = parseXMLToJson(xmlDescriptorString);
-			console.log("descriptor file: ", description);
-
-			console.log("directory before mergin:", archiveStructure.children[0])
 			directoryObject = mergeObjects(description, archiveStructure.children[0]);
-
 			openedArchive.set(directoryObject);
 			archiveMode.set(true);
-			console.log("directory object:", directoryObject);
 		} catch (err) {
 			console.error('Error reading file:', err);
 		}
