@@ -1,19 +1,35 @@
 <script>
 	import { onMount } from 'svelte';
-	import { openedCodes, selectedFile, editorUpdateTrigger } from '$lib/stores.js';
+	import {
+		openedCodes,
+		selectedFile,
+		editorUpdateTrigger,
+		archiveMode,
+		selectedArchiveFile,
+		readOnly
+	} from '$lib/stores.js';
 
 	let editor;
 	let editorContainer;
 
 	const updateEditorContent = () => {
-		if (!$selectedFile) {
-			editor.setValue(''); // Clear the editor content if selectedFile is null
-			return;
-		}
+		// console.log('updateEditorContent', $selectedFile, $openedCodes);
+		let codeObj;
 		const codes = $openedCodes;
-		const selectedFileName = $selectedFile?.name;
-        console.log(codes)
-		const codeObj = codes.find((code) => code.name === selectedFileName);
+		if ($archiveMode) {
+			if (!$selectedArchiveFile) {
+				editor.setValue(''); // Clear the editor content if selectedFile is null
+				return;
+			}
+			codeObj = codes.find((code) => code.name === $selectedArchiveFile);
+		} else {
+			if (!$selectedFile) {
+				editor.setValue(''); // Clear the editor content if selectedFile is null
+				return;
+			}
+			const selectedFileName = $selectedFile?.name;
+			codeObj = codes.find((code) => code.name === selectedFileName);
+		}
 		if (codeObj && editor && codeObj.code !== editor.getValue()) {
 			editor.setValue(codeObj.code);
 		}
@@ -26,6 +42,7 @@
 			value: '', // initial value can be an empty string
 			language: 'java',
 			theme: 'vs-dark',
+			readOnly: $readOnly, // Set initial value based on the store
 			automaticLayout: true
 		});
 
@@ -35,7 +52,13 @@
 			// Update the openedCodes store with new content for the currently selected file
 			openedCodes.update((codes) => {
 				// Find the index of the code object for the currently selected file
-				const index = codes.findIndex((code) => code.name === $selectedFile.name);
+				let index;
+				if ($archiveMode) {
+					index = codes.findIndex((code) => code.name === $selectedArchiveFile);
+				} else {
+					index = codes.findIndex((code) => code.name === $selectedFile.name);
+				}
+
 				if (index !== -1) {
 					// Create a new array with the updated code object
 					const updatedCodes = [...codes];
@@ -57,7 +80,12 @@
 
 		const updateEditorValue = () => {
 			const codes = $openedCodes;
-			const codeObj = codes.find((code) => code.name === $selectedFile.name);
+			let codeObj;
+			if ($archiveMode) {
+				codeObj = codes.find((code) => code.name === $selectedArchiveFile);
+			} else {
+				codeObj = codes.find((code) => code.name === $selectedFile.name);
+			}
 			if (codeObj && editor && codeObj.code !== editor.getValue()) {
 				editor.setValue(codeObj.code);
 			}
@@ -71,8 +99,20 @@
 			updateEditorContent();
 		});
 
+		const updateReadOnlyStatus = (status) => {
+			if (editor) {
+				editor.updateOptions({ readOnly: status });
+			}
+		};
+
+		// Subscribe to the readOnly store
+		const unsubscribeReadOnly = readOnly.subscribe(updateReadOnlyStatus);
+
 		// Return a cleanup function to unsubscribe when the component is destroyed
-		return () => unsubscribe();
+		return () => {
+			unsubscribeReadOnly();
+			unsubscribe();
+		};
 	});
 </script>
 

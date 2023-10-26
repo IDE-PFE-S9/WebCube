@@ -6,27 +6,20 @@
     import UmlIcon from "/src/lib/assets/NavbarIcons/UmlIcon.svelte";
     import UserIcon from "/src/lib/assets/NavbarIcons/UserIcon.svelte";
 
-    let activeItem = "Explorer";
     const navbarItems = [
         { text: "Explorer", icon: FilesIcon },
-        { text: "Fichiers", icon: GitIcon },
+        { text: "Archive", icon: GitIcon },
         { text: "Uml", icon: UmlIcon },
         { text: "Utilisateur", icon: UserIcon },
         { text: "Paramètres", icon: ParametersIcon },
     ];
-
-    function manageItemClick(itemText) {
-        activeItem = itemText;
-    }
 </script>
 
 <div class="navbar">
-    {#each navbarItems as { text, icon}}
+    {#each navbarItems as { text, icon, link }}
         <NavbarItem
             text={text}
             icon={icon}
-            onClick={() => manageItemClick(text)}
-            activeItem={activeItem}
         />
     {/each}
 </div>

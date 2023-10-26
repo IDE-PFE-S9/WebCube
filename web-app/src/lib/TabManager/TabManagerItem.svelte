@@ -1,7 +1,12 @@
 <script>
 	import FileIcon from '$lib/assets/FileExplorerIcons/FileIcon.svelte';
 	import DeleteIcon from '/src/lib/assets/TabManagerIcons/DeleteIcon.svelte';
-	import { openedTabs, openedCodes, selectedFile, editorUpdateTrigger } from '$lib/stores.js';
+	import {
+		openedTabs,
+		openedCodes,
+		selectedFile,
+		editorUpdateTrigger,
+	} from '$lib/stores.js';
 
 	export let currentFile;
 

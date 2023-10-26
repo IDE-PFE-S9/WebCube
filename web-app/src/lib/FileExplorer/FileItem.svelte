@@ -2,12 +2,13 @@
 	export let file;
 
 	import FileIcon from '$lib/assets/FileExplorerIcons/FileIcon.svelte';
-	import { selectedFile, openedCodes, openedTabs, editorUpdateTrigger } from '$lib/stores.js';
+	import { selectedFile, openedCodes, openedTabs, editorUpdateTrigger, readOnly } from '$lib/stores.js';
 
 	let fileExtension = file?.name.split('.').pop();
 
 	async function openFile() {
 		selectedFile.set(file);
+		readOnly.set(true)
 
 		openedTabs.update((tabs) => {
 			if (!tabs.includes(file)) {

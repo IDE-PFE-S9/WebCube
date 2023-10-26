@@ -1,10 +1,11 @@
 <script>
 	import TerminalNavItem from './TerminalNavItem.svelte';
-	import { terminalNavbarActiveItem, terminalOutput } from '$lib/stores.js';
+	import { terminalNavbarActiveItem, terminalOutput, archiveMode } from '$lib/stores.js';
 	import TerminalNavbarClearButton from './TerminalNavbarClearButton.svelte';
 	import TerminalNavbarRunButton from './TerminalNavbarRunButton.svelte';
 	import TerminalNavbarSaveButton from './TerminalNavbarSaveButton.svelte';
 	import TerminalNavbarCompilButton from './TerminalNavbarCompilButton.svelte';
+	import TerminalNavbarSaveArchiveButton from './TerminalNavbarSaveArchiveButton.svelte';
 
 	const navbarItems = [{ text: 'Problèmes' }, { text: 'Sortie' }];
 
@@ -16,12 +17,16 @@
 <div class="navbar">
 	<div class="navbar-buttons">
 		{#each navbarItems as { text }}
-		<TerminalNavItem {text} onClick={() => manageItemClick(text)} />
-	{/each}
+			<TerminalNavItem {text} onClick={() => manageItemClick(text)} />
+		{/each}
 	</div>
 	{#if $terminalNavbarActiveItem === 'Sortie'}
 		<div class="navbar-buttons">
-			<TerminalNavbarSaveButton />
+			{#if $archiveMode}
+				<TerminalNavbarSaveArchiveButton />
+			{:else}
+				<TerminalNavbarSaveButton />
+			{/if}
 			<TerminalNavbarCompilButton />
 			<TerminalNavbarRunButton />
 			<TerminalNavbarClearButton />
