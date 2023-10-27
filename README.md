@@ -1,4 +1,6 @@
-# Dépôt du PFE WebCube 2023/2024
+# WebCube
+
+![WebCube Logo](./img/DALLE_WebCube_Logo.png)
 
 ## Overview
 
