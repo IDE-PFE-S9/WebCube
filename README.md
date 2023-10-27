@@ -1,6 +1,8 @@
 # WebCube
 
-![WebCube Logo](./img/DALLE_WebCube_Logo.png)
+<div align="center">
+  <img src="./img/DALLE_WebCube_Logo.png" alt="WebCube Logo" width="100"/>
+</div>
 
 ## Overview
 
