@@ -27,6 +27,7 @@ public class FileController {
             try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(file.getBytes()))) {
                 ZipEntry zipEntry;
                 while ((zipEntry = zis.getNextEntry()) != null) {
+                    System.out.println(zipEntry);
                     File entryDestination = new File(directory, zipEntry.getName());
                     if (zipEntry.isDirectory()) {
                         entryDestination.mkdirs();

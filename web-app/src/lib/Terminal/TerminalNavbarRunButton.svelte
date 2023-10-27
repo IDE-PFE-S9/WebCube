@@ -11,18 +11,18 @@
 			await Promise.all(
 				directory.children.map(async (item) => {
 					if (item.type === 'directory') {
-						const newFolder = zipFolder.folder(item.name);
+						const newFolder = zipFolder.folder(item.name.split('/').pop());
 						await processDirectory(item, newFolder);
 					} else if (item.type === 'file') {
 						const fileHandle = item.handle;
 						const file = await fileHandle.getFile();
 						if (item.name.endsWith('.jar')) {
 							// Handle JAR files as binary
-							zipFolder.file(item.name, file);
+							zipFolder.file(item.name.split('/').pop(), file);
 						} else {
 							// Handle other files as text
 							const contents = await file.text();
-							zipFolder.file(item.name, contents);
+							zipFolder.file(item.name.split('/').pop(), contents);
 						}
 					}
 				})
@@ -39,18 +39,18 @@
 		$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
 		const zipBlob = await createZip($openedDirectory);
-
+		
 		let headersList = {
-			Accept: '*/*',
-			'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
-			Authorization: 'Basic dXNlcjpmYjlhNDk2ZS03MDczLTRkNjgtYjZmNS1iNzliMzdiZjRhM2I='
+			Accept: '*/*'
 		};
 
+		let username = "arthur";
+
 		const formData = new FormData();
-		formData.append('directory', `arthur/${$openedDirectory.name}`);
+		formData.append('directory', `/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`);
 		formData.append('file', zipBlob, 'archive.zip');
 
-		const response = await fetch('http://localhost:8090/api/files/upload', {
+		const response = await fetch('http://localhost:4444/api/files/upload', {
 			method: 'POST',
 			headers: headersList,
 			body: formData
@@ -58,11 +58,10 @@
 
 		const responseData = await response.text();
 		console.log(responseData);
-		let username = "arthur";
+
 		// API call to compile the code and get the API response
 		let compilationResponse = await fetch(
-			// TODO: CHANGE USERNAME
-			`http://localhost:8090/api/compileAndRun?projectPath=/code/${username}/${$openedDirectory.name}`,
+			`http://localhost:4444/api/compileAndRun?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`,
 			{
 				method: 'GET',
 				headers: headersList
