@@ -1,7 +1,7 @@
 # WebCube
 
 <div align="center">
-  <img src="./img/DALLE_WebCube_Logo.png" alt="WebCube Logo" width="200"/>
+  <img src="./img/WebCube_logo.png" alt="WebCube Logo" width="300"/>
 </div>
 
 ## Overview
