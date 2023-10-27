@@ -7,8 +7,9 @@
 	import StructureParser from '../lib/StructureParser/StructureParser.svelte';
 	import WcArchiveExplorer from '../lib/ArchiveExplorer/WCArchiveExplorer.svelte';
 	import ArchiveTabManager from '../lib/TabManager/ArchiveTabManager.svelte';
+	import MarkdownViewer from '../lib/MarkdownViewer/MarkdownViewer.svelte';
 
-	import { archiveMode } from '$lib/stores.js';
+	import { archiveMode, markdownMode } from '$lib/stores.js';
 </script>
 
 <div class="main">
@@ -22,13 +23,17 @@
 		<StructureParser />
 	</div>
 	<div class="right">
-		{#if archiveMode}
+		{#if $archiveMode}
 			<ArchiveTabManager />
 		{:else}
 			<TabManager />
 		{/if}
-		<MonacoEditor />
-		<Terminal />
+		{#if $markdownMode}
+			<MarkdownViewer />
+		{:else}
+			<MonacoEditor />
+			<Terminal />
+		{/if}
 	</div>
 	<slot />
 </div>
@@ -46,6 +51,7 @@
 		font-family: 'Roboto', sans-serif;
 		height: 100%;
 		width: 100%;
+		background-color: #1e1e1e;
 
 		position: absolute;
 		top: 0;
@@ -58,7 +64,7 @@
 			height: 100%;
 		}
 
-		.mid{
+		.mid {
 			display: flex;
 			flex-direction: column;
 			width: 20rem;

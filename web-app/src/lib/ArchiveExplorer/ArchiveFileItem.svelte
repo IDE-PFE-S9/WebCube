@@ -6,8 +6,9 @@
 		selectedArchiveFile,
 		openedCodes,
 		openedArchiveTabs,
-		editorUpdateTrigger, 
-		readOnly
+		editorUpdateTrigger,
+		readOnly,
+		markdownMode
 	} from '$lib/stores.js';
 
 	let fileExtension = file?.name.split('.').pop();
@@ -40,13 +41,22 @@
 			console.log($openedCodes);
 			return codes;
 		});
-
+		if (fileExtension === 'md') {
+			markdownMode.set(true);
+		} else {
+			markdownMode.set(false);
+		}
 		editorUpdateTrigger.set(file);
 	}
 </script>
 
 <div class="container" class:hidden={!file.visible}>
-	<button on:click={openFile} on:keypress={openFile} class:selected={file.name === $selectedArchiveFile} class="file">
+	<button
+		on:click={openFile}
+		on:keypress={openFile}
+		class:selected={file.name === $selectedArchiveFile}
+		class="file"
+	>
 		<FileIcon {fileExtension} />
 		{relativeName}
 	</button>

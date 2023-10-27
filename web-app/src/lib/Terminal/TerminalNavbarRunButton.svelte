@@ -43,7 +43,7 @@
 		let headersList = {
 			Accept: '*/*',
 			'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
-			Authorization: 'Basic dXNlcjo5NjE4MDE3MC00ZTc1LTRmZGUtYThhZi1hOGNjNGQwNGFhZTk='
+			Authorization: 'Basic dXNlcjpmYjlhNDk2ZS03MDczLTRkNjgtYjZmNS1iNzliMzdiZjRhM2I='
 		};
 
 		const formData = new FormData();
@@ -58,7 +58,7 @@
 
 		const responseData = await response.text();
 		console.log(responseData);
-
+		let username = "arthur";
 		// API call to compile the code and get the API response
 		let compilationResponse = await fetch(
 			// TODO: CHANGE USERNAME
