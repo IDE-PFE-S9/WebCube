@@ -14,6 +14,7 @@ export const terminalOutput = writable([]);
 // editor store
 export const editorUpdateTrigger = writable(null);
 export const readOnly = writable(false);
+export const markdownMode = writable(false);
 
 // archive explorer stores
 export const archiveMode = writable(false);
