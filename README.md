@@ -6,17 +6,11 @@
 
 ## Overview
 
-- `LSP/`: Contains Docker container that set up **LSP** server (for autocompletion, linter ...)
+- `img/`: Documentation used to illustrate project.
   
-- `api/`: Houses for **api** code & Dockerfile to build a container.
-
-- `java-workers/`: Comprises **java compiler** which is ready to launch as Docker container.
+- `api/`: Houses for **api** code & Dockerfile to build container.
   
-- `mariadb/`: Holds docker-compose to deploy **mariadb database** server.
-  
-- `rabbitmq/`: Contains docker-compose to deploy **rabbitmq** server.
-  
-- `web-app/`: Houses for **web-app** source code.
+- `web-app/`: Houses for **web-app** source code & Dockerfile to build container.
 
 
 ## Developing
