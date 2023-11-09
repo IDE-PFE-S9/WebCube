@@ -28,7 +28,9 @@ export const currentTab = writable("Explorer");
 
 // anti-cheat
 export const screenChangeCount = persist('screenChangeCount', 0);
-export const examMode = writable(true);
+export const examMode = writable(false);
+
+export const logs = persist('logs', [])
 
 function persist(key, initialValue) {
     // Initialize the store value

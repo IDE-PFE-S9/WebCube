@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { screenChangeCount, examMode } from '$lib/stores.js';
+	import { screenChangeCount, examMode, logs, selectedFile } from '$lib/stores.js';
 	import Swal from 'sweetalert2';
 
 	let isExamModeActive = false;
@@ -23,7 +23,6 @@
 					allowOutsideClick: false,
 					allowEscapeKey: false,
 					timerProgressBar: true,
-					
 					didOpen: () => {
 						Swal.showLoading();
 						const timer = Swal.getPopup().querySelector('b');
@@ -34,8 +33,9 @@
 					willClose: () => {
 						clearInterval(timerInterval);
 					}
-				})
+				});
 			} else {
+				logs.update((currentLogs) => [...currentLogs, `Pasted text in ${$selectedFile.name}`]);
 				screenChangeCount.update((count) => count + 1);
 			}
 		};

@@ -6,7 +6,8 @@
 		editorUpdateTrigger,
 		archiveMode,
 		selectedArchiveFile,
-		readOnly
+		readOnly,
+		logs
 	} from '$lib/stores.js';
 
 	let editor;
@@ -77,6 +78,10 @@
 
 		// Listen for changes in the editor content and update the store
 		editor.onDidChangeModelContent(updateCode);
+
+		editor.onDidPaste(() => {
+			logs.update((currentLogs) => [...currentLogs, `Pasted text in ${$selectedFile.name}`]);
+		});
 
 		const updateEditorValue = () => {
 			const codes = $openedCodes;
