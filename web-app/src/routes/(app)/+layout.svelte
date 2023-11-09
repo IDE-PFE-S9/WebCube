@@ -3,11 +3,11 @@
 	import TabManager from '$lib/TabManager/TabManager.svelte';
 	import Navbar from '$lib/Navbar/Navbar.svelte';
 	import MonacoEditor from '$lib/MonacoEditor/MonacoEditor.svelte';
-	import Terminal from '../lib/Terminal/Terminal.svelte';
-	import StructureParser from '../lib/StructureParser/StructureParser.svelte';
-	import WcArchiveExplorer from '../lib/ArchiveExplorer/WCArchiveExplorer.svelte';
-	import ArchiveTabManager from '../lib/TabManager/ArchiveTabManager.svelte';
-	import MarkdownViewer from '../lib/MarkdownViewer/MarkdownViewer.svelte';
+	import Terminal from '../../lib/Terminal/Terminal.svelte';
+	import StructureParser from '../../lib/StructureParser/StructureParser.svelte';
+	import WcArchiveExplorer from '../../lib/ArchiveExplorer/WCArchiveExplorer.svelte';
+	import ArchiveTabManager from '../../lib/TabManager/ArchiveTabManager.svelte';
+	import MarkdownViewer from '../../lib/MarkdownViewer/MarkdownViewer.svelte';
 
 	import { archiveMode, markdownMode } from '$lib/stores.js';
 </script>

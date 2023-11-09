@@ -26,6 +26,33 @@ export const archiveHandle = writable(null);
 // navbar stores
 export const currentTab = writable("Explorer");
 
+// anti-cheat
+export const screenChangeCount = persist('screenChangeCount', 0);
+export const examMode = writable(true);
+
+function persist(key, initialValue) {
+    // Initialize the store value
+    let value = initialValue;
+
+    // Check if we're in a browser environment
+    if (typeof window !== 'undefined') {
+        // Get the current value from local storage if available
+        const storedValue = localStorage.getItem(key);
+        value = storedValue === null ? initialValue : JSON.parse(storedValue);
+    }
+
+    const store = writable(value);
+
+    if (typeof window !== 'undefined') {
+        // Subscribe to changes in the store and update local storage
+        store.subscribe((currentValue) => {
+            localStorage.setItem(key, JSON.stringify(currentValue));
+        });
+    }
+
+    return store;
+}
+
 /*
 openedCodes : {
     name : "test.java",
