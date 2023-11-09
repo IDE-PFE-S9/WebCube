@@ -191,7 +191,7 @@
 		display: flex;
 		flex-direction: column;
 		background-color: rgb(37, 37, 38);
-		height: 30%;
+		height: calc(30% + 0.5px);
 		min-width: 20rem;
 		border-top: 1px solid rgb(65, 65, 65);
 

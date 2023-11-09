@@ -1,6 +1,6 @@
 <script>
 	import { terminalOutput, openedDirectory } from '$lib/stores.js';
-	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
+	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 
 	import JSZip from 'jszip';
 
@@ -35,22 +35,19 @@
 		return content;
 	}
 
-	async function runCode() {
+	async function testCode() {
 		$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
 		const zipBlob = await createZip($openedDirectory);
-
+		
 		let headersList = {
 			Accept: '*/*'
 		};
 
-		let username = 'arthur';
+		let username = "arthur";
 
 		const formData = new FormData();
-		formData.append(
-			'directory',
-			`/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`
-		);
+		formData.append('directory', `/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`);
 		formData.append('file', zipBlob, 'archive.zip');
 
 		const response = await fetch('http://localhost:4444/api/files/upload', {
@@ -64,38 +61,20 @@
 
 		// API call to compile the code and get the API response
 		let compilationResponse = await fetch(
-			`http://localhost:4444/api/compileAndJar?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`,
+			`http://localhost:4444/api/compileAndTest?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`,
 			{
 				method: 'GET',
 				headers: headersList
 			}
 		);
-		let compilationResult = await compilationResponse.blob();
-
-		// // Create a new FileReader object
-		// let reader = new FileReader();
-
-		// // Define a function to be run when the FileReader has finished reading the Blob
-		// reader.onloadend = function () {
-		// 	// The result of reading the Blob is available as an ArrayBuffer in reader.result
-		// 	let arrayBuffer = reader.result;
-
-		// 	// Convert the ArrayBuffer to a Uint8Array
-		// 	let uint8Array = new Uint8Array(arrayBuffer);
-
-		// 	// Now you can call cheerpjAddStringFile with the Uint8Array
-		// 	cheerpjAddStringFile('/str/application.jar', uint8Array);
-		// };
-
-		// reader.readAsArrayBuffer(compilationResult);
-
-		// const exitCode = await cheerpjRunJar("/str/application.jar");	
-		// $terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
+		let compilationResult = await compilationResponse.text();
+		console.log(compilationResult)
+		$terminalOutput = [...$terminalOutput, compilationResult];
 	}
 </script>
 
-<button class="run-button" on:click={runCode}>
-	<RunIcon />
+<button class="run-button" on:click={testCode}>
+    <TestIcon />
 </button>
 
 <style lang="scss">
