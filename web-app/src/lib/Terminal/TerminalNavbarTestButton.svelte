@@ -76,8 +76,22 @@
 
 		// parse results
 		const resultList = parseInput(compilationResult);
-	
-		$terminalOutput = [...$terminalOutput, resultList];
+
+		console.log(resultList)
+		resultList.forEach((message) => {
+			$terminalOutput = [...$terminalOutput, objectToString(message)];
+		});
+
+		// $terminalOutput = [...$terminalOutput, resultList];
+	}
+
+	function objectToString(obj) {
+		let resultString = `Test: ${obj.Test}\nStatus: ${obj.Status}`;
+
+		if (obj.Data) {
+			resultString += `\nData: ${obj.Data}`;
+		}
+		return resultString;
 	}
 
 	// Main parsing function
