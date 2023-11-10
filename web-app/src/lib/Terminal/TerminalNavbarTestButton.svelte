@@ -39,15 +39,18 @@
 		$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
 		const zipBlob = await createZip($openedDirectory);
-		
+
 		let headersList = {
 			Accept: '*/*'
 		};
 
-		let username = "arthur";
+		let username = 'arthur';
 
 		const formData = new FormData();
-		formData.append('directory', `/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`);
+		formData.append(
+			'directory',
+			`/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`
+		);
 		formData.append('file', zipBlob, 'archive.zip');
 
 		const response = await fetch('http://localhost:4444/api/files/upload', {
@@ -68,13 +71,60 @@
 			}
 		);
 		let compilationResult = await compilationResponse.text();
-		console.log(compilationResult)
-		$terminalOutput = [...$terminalOutput, compilationResult];
+
+		// parse results
+		const resultList = parseInput(compilationResult);
+	
+		$terminalOutput = [...$terminalOutput, resultList];
+	}
+
+	// Main parsing function
+	function parseInput(input) {
+		input = input.slice(0, -1).slice(1);
+		let entries = input.split(', Test:').map((entry) => entry.trim());
+
+		const parsedEntries = entries.map((item, index) => {
+			if (index === 0) {
+				// Return the first item as is
+				return item;
+			} else {
+				// Add "Test:" to the beginning of the item
+				return 'Test: ' + item;
+			}
+		});
+
+		console.log(parsedEntries);
+
+		const result = parsedEntries.map((entry) => extractInfo(entry));
+
+		function extractInfo(str) {
+			// Extract 'Test' and 'Status' values
+			const testMatch = str.match(/Test: (.*?),/);
+			const statusMatch = str.match(/Status: (.*?),/);
+			let testData = str.match(/Data: (.*)/s); // 's' flag to include newline characters
+
+			let test = testMatch && testMatch[1] ? testMatch[1].trim() : null;
+			let status = statusMatch && statusMatch[1] ? statusMatch[1].trim() : null;
+			let data = testData && testData[1] ? testData[1].trim() : null;
+
+			// Check if 'Data' is 'null' as a string
+			if (data === 'null') {
+				data = null;
+			}
+
+			return {
+				Test: test,
+				Status: status,
+				Data: data
+			};
+		}
+
+		return result;
 	}
 </script>
 
 <button class="run-button" on:click={testCode}>
-    <TestIcon />
+	<TestIcon />
 </button>
 
 <style lang="scss">
