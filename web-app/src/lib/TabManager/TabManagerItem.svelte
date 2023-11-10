@@ -1,12 +1,7 @@
 <script>
 	import FileIcon from '$lib/assets/FileExplorerIcons/FileIcon.svelte';
 	import DeleteIcon from '/src/lib/assets/TabManagerIcons/DeleteIcon.svelte';
-	import {
-		openedTabs,
-		openedCodes,
-		selectedFile,
-		editorUpdateTrigger,
-	} from '$lib/stores.js';
+	import { openedTabs, openedCodes, selectedFile, editorUpdateTrigger, markdownMode } from '$lib/stores.js';
 
 	export let currentFile;
 
@@ -15,6 +10,11 @@
 	function selectTab() {
 		selectedFile.set(currentFile);
 		editorUpdateTrigger.set($selectedFile);
+		if ($selectedFile.name.split('.').pop() == 'md') {
+			markdownMode.set(true);
+		} else {
+			markdownMode.set(false);
+		}
 	}
 
 	function closeTab() {
@@ -38,6 +38,12 @@
 		}
 		// Trigger an update to the editor content
 		editorUpdateTrigger.set($selectedFile);
+		// set the markdownMode store according to the new selected file
+		if ($selectedFile?.name.split('.').pop() == 'md') {
+			markdownMode.set(true);
+		} else {
+			markdownMode.set(false);
+		}
 	}
 </script>
 
@@ -62,8 +68,8 @@
 		all: unset;
 		display: flex;
 		flex-direction: row;
-        align-items: center;
-        justify-content: center;
+		align-items: center;
+		justify-content: center;
 		padding: 0px 10px;
 		cursor: pointer;
 		color: rgb(136, 136, 136);
@@ -100,13 +106,13 @@
 			all: unset;
 			display: flex;
 			align-items: center;
-            justify-content: center;
+			justify-content: center;
 			fill: rgb(45, 45, 45);
 			border-radius: 5px;
 
 			&:hover {
 				background-color: rgb(60, 60, 60);
-			
+
 				&.selected {
 					background-color: (50, 50, 50);
 				}

@@ -3,8 +3,8 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
+		"dev": "vite dev --config vite.config.js",
+		"build": "vite build --config vite.config.build.js",
 		"preview": "vite preview",
 		"test": "playwright test",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
@@ -18,6 +18,7 @@
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte": "^2.30.0",
+		"marked": "^9.1.2",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.10.1",
 		"sass": "^1.68.0",
@@ -26,8 +27,11 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"antlr4": "^4.13.0",
+		"antlr4": "^4.13.1",
+		"dotenv": "^16.3.1",
 		"jszip": "^3.10.1",
-		"monaco-editor": "^0.43.0"
+		"monaco-editor": "^0.43.0",
+		"reconnecting-websocket": "^4.4.0",
+		"sweetalert2": "^11.6.13"
 	}
 }

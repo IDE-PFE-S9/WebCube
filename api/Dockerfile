@@ -1,5 +1,8 @@
 FROM maven:3.8.1-jdk-11 AS build
 
+ARG MAVEN_OPTS
+ENV MAVEN_OPTS=${MAVEN_OPTS}
+
 WORKDIR /api
 
 COPY pom.xml .

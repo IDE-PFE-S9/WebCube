@@ -1,6 +1,6 @@
 <script>
 	import { terminalOutput, openedDirectory } from '$lib/stores.js';
-	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
+	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 
 	import JSZip from 'jszip';
 
@@ -37,7 +37,7 @@
 		return content;
 	}
 
-	async function runCode() {
+	async function testCode() {
 		$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
 		const zipBlob = await createZip($openedDirectory);
@@ -66,38 +66,81 @@
 
 		// API call to compile the code and get the API response
 		let compilationResponse = await fetch(
-			`${apiUrl}/api/compileAndJar?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`,
+			`${apiUrl}/api/compileAndTest?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`,
 			{
 				method: 'GET',
 				headers: headersList
 			}
 		);
-		let compilationResult = await compilationResponse.blob();
+		let compilationResult = await compilationResponse.text();
 
-		// // Create a new FileReader object
-		// let reader = new FileReader();
+		// parse results
+		const resultList = parseInput(compilationResult);
 
-		// // Define a function to be run when the FileReader has finished reading the Blob
-		// reader.onloadend = function () {
-		// 	// The result of reading the Blob is available as an ArrayBuffer in reader.result
-		// 	let arrayBuffer = reader.result;
+		console.log(resultList)
+		resultList.forEach((message) => {
+			$terminalOutput = [...$terminalOutput, objectToString(message)];
+		});
 
-		// 	// Convert the ArrayBuffer to a Uint8Array
-		// 	let uint8Array = new Uint8Array(arrayBuffer);
+		// $terminalOutput = [...$terminalOutput, resultList];
+	}
 
-		// 	// Now you can call cheerpjAddStringFile with the Uint8Array
-		// 	cheerpjAddStringFile('/str/application.jar', uint8Array);
-		// };
+	function objectToString(obj) {
+		let resultString = `Test: ${obj.Test}\nStatus: ${obj.Status}`;
 
-		// reader.readAsArrayBuffer(compilationResult);
+		if (obj.Data) {
+			resultString += `\nData: ${obj.Data}`;
+		}
+		return resultString;
+	}
 
-		// const exitCode = await cheerpjRunJar("/str/application.jar");	
-		// $terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
+	// Main parsing function
+	function parseInput(input) {
+		input = input.slice(0, -1).slice(1);
+		let entries = input.split(', Test:').map((entry) => entry.trim());
+
+		const parsedEntries = entries.map((item, index) => {
+			if (index === 0) {
+				// Return the first item as is
+				return item;
+			} else {
+				// Add "Test:" to the beginning of the item
+				return 'Test: ' + item;
+			}
+		});
+
+		console.log(parsedEntries);
+
+		const result = parsedEntries.map((entry) => extractInfo(entry));
+
+		function extractInfo(str) {
+			// Extract 'Test' and 'Status' values
+			const testMatch = str.match(/Test: (.*?),/);
+			const statusMatch = str.match(/Status: (.*?),/);
+			let testData = str.match(/Data: (.*)/s); // 's' flag to include newline characters
+
+			let test = testMatch && testMatch[1] ? testMatch[1].trim() : null;
+			let status = statusMatch && statusMatch[1] ? statusMatch[1].trim() : null;
+			let data = testData && testData[1] ? testData[1].trim() : null;
+
+			// Check if 'Data' is 'null' as a string
+			if (data === 'null') {
+				data = null;
+			}
+
+			return {
+				Test: test,
+				Status: status,
+				Data: data
+			};
+		}
+
+		return result;
 	}
 </script>
 
-<button class="run-button" on:click={runCode}>
-	<RunIcon />
+<button class="run-button" on:click={testCode}>
+	<TestIcon />
 </button>
 
 <style lang="scss">

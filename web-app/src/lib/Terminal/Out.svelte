@@ -15,7 +15,7 @@
 <div class="out" bind:this={terminal}>
 	{#each $terminalOutput as entry}
 		<p class="out-text">
-			{@html entry.replace(/\n/g, '<br>')}
+			{@html entry.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}
 		</p>
 	{/each}
 </div>

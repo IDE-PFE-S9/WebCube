@@ -5,7 +5,8 @@
 		openedCodes,
 		editorUpdateTrigger,
 		openedArchiveTabs,
-		selectedArchiveFile
+		selectedArchiveFile,
+		markdownMode
 	} from '$lib/stores.js';
 
 	export let currentFile;
@@ -16,6 +17,11 @@
 	function selectTab() {
 		selectedArchiveFile.set(currentFile);
 		editorUpdateTrigger.set($selectedArchiveFile);
+		if ($selectedArchiveFile.name.split('.').pop() == 'md') {
+			markdownMode.set(true);
+		} else {
+			markdownMode.set(false);
+		}
 	}
 
 	function closeTab() {
@@ -39,6 +45,11 @@
 		}
 		// Trigger an update to the editor content
 		editorUpdateTrigger.set($selectedArchiveFile);
+		if ($selectedArchiveFile.name.split('.').pop() == 'md') {
+			markdownMode.set(true);
+		} else {
+			markdownMode.set(false);
+		}
 	}
 </script>
 
