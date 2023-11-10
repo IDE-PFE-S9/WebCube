@@ -2,10 +2,10 @@
     import UserPanelNavItem from './UserPanelNavItem.svelte';
     import { adminNavbarActiveItem, terminalOutput, archiveMode } from '$lib/stores.js';
 	
-    import GeneralPagePanel from './GeneralPagePanel.svelte';
-    import ExamenPagePanel from './ExamenPagePanel.svelte';
-    import AvancementPagePanel from './AvancementPagePanel.svelte';
-    import AutresPagePanel from './AutresPagePanel.svelte';
+    import PageGeneralPanel from './PageGeneralPanel.svelte';
+    import PageExamenPanel from './PageExamenPanel.svelte';
+    import PageAvancementPanel from './PageAvancementPanel.svelte';
+    import PageAutresPanel from './PageAutresPanel.svelte';
 
     const navbarItems = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Autres' }];
 
@@ -14,7 +14,7 @@
 	}
 </script>
 
-<div>
+<div class="admin-container">
     <div class="navbar">
         <div class="navbar-buttons">
             {#each navbarItems as { text }}
@@ -25,19 +25,19 @@
 
     <div class="admin-container">
         {#if $adminNavbarActiveItem === 'Général'}
-            <GeneralPagePanel />
+            <PageGeneralPanel />
         {/if}
 
         {#if $adminNavbarActiveItem === 'Examen'}
-            <ExamenPagePanel />
+            <PageExamenPanel />
         {/if}
 
         {#if $adminNavbarActiveItem === 'Avancement'}
-            <AvancementPagePanel />
+            <PageAvancementPanel />
         {/if}
 
         {#if $adminNavbarActiveItem === 'Autres'}
-            <AutresPagePanel />
+            <PageAutresPanel />
         {/if}
     </div>
 </div>
@@ -59,10 +59,6 @@
 		}
 	}
     .admin-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
         width: 100%;
         color: white;
 }
