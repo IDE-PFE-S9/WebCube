@@ -4,6 +4,8 @@
 
 	import JSZip from 'jszip';
 
+	let apiUrl = process.env.API_URL;
+
 	async function createZip(directoryStructure) {
 		const zip = new JSZip();
 
@@ -53,7 +55,7 @@
 		);
 		formData.append('file', zipBlob, 'archive.zip');
 
-		const response = await fetch('http://localhost:4444/api/files/upload', {
+		const response = await fetch(`${apiUrl}/api/files/upload`, {
 			method: 'POST',
 			headers: headersList,
 			body: formData
@@ -64,7 +66,7 @@
 
 		// API call to compile the code and get the API response
 		let compilationResponse = await fetch(
-			`http://localhost:4444/api/compileAndTest?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`,
+			`${apiUrl}/api/compileAndTest?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`,
 			{
 				method: 'GET',
 				headers: headersList
@@ -74,8 +76,22 @@
 
 		// parse results
 		const resultList = parseInput(compilationResult);
-	
-		$terminalOutput = [...$terminalOutput, resultList];
+
+		console.log(resultList)
+		resultList.forEach((message) => {
+			$terminalOutput = [...$terminalOutput, objectToString(message)];
+		});
+
+		// $terminalOutput = [...$terminalOutput, resultList];
+	}
+
+	function objectToString(obj) {
+		let resultString = `Test: ${obj.Test}\nStatus: ${obj.Status}`;
+
+		if (obj.Data) {
+			resultString += `\nData: ${obj.Data}`;
+		}
+		return resultString;
 	}
 
 	// Main parsing function
