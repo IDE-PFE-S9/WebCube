@@ -27,9 +27,10 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"antlr4": "^4.13.0",
+		"antlr4": "^4.13.1",
 		"jszip": "^3.10.1",
 		"monaco-editor": "^0.43.0",
+		"reconnecting-websocket": "^4.4.0",
 		"sweetalert2": "^11.6.13"
 	}
 }

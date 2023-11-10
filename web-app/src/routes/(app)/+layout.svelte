@@ -3,38 +3,43 @@
 	import TabManager from '$lib/TabManager/TabManager.svelte';
 	import Navbar from '$lib/Navbar/Navbar.svelte';
 	import MonacoEditor from '$lib/MonacoEditor/MonacoEditor.svelte';
-	import Terminal from '../../lib/Terminal/Terminal.svelte';
-	import StructureParser from '../../lib/StructureParser/StructureParser.svelte';
-	import WcArchiveExplorer from '../../lib/ArchiveExplorer/WCArchiveExplorer.svelte';
-	import ArchiveTabManager from '../../lib/TabManager/ArchiveTabManager.svelte';
-	import MarkdownViewer from '../../lib/MarkdownViewer/MarkdownViewer.svelte';
+	import Terminal from '$lib/Terminal/Terminal.svelte';
+	import StructureParser from '$lib/StructureParser/StructureParser.svelte';
+	import WcArchiveExplorer from '$lib/ArchiveExplorer/WCArchiveExplorer.svelte';
+	import ArchiveTabManager from '$lib/TabManager/ArchiveTabManager.svelte';
+	import MarkdownViewer from '$lib/MarkdownViewer/MarkdownViewer.svelte';
+	import UserPanel from '$lib/UserPanel/UserPanel.svelte';
 
-	import { archiveMode, markdownMode } from '$lib/stores.js';
+	import { archiveMode, markdownMode, currentTab } from '$lib/stores.js';
 </script>
 
 <div class="main">
 	<Navbar />
-	<div class="mid">
-		{#if $archiveMode}
-			<WcArchiveExplorer />
-		{:else}
-			<FileExplorer />
-		{/if}
-		<StructureParser />
-	</div>
-	<div class="right">
-		{#if $archiveMode}
-			<ArchiveTabManager />
-		{:else}
-			<TabManager />
-		{/if}
-		{#if $markdownMode}
-			<MarkdownViewer />
-		{:else}
-			<MonacoEditor />
-			<Terminal />
-		{/if}
-	</div>
+	{#if $currentTab == 'Utilisateur'}
+		<UserPanel />
+	{:else}
+		<div class="mid">
+			{#if $currentTab == 'Archive'}
+				<WcArchiveExplorer />
+			{:else if $currentTab == 'Explorer'}
+				<FileExplorer />
+			{/if}
+			<StructureParser />
+		</div>
+		<div class="right">
+			{#if $currentTab == 'Archive'}
+				<ArchiveTabManager />
+			{:else if $currentTab == 'Explorer'}
+				<TabManager />
+			{/if}
+			{#if $markdownMode}
+				<MarkdownViewer />
+			{:else}
+				<MonacoEditor />
+				<Terminal />
+			{/if}
+		</div>
+	{/if}
 	<slot />
 </div>
 
