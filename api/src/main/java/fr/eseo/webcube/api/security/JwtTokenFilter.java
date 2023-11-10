@@ -1,9 +1,9 @@
 package fr.eseo.webcube.api.security;
 
-import com.projetgleseo.api.model.Person;
+/*import com.projetgleseo.api.model.Person;
 import com.projetgleseo.api.model.PlanningAssistant;
 import com.projetgleseo.api.model.Student;
-import com.projetgleseo.api.model.Teacher;
+import com.projetgleseo.api.model.Teacher;*/
 
 import fr.eseo.webcube.api.model.Etudiant;
 import io.jsonwebtoken.Claims;
@@ -66,22 +66,21 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     // TODO recuperation des informations du token
     private UserDetails getUserDetails(String token) {
-        Etudiant userDetails;
+        Etudiant userDetails = new Etudiant();
         Claims claims = jwtUtil.parseClaims(token);
         String role = (String) claims.get("role");
         role = role.replace("[", "").replace("]", "");
         String[] jwtSubject = jwtUtil.getSubject(token).split(",");
         if (role.equals("ROLE_TEACHER")) {
-            userDetails = new Teacher();
+            //userDetails = new Teacher();
         } else if (role.equals("ROLE_STUDENT")) {
 
-            userDetails = new Student();
+            //userDetails = new Student();
         } else {
-            userDetails = new PlanningAssistant();
+            //userDetails = new PlanningAssistant();
         }
-        userDetails.setPermission(role);
-        userDetails.setUsername(jwtSubject[0]);
+        //userDetails.setPermission(role);
+        //userDetails.setUsername(jwtSubject[0]);
         return userDetails;
-
     }
 }

@@ -53,9 +53,10 @@ public class Etudiant implements Serializable, UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton( new SimpleGrantedAuthority( "ROLE_STUDENT" ) );
-        
+        // Assurez-vous de retourner une collection non nulle d'autorités (rôles).
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_STUDENT"));
     }
+    
 
     @Override
     public String getPassword() {
