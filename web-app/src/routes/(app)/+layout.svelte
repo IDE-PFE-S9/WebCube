@@ -9,9 +9,9 @@
 	import ArchiveTabManager from '$lib/TabManager/ArchiveTabManager.svelte';
 	import MarkdownViewer from '$lib/MarkdownViewer/MarkdownViewer.svelte';
 	import UserPanel from '$lib/UserPanel/UserPanel.svelte';
+	import GitExplorer from '../../lib/GitExplorer/GitExplorer.svelte';
 
 	import { archiveMode, markdownMode, currentTab } from '$lib/stores.js';
-	import GitExplorer from '../../lib/GitExplorer/GitExplorer.svelte';
 </script>
 
 <div class="main">
