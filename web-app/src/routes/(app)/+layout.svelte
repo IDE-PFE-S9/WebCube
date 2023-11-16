@@ -9,8 +9,11 @@
 	import ArchiveTabManager from '$lib/TabManager/ArchiveTabManager.svelte';
 	import MarkdownViewer from '$lib/MarkdownViewer/MarkdownViewer.svelte';
 	import UserPanel from '$lib/UserPanel/UserPanel.svelte';
+	import { login, getUserDetails, exempleToken } from '$lib/auth.js'; // Assuming the MSAL code is in auth.js
+	import Cookies from 'js-cookie';
 
 	import { archiveMode, markdownMode, currentTab } from '$lib/stores.js';
+
 </script>
 
 <div class="main">
