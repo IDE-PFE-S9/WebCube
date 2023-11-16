@@ -101,7 +101,7 @@ public class UserController {
 
             Claims claims = jwtTokenUtil.parseClaims(tokenApi);
 
-            String surnameom = claims.get("surname", String.class);
+            String surname = claims.get("surname", String.class);
             String firstname = claims.get("firstname", String.class);
             Set<Role> roles = new HashSet<>(claims.get("roles", List.class));
 
