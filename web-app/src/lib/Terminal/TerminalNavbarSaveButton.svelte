@@ -16,7 +16,7 @@
 					if (item.type === 'directory') {
 						const newFolder = zipFolder.folder(itemName);
 						await processDirectory(item, newFolder);
-					} else if (item.type === 'file') {
+					} else if (item.type === 'file' && item.modified === true) {
 						zipFolder.file(itemName, item.data);
 					}
 				})
@@ -36,6 +36,7 @@
 				const codeToUpdate = $openedCodes.find((code) => code.name === node.name);
 				if (codeToUpdate) {
 					node.data = codeToUpdate.code; // Update the data field
+					node.modified = true
 				}
 			} else if (node.children) {
 				node.children.forEach(updateArchive); // Recurse into directories
@@ -65,6 +66,17 @@
 		});
 
 		const responseData = await response.text();
+
+		// traverse the $openedArchive and change all the modified fields to false
+		function resetModified(node) {
+			if (node.type === 'file') {
+				node.modified = false;
+			} else if (node.children) {
+				node.children.forEach(resetModified); // Recurse into directories
+			}
+		}
+
+		resetModified($openedArchive)
 
 		Swal.fire({
 			title: 'Fichiers sauvegardés !',

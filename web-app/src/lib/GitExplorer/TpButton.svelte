@@ -68,7 +68,8 @@
 						name: currentPath, // Use the constructed full path
 						data: content, // Content will be text or Uint8Array depending on file type
 						visible: false,
-						write: false
+						write: false,
+						modified: false
 					});
 				} else {
 					let dir = current.children.find((c) => c.type === 'directory' && c.name === currentPath);

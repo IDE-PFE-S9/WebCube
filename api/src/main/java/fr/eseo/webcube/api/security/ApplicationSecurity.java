@@ -8,10 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-
-
 
 @Configuration
 @EnableWebSecurity
@@ -69,12 +65,5 @@ public class ApplicationSecurity {
 
         return converter;
     }*/
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder
-                .withJwkSetUri("https://login.microsoftonline.com/organizations/discovery/v2.0/keys") // Remplacez {tenantId} par votre identifiant de locataire Azure AD
-                .build();
-    }
 
 }

@@ -49,7 +49,7 @@ public class TPService {
 		String gitLink = tp.getGitLink();
 		String name = tp.getName();
 	
-		// TODO: CHANGE THE PATH FOR PRODUCTION
+		// TODO: fix the path to use the token.
 		Path permDir = Paths.get("/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/arthur/" + name);
 	
 		// Check if the directory already exists
@@ -57,9 +57,9 @@ public class TPService {
 			// If it does not exist, create it and clone the repo
 			Files.createDirectories(permDir);
 			Git.cloneRepository()
-				.setURI(gitLink)
-				.setDirectory(permDir.toFile())
-				.call();
+					.setURI(gitLink)
+					.setDirectory(permDir.toFile())
+					.call();
 		}
 	
 		// If the directory exists, create a zip of the directory

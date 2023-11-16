@@ -51,9 +51,9 @@ public class TPController {
     public ResponseEntity<Resource> getArchiveById(@PathVariable Integer id) {
         try {
             Resource archive = tpService.getArchive(id);
-    
+
             String filename = "archive-" + id + ".wc"; // Set a filename for the downloaded archive
-    
+
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("application/zip")) // Set the content type
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"") // Suggest download

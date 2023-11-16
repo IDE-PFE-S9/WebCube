@@ -34,6 +34,8 @@ public class JobProducer {
     @Value("${spring.rabbitmq.host}")
     private String host;
 
+    // TODO: fix the paths to use the token.
+
     @GetMapping("/compileAndRun")
     public String compileAndRun(@RequestParam String projectPath) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
