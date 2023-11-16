@@ -1,4 +1,5 @@
 <script>
+  import StudentAdvancement from './StudentAdvancement.svelte';
 
 </script>
 
@@ -16,43 +17,31 @@
         </div>
     </div>
 
-    <div class="graph-avancement">
-        <div class="graph-groupe-A">
-            <h2> Avancement du Groupe A</h2>
-            <div class="progress-bar">
-                <span class="title">Nombre de test: 350 / 1200</span>
-                <div class="bar" style="width: 100%;">
-                    <div class="percentage-bar" style="width: 30%;"></div>
-                    <span class="percentage">30%</span>
-                </div>
-            </div>
-        </div>
+    <div class="graph-container">
+        <StudentAdvancement name={"Groupe A"} nbTestStudent={1000} nbTestTp={1000}></StudentAdvancement>
 
-        <div class="graph-groupe-B">
-            <h2> Avancement du Groupe B</h2>
-            <div class="progress-bar">
-                <span class="title">Nombre de test: 550 / 1200</span>
-                <div class="bar" style="width: 100%;">
-                    <div class="percentage-bar" style="width: 70%;"></div>
-                    <span class="percentage">70%</span>
-                </div>
-            </div>
-        </div>
+        <StudentAdvancement name={"Groupe B"} nbTestStudent={500} nbTestTp={1000}></StudentAdvancement>
 
-        <div class="graph-complet">
-            <h2> Avancement de la Promotion</h2>
-            <div class="progress-bar">
-                <span class="title">Nombre de test: 900 / 2400</span>
-                <div class="bar" style="width: 100%;">
-                    <div class="percentage-bar" style="width: 50%;"></div>
-                    <span class="percentage">50%</span>
-                </div>
-            </div>
-        </div>
+        <StudentAdvancement name={"Global"} nbTestStudent={1500} nbTestTp={2000}></StudentAdvancement>
     </div>
 
     <div class="avancement-individuel">
-        <h1>Avancement Individuel</h1>
+        <h1 class="individuel-title">Avancement Individuel</h1>
+        
+        <div class="individuel-container">
+           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"Meyniel Arthur"} nbTestStudent={10} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"Lurat Théo"} nbTestStudent={30} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"L'énormeBgLpb Ronan"} nbTestStudent={40} nbTestTp={40}></StudentAdvancement>
+
+           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
+        </div>
     </div>
 
 </div>
@@ -68,65 +57,32 @@
     .header-container {
         width:100%;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        align-items: center; 
     }
 
     .title{
-        justify-self: center;
+        text-align: center;
+        flex-grow: 1;
     }
 
     .tp-selector {
         display: flex;
-        justify-self: flex-end; 
-
+        align-items: center;
+        margin-left: auto;
         label {
             margin-right: 0.5rem;
         }
     }
-
-    .graph-avancement{
-        width: 100%;
+    .graph-container{
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-
-        .graph-groupe-A,
-        .graph-groupe-B,
-        .graph-complet {
-            padding-left: 3rem;
-            padding-right: 3rem;
-        }
+        flex-wrap: wrap;
     }
 
-    .progress-bar {
-        margin-bottom: 0.5rem;
-
-        .title {
-            display: block;
-            margin-bottom: 0.2rem;
-        }
-
-        .bar {
-            height: 20px; 
-            position: relative;
-            border: 2px solid white;
-            border-radius: 20px;
-
-            .percentage-bar {
-                background-color: rgb(52,120,198);
-                border-radius: 8px;
-                height: 100%;
-                position: absolute;
-            }
-
-            .percentage {
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                color: white;
-            }
-        }
+    .individuel-title{
+        text-align: center;
+    }
+    .individuel-container {
+        display: flex;
+        flex-wrap: wrap;
     }
 </style>
