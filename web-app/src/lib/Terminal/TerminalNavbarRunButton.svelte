@@ -1,78 +1,45 @@
 <script>
-	import { terminalOutput, openedDirectory } from '$lib/stores.js';
+	import { terminalOutput, openedArchive } from '$lib/stores.js';
 	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
-
-	import JSZip from 'jszip';
 
 	let apiUrl = process.env.API_URL;
 
-	async function createZip(directoryStructure) {
-		const zip = new JSZip();
-
-		async function processDirectory(directory, zipFolder) {
-			await Promise.all(
-				directory.children.map(async (item) => {
-					if (item.type === 'directory') {
-						const newFolder = zipFolder.folder(item.name.split('/').pop());
-						await processDirectory(item, newFolder);
-					} else if (item.type === 'file') {
-						const fileHandle = item.handle;
-						const file = await fileHandle.getFile();
-						if (item.name.endsWith('.jar')) {
-							// Handle JAR files as binary
-							zipFolder.file(item.name.split('/').pop(), file);
-						} else {
-							// Handle other files as text
-							const contents = await file.text();
-							zipFolder.file(item.name.split('/').pop(), contents);
-						}
-					}
-				})
-			);
-		}
-
-		await processDirectory(directoryStructure, zip); // awaiting this call as well
-
-		const content = await zip.generateAsync({ type: 'blob' });
-		return content;
-	}
-
 	async function runCode() {
 		$terminalOutput = [...$terminalOutput, 'Compiling...'];
-
-		const zipBlob = await createZip($openedDirectory);
 
 		let headersList = {
 			Accept: '*/*'
 		};
 
-		let username = 'arthur';
-
-		const formData = new FormData();
-		formData.append(
-			'directory',
-			`/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`
-		);
-		formData.append('file', zipBlob, 'archive.zip');
-
-		const response = await fetch(`${apiUrl}/api/files/upload`, {
-			method: 'POST',
-			headers: headersList,
-			body: formData
-		});
-
-		const responseData = await response.text();
-		console.log(responseData);
+		let username = "arthur"
 
 		// API call to compile the code and get the API response
 		let compilationResponse = await fetch(
-			`${apiUrl}/api/compileAndJar?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}${$openedDirectory.name}`,
+			`${apiUrl}/api/compileAndJar?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}/${$openedArchive.name}`,
 			{
 				method: 'GET',
 				headers: headersList
 			}
 		);
 		let compilationResult = await compilationResponse.blob();
+
+		// Create a new URL object from the Blob
+		let url = window.URL.createObjectURL(compilationResult);
+
+		// Create an anchor (`<a>`) element and set its href to the Blob URL
+		let a = document.createElement('a');
+		a.href = url;
+
+		// Set the filename for the downloaded file
+		a.download = $openedArchive.name.replace(/\.[^/.]+$/, '') + '.jar';
+
+		// Append the anchor to the body, click it to trigger the download, then remove it
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+
+		// It's a good practice to release the created URL object after use
+		window.URL.revokeObjectURL(url);
 
 		// // Create a new FileReader object
 		// let reader = new FileReader();
@@ -91,7 +58,7 @@
 
 		// reader.readAsArrayBuffer(compilationResult);
 
-		// const exitCode = await cheerpjRunJar("/str/application.jar");	
+		// const exitCode = await cheerpjRunJar("/str/application.jar");
 		// $terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
 	}
 </script>

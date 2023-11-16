@@ -277,7 +277,6 @@ public class JobWorker {
                 }
             }
         }
-
         return jarFile;
     }
 

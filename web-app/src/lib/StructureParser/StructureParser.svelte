@@ -1,5 +1,5 @@
 <script>
-	import { openedCodes, selectedFile, editorUpdateTrigger } from '$lib/stores.js';
+	import { openedCodes, selectedArchiveFile, editorUpdateTrigger } from '$lib/stores.js';
 
 	import antlr4 from 'antlr4';
 	import { CharStreams, CommonTokenStream } from 'antlr4';
@@ -10,10 +10,6 @@
 
 	let parsedOutput = {};
 
-	let showDetails = {}; // Object to keep track of which class details are shown
-	function toggleDetails(index) {
-		showDetails[index] = !showDetails[index];
-	}
 
 	class JavaListener extends JavaParserListener {
 		constructor() {
@@ -148,12 +144,13 @@
 
 	// Reactive statement to run parseJava whenever editorUpdateTrigger changes
 	const getCode = editorUpdateTrigger.subscribe(() => {
-		if (!$selectedFile) {
+		if (!$selectedArchiveFile) {
 			parsedOutput = {};
 			return;
 		}
+		
 		const codes = $openedCodes;
-		const selectedFileName = $selectedFile?.name;
+		const selectedFileName = $selectedArchiveFile;
 		const fileExtension = selectedFileName?.split('.').pop();
 
 
@@ -210,17 +207,6 @@
 				font-weight: 300;
 				color: rgb(187, 187, 187);
 			}
-		}
-
-		.class-name,
-		.field,
-		.method {
-			font-family: 'Courier New', monospace;
-			margin-left: 20px;
-		}
-
-		.collapsible {
-			display: none;
 		}
 	}
 </style>

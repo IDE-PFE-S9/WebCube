@@ -28,7 +28,6 @@
 	"type": "module",
 	"dependencies": {
 		"antlr4": "^4.13.1",
-		"dotenv": "^16.3.1",
 		"jszip": "^3.10.1",
 		"monaco-editor": "^0.43.0",
 		"reconnecting-websocket": "^4.4.0",
