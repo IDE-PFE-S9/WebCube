@@ -1,5 +1,6 @@
 <script>
   import StudentAdvancement from './StudentAdvancement.svelte';
+  import GlobalAdvancement from './GlobalAdvancement.svelte';
 
 </script>
 
@@ -18,11 +19,11 @@
     </div>
 
     <div class="graph-container">
-        <StudentAdvancement name={"Groupe A"} nbTestStudent={1000} nbTestTp={1000}></StudentAdvancement>
+        <GlobalAdvancement name={"Groupe A"} nbTestStudent={1000} nbTestTp={1000}></GlobalAdvancement>
 
-        <StudentAdvancement name={"Groupe B"} nbTestStudent={500} nbTestTp={1000}></StudentAdvancement>
+        <GlobalAdvancement name={"Groupe B"} nbTestStudent={500} nbTestTp={1000}></GlobalAdvancement>
 
-        <StudentAdvancement name={"Global"} nbTestStudent={1500} nbTestTp={2000}></StudentAdvancement>
+        <GlobalAdvancement name={"Global"} nbTestStudent={1500} nbTestTp={2000}></GlobalAdvancement>
     </div>
 
     <div class="avancement-individuel">
@@ -32,7 +33,7 @@
            <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
            <StudentAdvancement name={"Meyniel Arthur"} nbTestStudent={10} nbTestTp={40}></StudentAdvancement>
            <StudentAdvancement name={"Lurat Théo"} nbTestStudent={30} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"L'énormeBgLpb Ronan"} nbTestStudent={40} nbTestTp={40}></StudentAdvancement>
+           <StudentAdvancement name={"L'énormeBgLpb Ronan"} nbTestStudent={4} nbTestTp={40}></StudentAdvancement>
 
            <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
            <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
@@ -84,5 +85,6 @@
     .individuel-container {
         display: flex;
         flex-wrap: wrap;
+        align-items: flex-end;
     }
 </style>

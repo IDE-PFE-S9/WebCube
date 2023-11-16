@@ -7,9 +7,9 @@
 </script>
 
 <div class="individuel">
-    <h4 class="name">{name}</h4>
+    <h2 class="name">{name}</h2>
     <div class="progress-bar">
-        <h6 class="nombre-test">Test : {nbTestStudent} / {nbTestTp}</h6>
+        <span class="title">Nombre de test : {nbTestStudent} / {nbTestTp}</span>
         <div class="bar" style="width: 100%;">
             <div class="percentage-bar" class:complete={percentage === 100} style="width: {percentage}%;"></div>
             <span class="percentage">{percentage}%</span>
@@ -23,23 +23,24 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
-        margin-bottom: 1rem;
-        width: 10rem;
+        margin-bottom: 1.5rem;
+        width: 20rem;
     }
 
     .name {
-        margin: 0.5rem;
-    }
-
-    .nombre-test {
-        margin:0.5rem;
+        margin: 0;
     }
 
     .progress-bar {
         margin-bottom: 0.5rem;
 
+        .title {
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
         .bar {
-            height: 1rem; 
+            height: 1.5rem; 
             position: relative;
             border: 2px solid white;
             border-radius: 20px;
@@ -50,7 +51,7 @@
                 height: 100%;
                 position: absolute;  
             }
-
+            
             .complete{
                     background-color: green;
                 }
