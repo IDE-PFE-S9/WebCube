@@ -4,8 +4,8 @@
 	id="Capa_1"
 	xmlns="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
-	width="800px"
-	height="800px"
+	width="408px"
+	height="408px"
 	viewBox="0 0 407.096 407.096"
 	xml:space="preserve"
 >

@@ -98,12 +98,14 @@
 					}
 				]
 			});
+
 			archiveHandle.set(fileHandle);
 			let archive = await fileHandle.getFile();
 			if (!archive.name.endsWith('.wc')) {
 				console.error('Invalid file type selected.');
 				return;
 			}
+
 			let archiveStructure = await handleArchive(archive);
 
 			const xmlDescriptorString = findDescriptor(archiveStructure);
@@ -198,8 +200,8 @@
 	<div id="title-container">
 		<h1 id="title">Explorateur</h1>
 	</div>
-	{#if directoryObject.name}
-		<ArchiveDirectoryItem directory={directoryObject} />
+	{#if $openedArchive}
+		<ArchiveDirectoryItem directory={$openedArchive} />
 	{:else}
 		<button on:click={openArchive} class="button-open-directory">Open WebCube Archive</button>
 	{/if}

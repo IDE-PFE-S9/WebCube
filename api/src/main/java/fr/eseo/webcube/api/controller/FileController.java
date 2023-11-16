@@ -1,12 +1,27 @@
 package fr.eseo.webcube.api.controller;
 
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.*;
-import java.nio.file.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/files")
@@ -43,6 +58,39 @@ public class FileController {
                     }
                 }
             }
+
+            // commit the changes to the gir repository
+            try (Git git = Git.open(new File(directory))) {
+                // Check if the branch exists and create it if not
+                String branchName = "arthurmeyniel";
+                List<Ref> branches = git.branchList().call();
+                boolean branchExists = branches.stream().anyMatch(ref -> ref.getName().endsWith(branchName));
+
+                if (!branchExists) {
+                    git.branchCreate().setName(branchName).call();
+                }
+
+                // Checkout the branch (newly created or existing)
+                git.checkout().setName(branchName).call();
+
+                // Add all files to the repository
+                git.add().addFilepattern(".").call();
+
+                // Commit the changes
+                git.commit().setMessage("test commit message").call();
+
+                // Push the commit to the branch
+                // TODO: CHANGE THE PASSWORD WITH A TOKEN FOR THE ACCOUNT !!!
+                git.push()
+                        .setCredentialsProvider(
+                                new UsernamePasswordCredentialsProvider("arthur.meyniel@icloud.com", "your_token_here"))
+                        .setRefSpecs(new RefSpec(branchName))
+                        .call();
+            } catch (IOException | GitAPIException e) {
+                e.printStackTrace();
+                // Handle exceptions
+            }
+            System.out.println("yes");
             return "File uploaded and extracted successfully!";
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,4 +98,3 @@ public class FileController {
         }
     }
 }
-

@@ -21,21 +21,23 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class TP implements Serializable{
+public class TP implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idTp")
-    private Integer idTp;
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "avancement")
-    private Integer avancement;
-
-    @Column(name = "isExam")
-    private boolean isExam;
+    @Column(name = "name")
+    private String name;
 
     @ManyToMany(mappedBy = "tp")
     @JsonIgnore
     private Set<User> users;
     
+    @Column(name = "type")
+    private String type;
+    
+    @Column(name = "gitLink")
+    private String gitLink;
 }
