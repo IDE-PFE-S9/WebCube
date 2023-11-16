@@ -1,36 +1,75 @@
 <script>
-	import { openedCodes, selectedFile } from '$lib/stores.js';
+	import { openedCodes, openedArchive } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
+	import Swal from 'sweetalert2';
+	import JSZip from 'jszip';
+
+	let apiUrl = process.env.API_URL;
+
+	async function createZip(directoryStructure) {
+		const zip = new JSZip();
+
+		async function processDirectory(directory, zipFolder) {
+			await Promise.all(
+				directory.children.map(async (item) => {
+					const itemName = item.name.split('/').pop(); // Get the relative name
+					if (item.type === 'directory') {
+						const newFolder = zipFolder.folder(itemName);
+						await processDirectory(item, newFolder);
+					} else if (item.type === 'file') {
+						zipFolder.file(itemName, item.data);
+					}
+				})
+			);
+		}
+
+		await processDirectory(directoryStructure, zip); // Start the process with the root directory
+
+		const content = await zip.generateAsync({ type: 'blob' });
+		return content;
+	}
 
 	async function saveFile() {
-		const fileHandle = $selectedFile.handle; // Access the file handle from the selectedFile store.
-
-		if (!fileHandle) {
-			console.error('File handle is not available');
-			return;
+		// Function to recursively update the archive
+		function updateArchive(node) {
+			if (node.type === 'file') {
+				const codeToUpdate = $openedCodes.find((code) => code.name === node.name);
+				if (codeToUpdate) {
+					node.data = codeToUpdate.code; // Update the data field
+				}
+			} else if (node.children) {
+				node.children.forEach(updateArchive); // Recurse into directories
+			}
 		}
+		updateArchive($openedArchive);
 
-		// Find the code object for the currently selected file.
-		const codeObj = $openedCodes.find(code => code.name === $selectedFile.name);
-		if (!codeObj) {
-			console.error('Code not found for the selected file');
-			return;
-		}
+		const zipBlob = await createZip($openedArchive);
 
-		const contents = codeObj.code;  // Access the code from the code object.
-        console.log('Contents to be written:', contents);
+		let headersList = {
+			Accept: '*/*'
+		};
 
-		try {
-			// Create a writable stream.
-			const writable = await fileHandle.createWritable();
-			// Write the contents back to the file.
-			await writable.write(contents);
-			// Close the stream.
-			await writable.close();
-			console.log('File has been saved');
-		} catch (error) {
-			console.error('Error writing file:', error);
-		}
+		let username = 'arthur';
+
+		const formData = new FormData();
+		formData.append(
+			'directory',
+			`/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}/${$openedArchive.name}`
+		);
+		formData.append('file', zipBlob, 'archive.zip');
+
+		const response = await fetch(`${apiUrl}/api/files/upload`, {
+			method: 'POST',
+			headers: headersList,
+			body: formData
+		});
+
+		const responseData = await response.text();
+
+		Swal.fire({
+			title: 'Fichiers sauvegardés !',
+			icon: 'success'
+		});
 	}
 </script>
 

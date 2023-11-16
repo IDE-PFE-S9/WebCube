@@ -6,6 +6,8 @@
 	export let directory;
 	let expanded = false;
 
+	let relativeName = directory.name.split('/').pop();
+
 	function toggleExpand() {
 		expanded = !expanded;
 	}
@@ -14,7 +16,7 @@
 <div id="container" class:hidden={!directory.visible}>
 	<button class="header" on:click={toggleExpand}>
 		<DirectoryIcon />
-		{directory.name}
+		{relativeName}
 	</button>
 	{#if expanded}
 		<div class="files">

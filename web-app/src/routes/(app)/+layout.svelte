@@ -11,6 +11,7 @@
 	import UserPanel from '$lib/UserPanel/UserPanel.svelte';
 
 	import { archiveMode, markdownMode, currentTab } from '$lib/stores.js';
+	import GitExplorer from '../../lib/GitExplorer/GitExplorer.svelte';
 </script>
 
 <div class="main">
@@ -22,7 +23,7 @@
 			{#if $currentTab == 'Archive'}
 				<WcArchiveExplorer />
 			{:else if $currentTab == 'Explorer'}
-				<FileExplorer />
+				<GitExplorer />
 			{/if}
 			<StructureParser />
 		</div>

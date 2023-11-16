@@ -7,8 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,21 +15,19 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class TP implements Serializable{
+public class TP implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idTp")
-    private Integer idTp;
+    @Column(name = "id")
+    private Integer id;
 
-    @Column(name = "avancement")
-    private Integer avancement;
+    @Column(name = "name")
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "idEtudiant")
-    private Etudiant etudiant;
-
-    @Column(name = "isExam")
-    private boolean isExam;
+    @Column(name = "type")
+    private String type;
     
+    @Column(name = "gitLink")
+    private String gitLink;
 }
