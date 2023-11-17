@@ -13,45 +13,56 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
-import fr.eseo.webcube.api.dao.TPDAO;
+import fr.eseo.webcube.api.dao.TpRepository;
+import fr.eseo.webcube.api.dao.UserRepository;
+import fr.eseo.webcube.api.dao.UserTpRepository;
 import fr.eseo.webcube.api.model.TP;
+import fr.eseo.webcube.api.model.User;
+import fr.eseo.webcube.api.model.UserTP;
+import fr.eseo.webcube.api.model.UserTpKey;
 
 @Service
 public class TPService {
 
 	@Autowired
-	private TPDAO tpdao;
+	private TpRepository tpRepository;
 
-	// TODO regler probleme de type JpaRepository<TP,Integrer>
-	protected TPDAO getDao() {
-		return tpdao;
-	}
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private UserTpRepository userTpRepository;
 
 	public List<TP> getTpList() {
-		return tpdao.findAll();
+		return tpRepository.findAll();
 	}
 
 	public Optional<TP> getTp(Integer id) {
-		return tpdao.findById(id);
+		return tpRepository.findById(id);
 	}
 
-	public Resource getArchive(Integer id) throws Exception {
-		Optional<TP> tpOptional = tpdao.findById(id);
-	
+	public Resource getArchive(Integer id, String uniqueName) throws Exception {
+		Optional<TP> tpOptional = tpRepository.findById(id);
+
 		TP tp = tpOptional.get();
 		String gitLink = tp.getGitLink();
 		String name = tp.getName();
-	
+
+		String username = uniqueName.split("@")[0].replace(".", "-");
+
+		User user = userRepository.findByUniqueName(uniqueName);
+
 		// TODO: fix the path to use the token.
-		Path permDir = Paths.get("/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/arthur/" + name);
-	
+		Path permDir = Paths.get(
+				"/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/"
+						+ username + "/" + name);
+
 		// Check if the directory already exists
 		if (!Files.exists(permDir)) {
 			// If it does not exist, create it and clone the repo
@@ -60,12 +71,24 @@ public class TPService {
 					.setURI(gitLink)
 					.setDirectory(permDir.toFile())
 					.call();
+
+			// Store the TP in database
+			// here i want to create an entry inside the userTP table with the id of the tp,
+			// the uniqueName of the user and the completion set to 0
+			// Create and store the UserTP in database
+			UserTpKey userTPKey = new UserTpKey(uniqueName, tp.getId());
+			UserTP userTP = new UserTP();
+			userTP.setId(userTPKey);
+			userTP.setUser(user);
+			userTP.setTp(tp);
+			userTP.setCompletion("0"); // Assuming completion is a String
+			userTpRepository.save(userTP);
 		}
-	
+
 		// If the directory exists, create a zip of the directory
 		Path zipPath = Files.createTempFile("archive", ".wc");
 		zipFolder(permDir, zipPath);
-	
+
 		// Convert zip to Resource
 		Resource resource = new UrlResource(zipPath.toUri());
 		return resource;
