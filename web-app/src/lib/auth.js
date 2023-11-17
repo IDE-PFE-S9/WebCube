@@ -2,7 +2,6 @@
 import { PublicClientApplication } from "@azure/msal-browser";
 import Cookies from "js-cookie";
 
-
 // MSAL configuration
 const msalConfig = {
     auth: {
@@ -18,12 +17,12 @@ const msalConfig = {
 
 // Create an instance of PublicClientApplication with the config
 
-
-// Function to login
+//Fonction to login
 async function login() {
     const msalInstance = new PublicClientApplication(msalConfig);
     await msalInstance.initialize();
     console.log('msalInstance', msalInstance);
+    
     try {
         await msalInstance.loginPopup({
             scopes: ["User.Read"],
@@ -42,12 +41,51 @@ async function login() {
             console.log('Access Token:', response.accessToken);
 
             Cookies.set("azureJWT", response.accessToken);
+
+            getUserDetails();
         }
     } catch (error) {
         console.error(error);
         console.log('moche comme erreur');
     }
 }
+
+/*async function login() {
+
+    const loginRequest = {
+        scopes: ["User.Read"],
+        prompt: "select_account"
+      };
+      
+      let accountId = "";
+      
+      const myMsal = new PublicClientApplication(msalConfig);
+      await myMsal.initialize();
+      console.log('msalInstance', myMsal);
+      
+      window.open(
+      myMsal
+        .loginPopup(loginRequest)
+        .then(async function (loginResponse) {
+          //accountId = loginResponse.account.homeAccountId;
+          // Display signed-in user content, call API, etc.
+          const account = myMsal.getAllAccounts()[0];
+        if (account) {
+            const response = await myMsal.acquireTokenSilent({
+                scopes: ["User.Read"],
+                account: account
+            });
+            console.log('Access Token:', response.accessToken);
+            Cookies.set("azureJWT", response.accessToken);
+
+
+        }})
+        .catch(function (error) {
+          //login failure
+          console.log(error);
+        })).focus();
+}*/
+
 
 async function getUserDetails() {
     const response = await fetch(`http://localhost:4444/User/Exemple`, {
