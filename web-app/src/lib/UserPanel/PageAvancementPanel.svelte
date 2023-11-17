@@ -1,6 +1,31 @@
 <script>
-  import StudentAdvancement from './StudentAdvancement.svelte';
-  import GlobalAdvancement from './GlobalAdvancement.svelte';
+    import GlobalAdvancement from './GlobalAdvancement.svelte';
+    import '@carbon/charts-svelte/styles.css'
+	import { BarChartSimple } from '@carbon/charts-svelte'
+
+
+    let data = [
+        {"group": "Qty","value": 65000},
+        {"group": "More","value": 29123},
+        {"group": "Sold","value": 35213},
+        {"group": "Restocking","value": 51213},
+        {"group": "Misc","value": 16932}
+    ]
+
+    let options = {
+        "title": "Horizontal simple bar (discrete)",
+        "axes": {
+            "left": {
+            "mapsTo": "group",
+            "scaleType": "labels"
+            },
+            "bottom": {
+            "mapsTo": "value"
+            }
+        },
+        "height": "400px",
+        "theme": "g100"
+    }
 
 </script>
 
@@ -28,21 +53,9 @@
 
     <div class="avancement-individuel">
         <h1 class="individuel-title">Avancement Individuel</h1>
-        
-        <div class="individuel-container">
-           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"Meyniel Arthur"} nbTestStudent={10} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"Lurat Théo"} nbTestStudent={30} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"L'énormeBgLpb Ronan"} nbTestStudent={4} nbTestTp={40}></StudentAdvancement>
 
-           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
-           <StudentAdvancement name={"Guilpin Erwan"} nbTestStudent={20} nbTestTp={40}></StudentAdvancement>
-        </div>
+        <BarChartSimple {data} {options} />
+
     </div>
 
 </div>
