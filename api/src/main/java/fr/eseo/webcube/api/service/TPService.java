@@ -8,17 +8,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.jgit.api.Git;
+import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
+import fr.eseo.webcube.api.Details.TpDetails;
+import fr.eseo.webcube.api.Response.TpResponse;
 import fr.eseo.webcube.api.dao.TpRepository;
 import fr.eseo.webcube.api.dao.UserRepository;
 import fr.eseo.webcube.api.dao.UserTpRepository;
@@ -116,4 +120,20 @@ public class TPService {
 		});
 		zos.close();
 	}
+
+	public TpResponse getCompletionByUniqueName(String uniqueName) {
+		List<TpDetails> tpDetails = userTpRepository.findDetailsByUniqueName(uniqueName);
+		TpResponse tpResponse = new TpResponse(uniqueName, tpDetails);
+        return tpResponse;
+    }
+
+	public TpResponse getCompletionByUniqueNameAndTpId(String uniqueName, Integer tpId) {
+		List<TpDetails> tpDetails = userTpRepository.findDetailsByUniqueNameAndTpId(uniqueName, tpId);
+		TpResponse tpResponse = new TpResponse(uniqueName, tpDetails);
+		return tpResponse;
+	}
+
+	public List<TpResponse> getCompletionsByTpId(Integer tpId) {
+        return userTpRepository.findTpResponseByTpId(tpId);
+    }
 }
