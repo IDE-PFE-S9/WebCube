@@ -12,12 +12,15 @@
 	import GitExplorer from '../../lib/GitExplorer/GitExplorer.svelte';
 
 	import { archiveMode, markdownMode, currentTab } from '$lib/stores.js';
+	import Diagram from '../../lib/Modelling/Diagram.svelte';
 </script>
 
 <div class="main">
 	<Navbar />
 	{#if $currentTab == 'Utilisateur'}
 		<UserPanel />
+	{:else if $currentTab == 'Uml'}
+		<Diagram />
 	{:else}
 		<div class="mid">
 			{#if $currentTab == 'Archive'}
