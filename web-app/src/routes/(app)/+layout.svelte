@@ -9,10 +9,11 @@
 	import ArchiveTabManager from '$lib/TabManager/ArchiveTabManager.svelte';
 	import MarkdownViewer from '$lib/MarkdownViewer/MarkdownViewer.svelte';
 	import UserPanel from '$lib/UserPanel/UserPanel.svelte';
-	import GitExplorer from '../../lib/GitExplorer/GitExplorer.svelte';
+	import GitExplorer from '$lib/GitExplorer/GitExplorer.svelte';
 
 	import { archiveMode, markdownMode, currentTab } from '$lib/stores.js';
-	import Diagram from '../../lib/Modelling/Diagram.svelte';
+	import Diagram from '$lib/Modeling/Diagram.svelte';
+	import ConfigPanel from '$lib/Modeling/ConfigPanel.svelte';
 </script>
 
 <div class="main">
@@ -20,7 +21,12 @@
 	{#if $currentTab == 'Utilisateur'}
 		<UserPanel />
 	{:else if $currentTab == 'Uml'}
-		<Diagram />
+		<div class="mid">
+			<ConfigPanel />
+		</div>
+		<div class="right">
+			<Diagram />
+		</div>
 	{:else}
 		<div class="mid">
 			{#if $currentTab == 'Archive'}

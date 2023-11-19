@@ -6,8 +6,9 @@
 	import JavaParser from '$lib/StructureParser/JavaParser';
 	import JavaParserListener from '$lib/StructureParser/JavaParserListener';
 	import { openedArchive } from '$lib/stores';
-
-	let parsedOutput = { classes: [], enums: [], interfaces: [] };
+	import Swal from 'sweetalert2';
+	import { onMount } from 'svelte';
+	import { showedEntities, entitiesList } from '$lib/stores';
 
 	class JavaListener extends JavaParserListener {
 		constructor() {
@@ -249,18 +250,6 @@
 		}
 	}
 
-	const archive = $openedArchive; // Accessing the store
-
-	if (archive && archive.children) {
-		archive.children.forEach((child) => traverseAndParse(child, parsedOutput));
-	}
-
-	console.log(parsedOutput);
-	let diagram = toMermaidSyntax(parsedOutput);
-	console.log(diagram);
-
-	let container;
-
 	function toMermaidSyntax(data) {
 		let mermaidSyntax = 'classDiagram\n';
 
@@ -380,19 +369,154 @@
 		return allTypes.includes(typeName);
 	}
 
-	async function renderDiagram() {
+	function onClickClass(node) {
+		console.log(`Class clicked: ${node.id.split('-')[1]}`);
+		let className = node.id.split('-')[1];
+		Swal.fire({
+			title: `Edit Class: ${className}`,
+			showCancelButton: true,
+			html: `
+            <input id="field-name" placeholder="Field Name">
+            <input id="field-type" placeholder="Field Type">
+			<select id="field-modifier">
+                <option value="public">public</option>
+                <option value="protected">protected</option>
+                <option value="private">private</option>
+            </select>`,
+			focusConfirm: false,
+			preConfirm: () => {
+				const fieldName = document.getElementById('field-name').value;
+				const fieldType = document.getElementById('field-type').value;
+				const fieldModifier = document.getElementById('field-modifier').value;
+				return { fieldName, fieldType, fieldModifier };
+			}
+		}).then((result) => {
+			if (result.isConfirmed) {
+				updateClassFields(className, result.value);
+			}
+		});
+	}
+
+	function updateClassFields(className, { fieldName, fieldType, fieldModifier }) {
+		const classObj = parsedOutput.classes.find((cls) => cls.name === className);
+		if (classObj) {
+			classObj.fields.push({
+				name: fieldName,
+				type: fieldType,
+				modifiers: [fieldModifier]
+			});
+			diagram = toMermaidSyntax(parsedOutput);
+		}
+	}
+
+	const filterOutput = (showedEntities, parsedOutput) => {
+		console.log(showedEntities)
+		const filteredClasses = parsedOutput.classes
+			.filter((cls) => showedEntities.includes(cls.name))
+			.map((cls) => ({
+				...cls,
+				implementedInterfaces:
+					cls.implementedInterfaces?.filter((name) => showedEntities.includes(name)) || [],
+				superClass: showedEntities.includes(cls.superClass) ? cls.superClass : null
+			}));
+
+		const filteredInterfaces = parsedOutput.interfaces
+			.filter((intf) => showedEntities.includes(intf.name))
+			.map((intf) => ({
+				...intf,
+				extendedInterfaces:
+					intf.extendedInterfaces?.filter((name) => showedEntities.includes(name)) || []
+			}));
+
+		const filteredEnums = parsedOutput.enums.filter((enm) => showedEntities.includes(enm.name));
+
+		const filteredOutput = {
+			classes: filteredClasses,
+			enums: filteredEnums,
+			interfaces: filteredInterfaces
+		};
+		return filteredOutput;
+	};
+
+	async function renderDiagram(diagram) {
+		const { svg } = await mermaid.render('mermaid', diagram);
+		container.innerHTML = svg;
+
+		const svgElement = container.querySelector('svg');
+		svgElement.querySelectorAll('.node').forEach((node) => {
+			node.addEventListener('click', () => {
+				onClickClass(node);
+			});
+		});
+	}
+
+	const updateDiagram = () => {
+		const filteredOutput = filterOutput($showedEntities, parsedOutput);
+		console.log($showedEntities)
+		console.log(filteredOutput)
+		if (
+			filteredOutput.classes.length === 0 &&
+			filteredOutput.enums.length === 0 &&
+			filteredOutput.interfaces.length === 0
+		) {
+			// Handle the case where there are no entities to display
+			diagram = ''; // Clear the diagram
+			container.innerHTML = '<p>No entities to display. Please select some entities.</p>';
+		} else {
+			// Generate the diagram syntax from the filtered output
+			diagram = toMermaidSyntax(filteredOutput);
+			renderDiagram(diagram);
+		}
+	}
+
+	const getEntityNames = (output) => {
+		let classesList = output.classes.map((cls) => cls.name);
+		let enumsList = output.enums.map((enm) => enm.name);
+		let interfacesList = output.interfaces.map((intf) => intf.name);
+		return [...classesList, ...enumsList, ...interfacesList];
+	};
+
+	onMount(async () => {
+		const archive = $openedArchive; // Accessing the store
+
+		if (archive && archive.children) {
+			archive.children.forEach((child) => traverseAndParse(child, parsedOutput));
+		}
+
+		$entitiesList = [...getEntityNames(parsedOutput)];
+		console.log($entitiesList)
+		$showedEntities = [...$entitiesList]; // Show all entities by default
+
+		let diagram = toMermaidSyntax(parsedOutput);
+
 		mermaid.initialize({
 			theme: 'neutral',
 			securityLevel: 'loose'
 		});
-		const { svg, bindFunctions } = await mermaid.render('mermaid', diagram);
-		container.innerHTML = svg;
-	}
 
-	$: diagram && renderDiagram();
+
+		console.log(diagram)
+		await renderDiagram(diagram);
+
+		mounted = true
+	});
+
+	let parsedOutput = { classes: [], enums: [], interfaces: [] };
+	let diagram = '';
+	let container; // Reference to the diagram container
+	let mounted = false;
+
+	$: if (mounted) {
+        $showedEntities;
+        updateDiagram();
+    }
 </script>
 
-<span class="diagram" bind:this={container} />
+{#if openedArchive}
+	<span class="diagram" bind:this={container} />
+{:else}
+	<h3 class="message">Veuillez d'abord ouvrir un tp</h3>
+{/if}
 
 <style>
 	.diagram {
@@ -400,5 +524,15 @@
 		justify-content: center;
 		align-items: center;
 		width: 100%;
+		height: 100%;
+	}
+
+	.message {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+		color: white;
 	}
 </style>
