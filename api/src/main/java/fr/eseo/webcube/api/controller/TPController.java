@@ -46,7 +46,9 @@ public class TPController {
     }
 
     @GetMapping("/tp/{id}")
-    public ResponseEntity<?> getTPById(@PathVariable Integer id) {
+    public ResponseEntity<?> getTPById(@PathVariable Integer id,
+    @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+    @RequestHeader(name = "Authorization-API") String tokenApi) {
         Optional<TP> tpOptional = tpService.getTp(id);
 
         if (tpOptional.isPresent()) {
@@ -64,7 +66,6 @@ public class TPController {
         try {
             tokenApi = tokenApi.substring(7);
             Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-            System.out.println(claims);
             String uniqueName = claims.get("uniqueName").toString();
 
             Resource archive = tpService.getArchive(id, uniqueName);
@@ -73,9 +74,8 @@ public class TPController {
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("application/zip")) // Set the content type
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"") // Suggest
-                                                                                                          // download
-                    .body(null);
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .body(archive);
         } catch (Exception e) { // Correct exception handling
             System.err.println(e);
             return ResponseEntity.notFound().build();
@@ -84,69 +84,67 @@ public class TPController {
 
     @GetMapping("tp/myCompletion")
     public ResponseEntity<TpResponse> getMyListCompletion(
-        @RequestHeader(name = "Authorization-Azure") String tokenAzure,
-        @RequestHeader(name = "Authorization-API") String tokenApi){
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi) {
 
-            tokenApi = tokenApi.substring(7);
-            Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-            String uniqueName = claims.get("uniqueName").toString();
-            String firstname = claims.get("firstname").toString();
-            String surname = claims.get("surname").toString();
+        tokenApi = tokenApi.substring(7);
+        Claims claims = jwtTokenUtil.parseClaims(tokenApi);
+        String uniqueName = claims.get("uniqueName").toString();
+        String firstname = claims.get("firstname").toString();
+        String surname = claims.get("surname").toString();
 
-            TpResponse tpResponse = tpService.getCompletionByUniqueName(uniqueName);
+        TpResponse tpResponse = tpService.getCompletionByUniqueName(uniqueName);
+
+        if (tpResponse != null) {
             tpResponse.setFirstname(firstname);
             tpResponse.setSurname(surname);
-    
-            if(tpResponse != null){
-                return ResponseEntity.ok(tpResponse);
-            } else {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-            }
+            return ResponseEntity.ok(tpResponse);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
-
+    }
 
     @GetMapping("tp/myCompletion/{id}")
     public ResponseEntity<TpResponse> getMyCompletion(
-        @PathVariable Integer id,
-        @RequestHeader(name = "Authorization-Azure") String tokenAzure,
-        @RequestHeader(name = "Authorization-API") String tokenApi){
+            @PathVariable Integer id,
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi) {
 
-            tokenApi = tokenApi.substring(7);
-            Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-            String uniqueName = claims.get("uniqueName").toString();
-            String firstname = claims.get("firstname").toString();
-            String surname = claims.get("surname").toString();
+        tokenApi = tokenApi.substring(7);
+        Claims claims = jwtTokenUtil.parseClaims(tokenApi);
+        String uniqueName = claims.get("uniqueName").toString();
+        String firstname = claims.get("firstname").toString();
+        String surname = claims.get("surname").toString();
 
-            TpResponse tpResponse = tpService.getCompletionByUniqueNameAndTpId(uniqueName, id);
+        TpResponse tpResponse = tpService.getCompletionByUniqueNameAndTpId(uniqueName, id);
+
+        if (tpResponse != null) {
             tpResponse.setFirstname(firstname);
             tpResponse.setSurname(surname);
-
-            if(tpResponse != null){
-                return ResponseEntity.ok(tpResponse);
-            } else {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-            }
+            return ResponseEntity.ok(tpResponse);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
+    }
 
     @GetMapping("tp/completion/etudiants/{id}")
     public ResponseEntity<List<TpResponse>> getCompletionMyTp(
-        @PathVariable Integer id,
-        @RequestHeader(name = "Authorization-Azure") String tokenAzure,
-        @RequestHeader(name = "Authorization-API") String tokenApi){
+            @PathVariable Integer id,
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi) {
 
-            //TODO : check if the user has the right of a teacher
+        // TODO : check if the user has the right of a teacher
 
-            tokenApi = tokenApi.substring(7);
-            Claims claims = jwtTokenUtil.parseClaims(tokenApi);
+        tokenApi = tokenApi.substring(7);
+        Claims claims = jwtTokenUtil.parseClaims(tokenApi);
 
-            List<TpResponse> tpResponses = tpService.getCompletionsByTpId(id);
+        List<TpResponse> tpResponses = tpService.getCompletionsByTpId(id);
 
-            if (tpResponses != null && !tpResponses.isEmpty()) {
-                return ResponseEntity.ok(tpResponses);
-            } else {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Collections.emptyList());
-            }
+        if (tpResponses != null && !tpResponses.isEmpty()) {
+            return ResponseEntity.ok(tpResponses);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Collections.emptyList());
         }
-
+    }
 
 }

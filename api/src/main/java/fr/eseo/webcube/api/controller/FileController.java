@@ -18,6 +18,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,9 @@ public class FileController {
     @PostMapping("/upload")
     public String uploadFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("directory") String directory) {
+            @RequestParam("directory") String directory,
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi) {
         try {
             // Validate the directory path
             Path dirPath = Paths.get(directory);

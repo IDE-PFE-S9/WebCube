@@ -2,16 +2,19 @@
 	export let tp;
 
 	import JSZip from 'jszip';
+	import Cookies from 'js-cookie';
 	import { openedArchive, archiveMode, currentTab } from '$lib/stores.js';
 
 	let apiUrl = process.env.API_URL;
 
 	let headersList = {
-		Accept: '*/*'
+		Accept: '*/*',
+		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
+		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
 	};
 
 	const getArchive = async () => {
-		let archiveResponse = await fetch(`http://localhost:4444/api/tp/archive/${tp.id}`, {
+		let archiveResponse = await fetch(`${apiUrl}/api/tp/archive/${tp.id}`, {
 			method: 'GET',
 			headers: headersList
 		});
@@ -178,7 +181,8 @@
 <button
 	class="button-archive"
 	class:selected={$openedArchive?.name === tp.name}
-	on:click={getArchive}>
+	on:click={getArchive}
+>
 	{tp.name}: 76% complété
 </button>
 

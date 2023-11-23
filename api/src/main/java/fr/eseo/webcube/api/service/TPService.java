@@ -85,11 +85,11 @@ public class TPService {
 			userTP.setId(userTPKey);
 			userTP.setUser(user);
 			userTP.setTp(tp);
-			userTP.setCompletion("0"); // Assuming completion is a String
+			userTP.setCompletion("0");
 			userTpRepository.save(userTP);
 		}
 
-		// If the directory exists, create a zip of the directory
+		
 		Path zipPath = Files.createTempFile("archive", ".wc");
 		zipFolder(permDir, zipPath);
 
