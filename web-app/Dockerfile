@@ -11,9 +11,6 @@ RUN npm install
 
 COPY . .
 
-RUN rm -f node_modules/antlr4/package.json
-COPY fix-antlr4/package.json node_modules/antlr4/package.json
-
 RUN npm run build
 
 FROM node:lts-alpine AS production

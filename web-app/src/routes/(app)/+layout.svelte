@@ -9,9 +9,12 @@
 	import ArchiveTabManager from '$lib/TabManager/ArchiveTabManager.svelte';
 	import MarkdownViewer from '$lib/MarkdownViewer/MarkdownViewer.svelte';
 	import UserPanel from '$lib/UserPanel/UserPanel.svelte';
-	import GitExplorer from '../../lib/GitExplorer/GitExplorer.svelte';
+	import GitExplorer from '$lib/GitExplorer/GitExplorer.svelte';
+  import Diagram from '$lib/Modeling/Diagram.svelte';
+	import ConfigPanel from '$lib/Modeling/ConfigPanel.svelte';
 
 	import { archiveMode, markdownMode, currentTab } from '$lib/stores.js';
+
 
 	let startX;
 	let startWidth;
@@ -41,12 +44,20 @@
 		document.removeEventListener('mousemove', onMouseMove);
 		document.removeEventListener('mouseup', onMouseUp);
 	}
+
 </script>
 
 <div class="main">
 	<Navbar />
 	{#if $currentTab == 'Utilisateur'}
 		<UserPanel />
+	{:else if $currentTab == 'Uml'}
+		<div class="mid">
+			<ConfigPanel />
+		</div>
+		<div class="right">
+			<Diagram />
+		</div>
 	{:else}
 		<div class="mid">
 			{#if $currentTab == 'Archive'}
