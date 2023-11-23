@@ -13,6 +13,7 @@ services:
       - "3000:3000"
     depends_on:
       - api
+    container_name: web-app
 
   api:
     build:
@@ -22,3 +23,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4444:4444"
+    container_name: api
+    
