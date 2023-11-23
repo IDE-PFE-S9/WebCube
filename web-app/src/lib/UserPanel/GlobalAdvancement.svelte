@@ -46,4 +46,7 @@
         margin-bottom: 1rem;
         width: 20rem;
     }
+    .name {
+        margin: 0.5rem;
+    }
 </style>

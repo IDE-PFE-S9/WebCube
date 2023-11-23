@@ -1,32 +1,6 @@
 <script>
     import GlobalAdvancement from './GlobalAdvancement.svelte';
-    import '@carbon/charts-svelte/styles.css'
-	import { BarChartSimple } from '@carbon/charts-svelte'
-
-
-    let data = [
-        {"group": "Qty","value": 65000},
-        {"group": "More","value": 29123},
-        {"group": "Sold","value": 35213},
-        {"group": "Restocking","value": 51213},
-        {"group": "Misc","value": 16932}
-    ]
-
-    let options = {
-        "title": "Horizontal simple bar (discrete)",
-        "axes": {
-            "left": {
-            "mapsTo": "group",
-            "scaleType": "labels"
-            },
-            "bottom": {
-            "mapsTo": "value"
-            }
-        },
-        "height": "400px",
-        "theme": "g100"
-    }
-
+    import StudentAdvancement from './StudentAdvancement.svelte';
 </script>
 
 <div class="avancement-container">
@@ -53,9 +27,7 @@
 
     <div class="avancement-individuel">
         <h1 class="individuel-title">Avancement Individuel</h1>
-
-        <BarChartSimple {data} {options} />
-
+        <StudentAdvancement></StudentAdvancement>
     </div>
 
 </div>

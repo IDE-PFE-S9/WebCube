@@ -1,20 +1,64 @@
 <script>
-    export let name;
-    export let nbTestStudent;
-    export let nbTestTp;
+    import '@carbon/charts-svelte/styles.css'
+	import { BarChartSimple } from '@carbon/charts-svelte'
+
+    let color = "rgb(52,120,198)"
     
-    let percentage = Math.round((nbTestStudent / nbTestTp) * 100);
+    let data = [
+        {"group": "name","name": "Guilpin Erwan","percentage": 76},
+        {"group": "name","name": "Meyniel Arthur","percentage": 23},
+        {"group": "name","name": "Lurat Theo","percentage": 45},
+        {"group": "name","name": "Mornet Ronan","percentage": 89},
+        {"group": "name","name": "Menard Mathieu","percentage": 100},
+        {"group": "name","name": "Menard Mathieu","percentage": 100},
+        {"group": "name","name": "Menard Mat","percentage": 100},
+        {"group": "name","name": "Guilpin Er","percentage": 76},
+        {"group": "name","name": "Meyniel Art","percentage": 23},
+        {"group": "name","name": "Lurat T","percentage": 45},
+        {"group": "name","name": "Mornet Ro","percentage": 89},
+        {"group": "name","name": "Menard Math","percentage": 100},
+        {"group": "name","name": "Guilpin Erw","percentage": 76},
+        {"group": "name","name": "Meyniel Arth","percentage": 23},
+        {"group": "name","name": "Lurat Th","percentage": 0},
+        {"group": "name","name": "Mornet Ron","percentage": 89},
+        {"group": "name","name": "Menard Mathi","percentage": 100},
+        {"group": "name","name": "Guilpin Erwa","percentage": 76},
+        {"group": "name","name": "Meyniel Arthu","percentage": 23},
+        {"group": "name","name": "Lurat The","percentage": 45},
+        {"group": "name","name": "Mornet Rona","percentage": 89},
+        {"group": "name","name": "Menard Mathie","percentage": 100}
+    ]
+
+    data.sort((a, b) => a.name.localeCompare(b.name));
+    data.reverse();
+
+    let dataLength = data.length
+    let chartHeight = dataLength*50 + "px"
+
+    let options = {
+        "axes": {
+            "left": {
+                "mapsTo": "name",
+                "scaleType": "labels"
+            },
+            "bottom": {
+                "mapsTo": "percentage"
+            }
+        },
+        "height": chartHeight,
+        "width": "600px",
+        "theme": "g100",
+        "toolbar":{"enabled":false},
+        "color": {
+            "scale": {
+                "value": color
+            },
+        }
+    }
 </script>
 
 <div class="individuel">
-    <h4 class="name">{name}</h4>
-    <div class="progress-bar">
-        <h6 class="nombre-test">Test : {nbTestStudent} / {nbTestTp}</h6>
-        <div class="bar" style="width: 100%;">
-            <div class="percentage-bar" class:complete={percentage === 100} style="width: {percentage}%;"></div>
-            <span class="percentage">{percentage}%</span>
-        </div>
-    </div>
+    <BarChartSimple {data} {options} />
 </div>
 
 <style lang="scss">
@@ -24,44 +68,5 @@
         align-items: center;
         text-align: center;
         margin-bottom: 1rem;
-        width: 10rem;
-    }
-
-    .name {
-        margin: 0.5rem;
-    }
-
-    .nombre-test {
-        margin:0.5rem;
-    }
-
-    .progress-bar {
-        margin-bottom: 0.5rem;
-
-        .bar {
-            height: 1rem; 
-            position: relative;
-            border: 2px solid white;
-            border-radius: 20px;
-
-            .percentage-bar {
-                background-color: rgb(52,120,198);
-                border-radius: 15px;
-                height: 100%;
-                position: absolute;  
-            }
-
-            .complete{
-                    background-color: green;
-                }
-
-            .percentage {
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-                color: white;
-            }
-        }
     }
 </style>
