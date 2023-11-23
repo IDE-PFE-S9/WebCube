@@ -24,6 +24,7 @@ public class JwtTokenUtil {
                 .claim("surname", user.getFamily_name())
                 .claim("firstname", user.getGiven_name())
                 .claim("roles", user.getRole())
+                .claim("uniqueName", user.getUniqueName())
                 .setIssuer("ESEO")
                 .setIssuedAt(new Date())
                 .setExpiration(user.getExpirationToken())

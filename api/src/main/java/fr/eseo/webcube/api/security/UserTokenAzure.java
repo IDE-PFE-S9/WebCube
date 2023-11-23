@@ -28,6 +28,8 @@ public class UserTokenAzure {
 
     private Date expirationToken;
 
+    private String uniqueName;
+
     public UserTokenAzure(){
     }
 

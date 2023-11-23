@@ -40,8 +40,8 @@ async function login() {
 
             // Use response.accessToken to make your API calls
             console.log('Access Token:', response.accessToken);
-
             Cookies.set("azureJWT", response.accessToken);
+            getUserDetails();
         }
     } catch (error) {
         console.error(error);

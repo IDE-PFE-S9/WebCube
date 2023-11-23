@@ -9,8 +9,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,13 +66,14 @@ public class UserController {
             JWTClaimsSet claimsAzure = JWTParser.parse(token).getJWTClaimsSet();
             String firstName = (String) claimsAzure.getClaim("given_name");
             String lastName = (String) claimsAzure.getClaim("family_name");
-            String uniqueName = (String) claimsAzure.getClaim("unique_name");
+            String uniqueName = (String) claimsAzure.getClaim("upn");
             Date expirationTokenAzure = (Date) claimsAzure.getClaim("exp");
             
             Set<Role> roles = userService.getRolesByUniqueName(uniqueName);
             UserTokenAzure user = new UserTokenAzure(firstName, lastName);
             user.setRole(roles);
             user.setExpirationToken(expirationTokenAzure);
+            user.setUniqueName((uniqueName));
             String accesToken = jwtTokenUtil.generateAccessToken(user);
 
             AuthResponse response = new AuthResponse(firstName, lastName, accesToken);
