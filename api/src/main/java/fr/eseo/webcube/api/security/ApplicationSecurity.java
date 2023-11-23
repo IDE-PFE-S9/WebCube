@@ -1,6 +1,6 @@
 package fr.eseo.webcube.api.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+/*import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -68,7 +68,7 @@ public class ApplicationSecurity {
         });
 
         return converter;
-    }*/
+    }
 
     @Bean
     public JwtDecoder jwtDecoder() {
@@ -77,4 +77,4 @@ public class ApplicationSecurity {
                 .build();
     }
 
-}
+}*/
