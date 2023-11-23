@@ -25,6 +25,10 @@ export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
 export const archiveHandle = writable(null);
 
+// modelling stores
+export const entitiesList = writable([]);
+export const showedEntities = writable([]);
+
 // navbar stores
 export const currentTab = writable("Explorer");
 

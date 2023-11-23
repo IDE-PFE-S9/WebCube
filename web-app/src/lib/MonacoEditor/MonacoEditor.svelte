@@ -53,22 +53,20 @@
 			// Update the openedCodes store with new content for the currently selected file
 			openedCodes.update((codes) => {
 				// Find the index of the code object for the currently selected file
-				let index;
-				if ($archiveMode) {
+				if (codes.length > 0) {
+					let index;
 					index = codes.findIndex((code) => code.name === $selectedArchiveFile);
-				} else {
-					index = codes.findIndex((code) => code.name === $selectedFile.name);
-				}
 
-				if (index !== -1) {
-					// Create a new array with the updated code object
-					const updatedCodes = [...codes];
-					updatedCodes[index] = {
-						...updatedCodes[index],
-						code: newValue,
-						status: 'unsaved' // Update the status to 'unsaved' since the content has changed
-					};
-					return updatedCodes;
+					if (index !== -1) {
+						// Create a new array with the updated code object
+						const updatedCodes = [...codes];
+						updatedCodes[index] = {
+							...updatedCodes[index],
+							code: newValue,
+							status: 'unsaved' // Update the status to 'unsaved' since the content has changed
+						};
+						return updatedCodes;
+					}
 				}
 				// If the currently selected file is not found in the openedCodes array,
 				// return the existing codes array unchanged
@@ -84,12 +82,10 @@
 		});
 
 		const updateEditorValue = () => {
-			const codes = $openedCodes;
+			let codes = $openedCodes;
 			let codeObj;
 			if ($archiveMode) {
 				codeObj = codes.find((code) => code.name === $selectedArchiveFile);
-			} else {
-				codeObj = codes.find((code) => code.name === $selectedFile.name);
 			}
 			if (codeObj && editor && codeObj.code !== editor.getValue()) {
 				editor.setValue(codeObj.code);
