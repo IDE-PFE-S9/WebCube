@@ -3,8 +3,8 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
+		"dev": "vite dev --config vite.config.js",
+		"build": "vite build --config vite.config.build.js",
 		"preview": "vite preview",
 		"test": "playwright test",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
@@ -31,8 +31,11 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"antlr4": "^4.13.1",
+		"@azure/msal-browser": "^3.5.0",
+		"antlr4": "^4.13.1-patch-1",
+		"js-cookie": "^3.0.5",
 		"jszip": "^3.10.1",
+		"mermaid": "^10.6.1",
 		"monaco-editor": "^0.43.0",
 		"reconnecting-websocket": "^4.4.0",
 		"sweetalert2": "^11.6.13"

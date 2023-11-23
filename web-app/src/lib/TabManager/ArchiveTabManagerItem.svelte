@@ -17,7 +17,7 @@
 	function selectTab() {
 		selectedArchiveFile.set(currentFile);
 		editorUpdateTrigger.set($selectedArchiveFile);
-		if ($selectedArchiveFile.name.split('.').pop() == 'md') {
+		if ($selectedArchiveFile.split('.').pop() == 'md') {
 			markdownMode.set(true);
 		} else {
 			markdownMode.set(false);
@@ -45,9 +45,14 @@
 		}
 		// Trigger an update to the editor content
 		editorUpdateTrigger.set($selectedArchiveFile);
-		if ($selectedArchiveFile.name.split('.').pop() == 'md') {
-			markdownMode.set(true);
+		if($selectedArchiveFile) {
+			if ($selectedArchiveFile.split('.').pop() == 'md') {
+				markdownMode.set(true);
+			} else {
+				markdownMode.set(false);
+			}
 		} else {
+			// no file opened
 			markdownMode.set(false);
 		}
 	}

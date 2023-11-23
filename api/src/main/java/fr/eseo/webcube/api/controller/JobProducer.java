@@ -10,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,11 @@ import com.rabbitmq.client.DeliverCallback;
 @RestController
 @RequestMapping("/api")
 public class JobProducer {
+
+    @Value("${spring.rabbitmq.host}")
+    private String host;
+
+    // TODO: fix the paths to use the token.
 
     @GetMapping("/compileAndRun")
     public String compileAndRun(@RequestParam String projectPath) throws Exception {
@@ -61,7 +67,7 @@ public class JobProducer {
 
     public void sendJob(String projectPath, String requestId, String action) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost(host);
         try (Connection connection = factory.newConnection();
                 Channel channel = connection.createChannel()) {
             String exchangeName = "jobs_exchange";
@@ -83,7 +89,7 @@ public class JobProducer {
     public String retrieveResult(String requestId) throws Exception {
         final String RESULT_EXCHANGE_NAME = "results_exchange";
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost(host);
         BlockingQueue<String> resultQueue = new ArrayBlockingQueue<>(1); // Queue to hold the result
         CountDownLatch latch = new CountDownLatch(1); // Latch to manage blocking/unblocking
 

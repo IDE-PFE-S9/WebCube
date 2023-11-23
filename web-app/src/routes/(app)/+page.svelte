@@ -1,5 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
+	import { login, getUserDetails } from '$lib/auth.js'; // Assuming the MSAL code is in auth.js
+	import Cookies from 'js-cookie';
 	import { screenChangeCount, examMode, logs, selectedFile } from '$lib/stores.js';
 	import Swal from 'sweetalert2';
 

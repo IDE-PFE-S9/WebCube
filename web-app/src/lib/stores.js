@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
+let wsUrl = process.env.WS_URL;
 
 // file explorer stores
 export const openedDirectory = writable(null);
@@ -26,6 +27,10 @@ export const openedArchive = writable(null);
 export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
 export const archiveHandle = writable(null);
+
+// modelling stores
+export const entitiesList = writable([]);
+export const showedEntities = writable([]);
 
 // navbar stores
 export const currentTab = writable("Explorer");
@@ -59,7 +64,7 @@ export function sendMessage(type, data) {
 }
 
 function setupWebSocket() {
-    const socket = new ReconnectingWebSocket('ws://localhost:4444/ws');
+    const socket = new ReconnectingWebSocket(`${wsUrl}/ws`);
 
     socket.onopen = () => {
         console.log('WebSocket connection established');
