@@ -95,9 +95,4 @@
     .individuel-title{
         text-align: center;
     }
-    .individuel-container {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-end;
-    }
 </style>

@@ -8,30 +8,42 @@
 
     let percentage = Math.round((nbTestStudent / nbTestTp) * 100);
     let data = [{"group": "value","value": percentage}]
+
+    let color = "rgb(52,120,198)"; 
+    if (percentage === 100) {
+        color = "green"; 
+    }
+
     let options = {
-        "title": name,
         "resizable": true,
-        "height": "150px    ",
-        "width": "100%",
+        "height": "100px",
+        "width":"200px",
         "gauge": {
             "type": "semi",
             "status": "danger",
         },
         "toolbar":{"enabled":false},
-        "theme": "g100"
-    } 
+        "theme": "g100",
+        "color": {
+            "scale": {
+                "value": color
+            }
+        }
+    }
 </script>
 
 <div class="individuel">
+    <h4 class="name">{name}</h4>
     <GaugeChart {data} {options} />
 </div>
 
 <style lang="scss">
-    .individuel {
+     .individuel {
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
+        margin-bottom: 1rem;
         width: 20rem;
     }
 </style>
