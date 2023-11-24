@@ -50,7 +50,7 @@ async function login() {
 }
 
 async function getUserDetails() {
-    const response = await fetch(`http://localhost:4444/User/Exemple`, {
+    const response = await fetch(`http://localhost:4444/User/connexion`, {
         headers: {'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT")}
     });
 

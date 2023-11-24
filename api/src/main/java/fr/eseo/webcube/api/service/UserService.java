@@ -22,7 +22,7 @@ public class UserService {
 	}
 
   public Set<Role> getRolesByUniqueName(String uniqueName) {
-    User user = userDAO.findByUniqueName(uniqueName);
+    User user = userDAO.findByUniqueName(uniqueName).get();
 
     if (user != null && user.getRoles() != null) {
         // Si l'utilisateur est trouvé et a des rôles, retournez les rôles.
@@ -33,7 +33,12 @@ public class UserService {
         // Dans cet exemple, je retourne un ensemble vide.
         return Collections.emptySet();
     }
-}
+  }
+
+  public User getUserByUniqueName(String uniqueName) {
+    return userDAO.findByUniqueName(uniqueName).get();
+  }
+
 
     
 }

@@ -12,11 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.eseo.webcube.api.model.TP;
+import fr.eseo.webcube.api.security.JwtTokenUtil;
 import fr.eseo.webcube.api.service.TPService;
+import io.jsonwebtoken.Claims;
 
 @RestController
 @RequestMapping("/api")
@@ -24,6 +27,9 @@ public class TPController {
 
     @Autowired
     private TPService tpService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/tp")
     public ResponseEntity<List<TP>> getTpList() {
@@ -63,4 +69,29 @@ public class TPController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("tp/myCompletion/{id}")
+    public ResponseEntity<?> getMyCompletion(
+        @PathVariable Integer id,
+        @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+        @RequestHeader(name = "Authorization-API") String tokenApi){
+
+            tokenApi = tokenApi.substring(7);
+            //Claims claims = jwtTokenUtil.parseClaims(tokenApi);
+            //String uniqueName = claims.get("firstname").toString();
+            String uniqueName = "firstname";
+
+            //String firstname = claims.get("firstname").toString();
+            //String surname = claims.get("surname").toString();
+
+            /*TpResponse tpResponse = tpService.getCompletionByUniqueNameAndTpId(uniqueName, id);
+            tpResponse.setFirstname(firstname);
+            tpResponse.setSurname(surname);*/
+
+            if(uniqueName != ""){
+                return ResponseEntity.ok(uniqueName);
+            } else {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+            }
+        }
 }

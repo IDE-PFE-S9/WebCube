@@ -4,6 +4,7 @@ import java.util.Date;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +25,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 
 import fr.eseo.webcube.api.model.Role;
+import fr.eseo.webcube.api.model.User;
 import fr.eseo.webcube.api.security.AuthResponse;
 import fr.eseo.webcube.api.security.JwtTokenUtil;
 import fr.eseo.webcube.api.security.UserTokenAzure;
@@ -27,7 +33,7 @@ import fr.eseo.webcube.api.service.UserService;
 import io.jsonwebtoken.Claims;
 
 @RestController
-@RequestMapping("/User")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -36,60 +42,54 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    
-
     @GetMapping()
     public ResponseEntity<?> getUserDetails(@RequestHeader("Authorization") String token) {
         token = token.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(token);
         String givenName = claims.get("given_name").toString();
         String family_name = claims.get("family_name").toString();
-        //System.out.println(id);
-        //System.out.println(rolePerson);
-        //System.out.println(typePerson);
+        // System.out.println(id);
+        // System.out.println(rolePerson);
+        // System.out.println(typePerson);
         UserTokenAzure response = new UserTokenAzure(givenName, family_name);
         return ResponseEntity.ok().body(response);
     }
 
-    /*@GetMapping("/Exemple")
-    public ResponseEntity<?> getUserExemple(@RequestHeader("Authorization") String token) {
-        String givenName = "givenName";
-        String family_name = "familyName";
-        UserDetailsResponse response = new UserDetailsResponse(givenName, family_name);
-        return ResponseEntity.ok().body(response);
-    }*/
+    @GetMapping("/connexion")
+    public ResponseEntity<?> connexion(@RequestHeader("Authorization-Azure") String tokenAzure) {
 
-    @GetMapping("/Exemple")
-    public ResponseEntity<?> getUserExemple(@RequestHeader("Authorization-Azure") String token) {
-        
-        token = token.substring(7);
+        tokenAzure = tokenAzure.substring(7);
 
         try {
-            JWTClaimsSet claimsAzure = JWTParser.parse(token).getJWTClaimsSet();
-            String firstName = (String) claimsAzure.getClaim("given_name");
-            String lastName = (String) claimsAzure.getClaim("family_name");
+            JWTClaimsSet claimsAzure = JWTParser.parse(tokenAzure).getJWTClaimsSet();
+            // String firstName = (String) claimsAzure.getClaim("given_name");
+            // String lastName = (String) claimsAzure.getClaim("family_name");
             String uniqueName = (String) claimsAzure.getClaim("unique_name");
-            Date expirationTokenAzure = (Date) claimsAzure.getClaim("exp");
-            
+            // Date expirationTokenAzure = (Date) claimsAzure.getClaim("exp");
+
             Set<Role> roles = userService.getRolesByUniqueName(uniqueName);
-            UserTokenAzure user = new UserTokenAzure(firstName, lastName);
-            user.setRole(roles);
-            user.setExpirationToken(expirationTokenAzure);
+            User user = userService.getUserByUniqueName(uniqueName);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur non trouvé dans la base de données");
+            }
+            // UserTokenAzure user = new UserTokenAzure(firstName, lastName);
+            // user.setRole(roles);
+            // user.setExpirationToken(expirationTokenAzure);
             String accesToken = jwtTokenUtil.generateAccessToken(user);
 
-            AuthResponse response = new AuthResponse(firstName, lastName, accesToken);
+            AuthResponse response = new AuthResponse(user.getFirstname(), user.getSurname(), accesToken);
             return ResponseEntity.ok().body(response);
         } catch (ParseException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur lors du traitement du token JWT.");
+        }
     }
-}
 
     @GetMapping("/exemple/tokens")
     public ResponseEntity<?> readTokenExemple(
-        @RequestHeader(name = "Authorization-Azure") String tokenAzure,
-        @RequestHeader(name = "Authorization-API") String tokenApi) {
-        
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi) {
+
         tokenAzure = tokenAzure.substring(7);
 
         try {
@@ -116,5 +116,4 @@ public class UserController {
         }
     }
 
-    
 }
