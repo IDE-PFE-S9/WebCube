@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.eseo.webcube.api.Details.TpDetails;
 import fr.eseo.webcube.api.Response.TpResponse;
 import fr.eseo.webcube.api.model.TP;
-import fr.eseo.webcube.api.model.UserTP;
 import fr.eseo.webcube.api.security.JwtTokenUtil;
 import fr.eseo.webcube.api.service.TPService;
 import io.jsonwebtoken.Claims;
@@ -94,10 +92,10 @@ public class TPController {
             String surname = claims.get("surname").toString();
 
             TpResponse tpResponse = tpService.getCompletionByUniqueName(uniqueName);
-            tpResponse.setFirstname(firstname);
-            tpResponse.setSurname(surname);
     
             if(tpResponse != null){
+                tpResponse.setFirstname(firstname);
+                tpResponse.setSurname(surname);
                 return ResponseEntity.ok(tpResponse);
             } else {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -118,10 +116,10 @@ public class TPController {
             String surname = claims.get("surname").toString();
 
             TpResponse tpResponse = tpService.getCompletionByUniqueNameAndTpId(uniqueName, id);
-            tpResponse.setFirstname(firstname);
-            tpResponse.setSurname(surname);
 
             if(tpResponse != null){
+                tpResponse.setFirstname(firstname);
+                tpResponse.setSurname(surname);
                 return ResponseEntity.ok(tpResponse);
             } else {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

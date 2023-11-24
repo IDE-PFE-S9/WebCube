@@ -8,14 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.jgit.api.Git;
-import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -85,7 +83,7 @@ public class TPService {
 			userTP.setId(userTPKey);
 			userTP.setUser(user);
 			userTP.setTp(tp);
-			userTP.setCompletion("0"); // Assuming completion is a String
+			userTP.setCompletion(0); // Assuming completion is a String
 			userTpRepository.save(userTP);
 		}
 

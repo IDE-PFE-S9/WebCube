@@ -33,5 +33,5 @@ public class UserTP implements Serializable {
     TP tp;
 
     @Column(name = "completion")
-    private String completion;
+    private Integer completion;
 }
