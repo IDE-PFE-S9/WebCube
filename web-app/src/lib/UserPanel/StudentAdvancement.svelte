@@ -1,4 +1,3 @@
-
 <script>
     import '@carbon/charts-svelte/styles.css'
 	import { BarChartSimple } from '@carbon/charts-svelte'
@@ -16,13 +15,15 @@
                 "scaleType": "labels"
             },
             "bottom": {
-                "mapsTo": "percentage"
+                "mapsTo": "percentage",
+                "scaleType": "linear"
             }
         },
         "height": chartHeight,
         "width": "600px",
         "theme": "g100",
-        "toolbar":{"enabled":false}
+        "toolbar":{"enabled":false},
+        "legend": {"enabled": false}
     }
 
     $: {
@@ -42,13 +43,15 @@
                     "scaleType": "labels"
                 },
                 "bottom": {
-                    "mapsTo": "percentage"
+                    "mapsTo": "percentage",
+                    "scaleType": "linear"
                 }
             },
             "height": chartHeight,
             "width": "600px",
             "theme": "g100",
-            "toolbar":{"enabled":false}
+            "toolbar":{"enabled":false},
+            "legend": {"enabled": false}
         }
     }
 </script>

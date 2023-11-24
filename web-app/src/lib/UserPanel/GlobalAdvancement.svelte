@@ -1,18 +1,12 @@
 <script>
     import '@carbon/charts-svelte/styles.css'
     import { GaugeChart } from '@carbon/charts-svelte'
-    import { onMount } from 'svelte'
 
     export let name;
-    export let completion;
+    export let completions;
 
     let color = "rgb(52,120,198)";
-
-    if (completion === 100) {
-        color = "green";
-    }
-
-    let data = [{"group": "value","value": completion}]
+    let data = []
 
     let options = {
         "resizable": true,
@@ -27,6 +21,36 @@
         "color": {
             "scale": {
                 "value": color
+            }
+        }
+    }
+
+    $: {
+        let somme = 0;
+        for (let i = 0; i < completions.length; i++) {
+            somme += completions[i];
+        }
+        let percentage = somme / completions.length;
+
+        if (percentage === 100) {
+            color = "green";
+        }
+
+        data = [{"group": "value","value": percentage}]
+        options = {
+            "resizable": true,
+            "height": "100px",
+            "width":"200px",
+            "gauge": {
+                "type": "semi",
+                "status": "danger",
+            },
+            "toolbar":{"enabled":false},
+            "theme": "g100",
+            "color": {
+                "scale": {
+                    "value": color
+                }
             }
         }
     }

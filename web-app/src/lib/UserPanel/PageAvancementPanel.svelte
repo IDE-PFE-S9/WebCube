@@ -34,7 +34,7 @@
 
     onMount(async () => {
         try {
-            await getAdvancementTp(1);
+            await getAdvancementTp(2);
         } catch (error) {
             console.error('Une erreur est survenue:', error);
         }
@@ -56,11 +56,11 @@
     </div>
 
     <div class="graph-container">
-        <GlobalAdvancement name={"Groupe A"} completion={50}></GlobalAdvancement>
+        <GlobalAdvancement name={"Groupe A"} completions={completions}></GlobalAdvancement>
 
-        <GlobalAdvancement name={"Groupe B"} completion={100}></GlobalAdvancement>
+        <GlobalAdvancement name={"Groupe B"} completions={completions}></GlobalAdvancement>
 
-        <GlobalAdvancement name={"Global"} completion={75}></GlobalAdvancement>
+        <GlobalAdvancement name={"Global"} completions={completions}></GlobalAdvancement>
     </div>
 
     <div class="avancement-individuel">

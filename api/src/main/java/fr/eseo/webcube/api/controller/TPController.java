@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.eseo.webcube.api.Details.TpDetails;
 import fr.eseo.webcube.api.Response.TpResponse;
 import fr.eseo.webcube.api.model.TP;
-import fr.eseo.webcube.api.model.UserTP;
 import fr.eseo.webcube.api.security.JwtTokenUtil;
 import fr.eseo.webcube.api.service.TPService;
 import io.jsonwebtoken.Claims;
