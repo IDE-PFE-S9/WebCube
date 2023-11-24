@@ -1,18 +1,18 @@
 <script>
     import '@carbon/charts-svelte/styles.css'
     import { GaugeChart } from '@carbon/charts-svelte'
+    import { onMount } from 'svelte'
 
     export let name;
-    export let nbTestStudent;
-    export let nbTestTp;
+    export let completion;
 
-    let percentage = Math.round((nbTestStudent / nbTestTp) * 100);
-    let data = [{"group": "value","value": percentage}]
+    let color = "rgb(52,120,198)";
 
-    let color = "rgb(52,120,198)"; 
-    if (percentage === 100) {
-        color = "green"; 
+    if (completion === 100) {
+        color = "green";
     }
+
+    let data = [{"group": "value","value": completion}]
 
     let options = {
         "resizable": true,

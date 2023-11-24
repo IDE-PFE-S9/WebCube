@@ -1,6 +1,44 @@
 <script>
     import GlobalAdvancement from './GlobalAdvancement.svelte';
     import StudentAdvancement from './StudentAdvancement.svelte';
+    import Cookies from 'js-cookie';
+    import { onMount } from 'svelte';
+
+    let completions = [];
+    let names = [];
+
+    async function getAdvancementTp(tpId) {
+        const response = await fetch('http://localhost:4444/api/tp/completion/etudiants/'+tpId, {
+            headers: {
+                'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
+                'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.log(errorData);
+            alert('Une erreur est survenue lors de la requête API : ' + errorData.error);
+            return null;
+        }
+
+        const dataReturned = await response.json();
+        names = dataReturned.map(student => `${student.firstname} ${student.surname}`);
+        completions = dataReturned.map(student => student.completion);
+
+        console.log('Noms:', names);
+        console.log('Completions:', completions);
+
+        return {names, completions};
+    }
+
+    onMount(async () => {
+        try {
+            await getAdvancementTp(1);
+        } catch (error) {
+            console.error('Une erreur est survenue:', error);
+        }
+    });
 </script>
 
 <div class="avancement-container">
@@ -18,16 +56,16 @@
     </div>
 
     <div class="graph-container">
-        <GlobalAdvancement name={"Groupe A"} nbTestStudent={1000} nbTestTp={1000}></GlobalAdvancement>
+        <GlobalAdvancement name={"Groupe A"} completion={50}></GlobalAdvancement>
 
-        <GlobalAdvancement name={"Groupe B"} nbTestStudent={500} nbTestTp={1000}></GlobalAdvancement>
+        <GlobalAdvancement name={"Groupe B"} completion={100}></GlobalAdvancement>
 
-        <GlobalAdvancement name={"Global"} nbTestStudent={1500} nbTestTp={2000}></GlobalAdvancement>
+        <GlobalAdvancement name={"Global"} completion={75}></GlobalAdvancement>
     </div>
 
     <div class="avancement-individuel">
         <h1 class="individuel-title">Avancement Individuel</h1>
-        <StudentAdvancement></StudentAdvancement>
+        <StudentAdvancement names={names} completions={completions}></StudentAdvancement>
     </div>
 
 </div>

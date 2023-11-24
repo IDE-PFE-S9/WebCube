@@ -94,10 +94,10 @@ public class TPController {
             String surname = claims.get("surname").toString();
 
             TpResponse tpResponse = tpService.getCompletionByUniqueName(uniqueName);
-            tpResponse.setFirstname(firstname);
-            tpResponse.setSurname(surname);
     
             if(tpResponse != null){
+                tpResponse.setFirstname(firstname);
+                tpResponse.setSurname(surname);
                 return ResponseEntity.ok(tpResponse);
             } else {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -118,10 +118,10 @@ public class TPController {
             String surname = claims.get("surname").toString();
 
             TpResponse tpResponse = tpService.getCompletionByUniqueNameAndTpId(uniqueName, id);
-            tpResponse.setFirstname(firstname);
-            tpResponse.setSurname(surname);
 
             if(tpResponse != null){
+                tpResponse.setFirstname(firstname);
+                tpResponse.setSurname(surname);
                 return ResponseEntity.ok(tpResponse);
             } else {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
