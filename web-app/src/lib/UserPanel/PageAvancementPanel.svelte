@@ -6,6 +6,7 @@
 
     let completions = [];
     let names = [];
+    let selectedTp = "1"; 
 
     async function getAdvancementTp(tpId) {
         const response = await fetch('http://localhost:4444/api/tp/completion/etudiants/'+tpId, {
@@ -26,19 +27,17 @@
         names = dataReturned.map(student => `${student.firstname} ${student.surname}`);
         completions = dataReturned.map(student => student.completion);
 
+        console.log(dataReturned);
+
         console.log('Noms:', names);
         console.log('Completions:', completions);
 
         return {names, completions};
     }
 
-    onMount(async () => {
-        try {
-            await getAdvancementTp(2);
-        } catch (error) {
-            console.error('Une erreur est survenue:', error);
-        }
-    });
+    $:{
+        getAdvancementTp(selectedTp);
+    }
 </script>
 
 <div class="avancement-container">
@@ -47,10 +46,10 @@
 
         <div class="tp-selector">
             <label for="tpDropdown">Sélectionner un TP :</label>
-            <select id="tpDropdown">
-                <option value="tp1">TP 1</option>
-                <option value="tp2">TP 2</option>
-                <option value="tp3">TP 3</option>
+            <select id="tpDropdown" bind:value={selectedTp}>
+                <option value="1">TP 1</option>
+                <option value="2">TP 2</option>
+                <option value="3">TP 3</option>
             </select>
         </div>
     </div>
