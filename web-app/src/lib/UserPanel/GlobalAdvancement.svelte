@@ -8,22 +8,7 @@
     let color = "rgb(52,120,198)";
     let data = []
 
-    let options = {
-        "resizable": true,
-        "height": "100px",
-        "width":"200px",
-        "gauge": {
-            "type": "semi",
-            "status": "danger",
-        },
-        "toolbar":{"enabled":false},
-        "theme": "g100",
-        "color": {
-            "scale": {
-                "value": color
-            }
-        }
-    }
+    let options = {}
 
     $: {
         let somme = 0;
@@ -32,8 +17,9 @@
         }
         let percentage = somme / completions.length;
 
+        color = "rgb(52,120,198)";
         if (percentage === 100) {
-            color = "green";
+            color = "rgb(218,153,36)";
         }
 
         data = [{"group": "value","value": percentage}]
