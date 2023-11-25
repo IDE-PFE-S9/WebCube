@@ -1,6 +1,7 @@
 package fr.eseo.webcube.api.Response;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -19,9 +20,11 @@ public class TpResponse {
 
     private String surname;
 
-    private Integer completion;
+    private int completion;
 
     private List<TpDetails> tpDetails;
+
+    private Set<String> roles;
 
 
     public TpResponse(String uniqueName, List<TpDetails> tpDetails) {
@@ -29,10 +32,24 @@ public class TpResponse {
         this.tpDetails = tpDetails;
     }
 
+    public TpResponse(String uniqueName, List<TpDetails> tpDetails, Set<String> roles) {
+        this.uniqueName = uniqueName;
+        this.tpDetails = tpDetails;
+        this.roles = roles;
+    }
+
     public TpResponse(String uniqueName, String firstname, String surname, Integer completion) {
         this.uniqueName = uniqueName;
         this.firstname = firstname;
         this.surname = surname;
         this.completion = completion;
+    }
+
+    public TpResponse(String uniqueName, String firstname, String surname, Integer completion, Set<String> roles) {
+        this.uniqueName = uniqueName;
+        this.firstname = firstname;
+        this.surname = surname;
+        this.completion = completion;
+        this.roles = roles;
     }
 }
