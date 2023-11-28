@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class TpDetails {
-    private String completion;
+    private Integer completion;
     private Integer id;
     private String nom;
     private String type;

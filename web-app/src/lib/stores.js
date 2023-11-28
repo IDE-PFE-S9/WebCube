@@ -14,6 +14,9 @@ export const openedTabs = writable([]);
 export const terminalNavbarActiveItem = writable('Problèmes');
 export const terminalOutput = writable([]);
 
+// user panel stores
+export const adminNavbarActiveItem = writable('Général');
+
 // editor store
 export const editorUpdateTrigger = writable(null);
 export const readOnly = writable(false);
@@ -85,7 +88,7 @@ function setupWebSocket() {
             case 'userCount':
                 userCount.set(message.data)
                 break;
-            // Add more cases as needed for different message types
+                // Add more cases as needed for different message types
         }
     };
 

@@ -19,7 +19,7 @@ public class TpResponse {
 
     private String surname;
 
-    private String completion;
+    private Integer completion;
 
     private List<TpDetails> tpDetails;
 
@@ -29,7 +29,7 @@ public class TpResponse {
         this.tpDetails = tpDetails;
     }
 
-    public TpResponse(String uniqueName, String firstname, String surname, String completion) {
+    public TpResponse(String uniqueName, String firstname, String surname, Integer completion) {
         this.uniqueName = uniqueName;
         this.firstname = firstname;
         this.surname = surname;
