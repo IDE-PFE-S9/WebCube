@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -27,12 +28,11 @@ import fr.eseo.webcube.api.model.User;
 
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 
 
 @Configuration
-@Order(Ordered.HIGHEST_PRECEDENCE)
-//@EnableWebSecurity
+@EnableWebSecurity
 public class ApplicationSecurity {
 
     @Autowired
@@ -44,19 +44,17 @@ public class ApplicationSecurity {
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
 
-    /*@Bean
-    public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUniqueName(username)
-                .orElseThrow(
-                        () -> new UsernameNotFoundException("User " + username + " not found"));
-    }
+    @Value("${spring.security.oauth2.client.registration.azure.client-id}")
+    private String clientId;
 
+    @Value("${spring.security.oauth2.client.registration.azure.client-secret}")
+    private String clientSecret;
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }*/
+    @Value("${spring.security.oauth2.client.registration.azure.redirect-uri}")
+    private String redirectUri;
+
+    @Value("${spring.security.oauth2.client.provider.azure.token-uri}")
+    private String tokenUri;
 
     //Permet de configurer la sécurité de l'api, ainsi que les urls accéssible par certain role
     @Bean
@@ -69,6 +67,10 @@ public class ApplicationSecurity {
                 //.antMatchers("/Student").hasRole("TEACHER")
                 //.antMatchers("/**").permitAll();
                 .anyRequest().authenticated();
+        http.oauth2ResourceServer()
+                .jwt().decoder(jwtDecoder())
+                .and()
+                .jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
 
         http
                 .rememberMe()
@@ -86,14 +88,27 @@ public class ApplicationSecurity {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-                Optional<User> optionalUser = userRepository.findByUniqueName(username);
-                User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
-                return new CustomUserDetails(user);
-    };
-}
+        @Bean
+        public UserDetailsService userDetailsService() {
+                return username -> {
+                        Optional<User> optionalUser = userRepository.findByUniqueName(username);
+                        User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
+                        return new CustomUserDetails(user);
+                };
+        }
 
+        @Bean
+        public JwtDecoder jwtDecoder() {
+                NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(this.tokenUri).build();
+                jwtDecoder.setClaimSetConverter(new CustomClaimSetConverter());
+                return jwtDecoder;
+        }
+
+        @Bean
+        public JwtAuthenticationConverter jwtAuthenticationConverter() {
+                JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+                converter.setJwtGrantedAuthoritiesConverter(new CustomJwtGrantedAuthoritiesConverter());
+                return converter;
+        }
 
 }
