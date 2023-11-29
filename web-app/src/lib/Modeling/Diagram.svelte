@@ -494,8 +494,6 @@
 			securityLevel: 'loose'
 		});
 
-
-		console.log(diagram)
 		await renderDiagram(diagram);
 
 		mounted = true

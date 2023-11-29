@@ -22,7 +22,7 @@
         } else if ($currentTab == "Explorer") {
             archiveMode.set(false);
         } else if ($currentTab == "Utilisateur") {
-            login()
+            // login()
         }
     }
 </script>
