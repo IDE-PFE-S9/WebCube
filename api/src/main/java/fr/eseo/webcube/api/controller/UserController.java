@@ -34,7 +34,6 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    
 
     @GetMapping()
     public ResponseEntity<?> getUserDetails(@RequestHeader("Authorization") String token) {

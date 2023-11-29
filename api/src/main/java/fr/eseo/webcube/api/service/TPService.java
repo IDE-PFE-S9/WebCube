@@ -91,7 +91,7 @@ public class TPService {
 			userTpRepository.save(userTP);
 		}
 
-		// If the directory exists, create a zip of the directory
+		
 		Path zipPath = Files.createTempFile("archive", ".wc");
 		zipFolder(permDir, zipPath);
 

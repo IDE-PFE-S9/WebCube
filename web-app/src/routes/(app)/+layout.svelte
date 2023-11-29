@@ -10,11 +10,10 @@
 	import MarkdownViewer from '$lib/MarkdownViewer/MarkdownViewer.svelte';
 	import UserPanel from '$lib/UserPanel/UserPanel.svelte';
 	import GitExplorer from '$lib/GitExplorer/GitExplorer.svelte';
-  import Diagram from '$lib/Modeling/Diagram.svelte';
+	import Diagram from '$lib/Modeling/Diagram.svelte';
 	import ConfigPanel from '$lib/Modeling/ConfigPanel.svelte';
 
-	import { archiveMode, markdownMode, currentTab } from '$lib/stores.js';
-
+	import { markdownMode, currentTab } from '$lib/stores.js';
 
 	let startX;
 	let startWidth;
@@ -44,7 +43,6 @@
 		document.removeEventListener('mousemove', onMouseMove);
 		document.removeEventListener('mouseup', onMouseUp);
 	}
-
 </script>
 
 <div class="main">
@@ -117,7 +115,6 @@
 			width: 20rem;
 			height: 100%;
 		}
-
 
 		.right {
 			display: flex;
