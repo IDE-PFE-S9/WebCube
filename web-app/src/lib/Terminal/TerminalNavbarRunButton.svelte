@@ -1,15 +1,18 @@
 <script>
 	import { terminalOutput, openedArchive } from '$lib/stores.js';
 	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
-
+	import Cookies from 'js-cookie';
+	
 	let apiUrl = process.env.API_URL;
 
 	async function runCode() {
 		$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
 		let headersList = {
-			Accept: '*/*'
-		};
+		Accept: '*/*',
+		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
+		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
+	};
 
 		let username = "arthur"
 

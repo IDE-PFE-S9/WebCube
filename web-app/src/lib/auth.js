@@ -1,6 +1,8 @@
 // Import MSAL
 import { PublicClientApplication } from "@azure/msal-browser";
 import Cookies from "js-cookie";
+import { token } from "./stores";
+import Swal from "sweetalert2";
 
 
 // MSAL configuration
@@ -42,10 +44,10 @@ async function login() {
             console.log('Access Token:', response.accessToken);
             Cookies.set("azureJWT", response.accessToken);
             getUserDetails();
+            Swal.close();
         }
     } catch (error) {
         console.error(error);
-        console.log('moche comme erreur');
     }
 }
 
@@ -63,7 +65,7 @@ async function getUserDetails() {
 
     const dataReturned = await response.json();
     Cookies.set("apiJWT", dataReturned.token);
-    console.log(dataReturned);
+    token.set(Cookies.get('apiJWT'))
     return dataReturned;
 }
 

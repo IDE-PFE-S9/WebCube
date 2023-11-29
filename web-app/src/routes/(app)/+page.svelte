@@ -1,11 +1,15 @@
 <script>
 	import { onMount } from 'svelte';
-	import { login, getUserDetails } from '$lib/auth.js'; // Assuming the MSAL code is in auth.js
-	import Cookies from 'js-cookie';
+	import { login } from '$lib/auth.js'; // Assuming the MSAL code is in auth.js
+	import { token } from '$lib/stores.js';
 	import { screenChangeCount, examMode, logs, selectedFile } from '$lib/stores.js';
 	import Swal from 'sweetalert2';
 
 	let isExamModeActive = false;
+
+	$: if (!$token) {
+		showLoginPopup();
+	}
 
 	onMount(() => {
 		// Subscribe to the examMode store
@@ -50,7 +54,27 @@
 			unsubscribe();
 		};
 	});
+
+
+	function showLoginPopup() {
+		Swal.fire({
+			title: "Vous devez d'abord vous connecter",
+			icon: 'warning',
+			html: '<button id="loginBtn" style="cursor:pointer;color:white;font-size:1rem;background-color:#1e1e1e;width:40%;height:50px;border-radius:10px;border:1px solid white">Se connecter</button>',
+			background: "#1e1e1e",
+			color: "white",
+			showConfirmButton: false,
+			allowOutsideClick: false,
+			allowEscapeKey: false,
+			allowEnterKey: false,
+			didOpen: () => {
+				const loginBtn = document.getElementById('loginBtn');
+				loginBtn.addEventListener('click', login);
+			}
+		});
+	}
 </script>
+
 
 <style lang="scss">
 </style>

@@ -3,6 +3,7 @@
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
 	import Swal from 'sweetalert2';
 	import JSZip from 'jszip';
+	import Cookies from 'js-cookie';
 
 	let apiUrl = process.env.API_URL;
 
@@ -47,8 +48,10 @@
 		const zipBlob = await createZip($openedArchive);
 
 		let headersList = {
-			Accept: '*/*'
-		};
+		Accept: '*/*',
+		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
+		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
+	};
 
 		let username = 'arthur';
 

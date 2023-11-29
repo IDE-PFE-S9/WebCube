@@ -24,8 +24,7 @@ public class ApplicationSecurity {
         http.csrf().disable();
         http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http
-            .authorizeRequests()
+        http.authorizeRequests()
                 .antMatchers("/**").permitAll() ; // Endpoint public accessible sans authentification
                // .anyRequest().authenticated()
             //.and()
