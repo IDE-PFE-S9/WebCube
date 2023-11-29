@@ -105,21 +105,25 @@
 
         select {
             padding: 0.4rem;
+            max-width: 150px;
             font-size: 0.8rem;
             border: 2.5px solid;
             border-radius: 20px;
             outline: none;
             cursor: pointer;
             transition: border-color 0.3s ease;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
 
             &:hover,
             &:focus {
                 border-color: #3498db;
             }
         
-            appearance: none; // Supprime le style par défaut du navigateur
-            padding-right: 2rem; // Ajoute de l'espace pour la flèche du dropdown
-            background-color: white; // Couleur de fond du dropdown
+            appearance: none;   
+            padding-right: 2rem; 
+            background-color: white; 
             background-image: url('data:image/svg+xml,\
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%233498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>'); // Ajoute une petite flèche à droite
             background-repeat: no-repeat;
