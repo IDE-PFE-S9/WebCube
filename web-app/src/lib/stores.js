@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import Cookies from "js-cookie"
 
 let wsUrl = process.env.WS_URL;
 
@@ -41,6 +42,12 @@ export const screenChangeCount = persist('screenChangeCount', 0);
 
 export const logs = persist('logs', [])
 
+// connection
+export const token = writable(checkToken());
+
+function checkToken() {
+    return Cookies.get('apiJWT');
+}
 
 // web-sockets 
 // Check if running in a browser and setup WebSocket

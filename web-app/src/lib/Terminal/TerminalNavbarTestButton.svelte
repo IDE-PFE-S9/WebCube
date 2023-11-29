@@ -1,6 +1,7 @@
 <script>
 	import { terminalOutput, openedArchive } from '$lib/stores.js';
 	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
+	import Cookies from 'js-cookie';
 
 	let apiUrl = process.env.API_URL;
 
@@ -8,8 +9,10 @@
 		$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
 		let headersList = {
-			Accept: '*/*'
-		};
+		Accept: '*/*',
+		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
+		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
+	};
 
 		let username = "arthur"
 

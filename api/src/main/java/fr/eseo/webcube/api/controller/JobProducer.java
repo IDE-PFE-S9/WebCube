@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,21 +38,27 @@ public class JobProducer {
     // TODO: fix the paths to use the token.
 
     @GetMapping("/compileAndRun")
-    public String compileAndRun(@RequestParam String projectPath) throws Exception {
+    public String compileAndRun(@RequestParam String projectPath,
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
         sendJob(projectPath, requestId, "run");
         return retrieveResult(requestId);
     }
 
     @GetMapping("/compileAndTest")
-    public String compileAndTest(@RequestParam String projectPath) throws Exception {
+    public String compileAndTest(@RequestParam String projectPath,
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
         sendJob(projectPath, requestId, "test");
         return retrieveResult(requestId);
     }
 
     @GetMapping("/compileAndJar")
-    public ResponseEntity<Resource> compileAndJar(@RequestParam String projectPath) throws Exception {
+    public ResponseEntity<Resource> compileAndJar(@RequestParam String projectPath,
+    @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+    @RequestHeader(name = "Authorization-API") String tokenApi) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
         sendJob(projectPath, requestId, "jar");
         String jarFilePath = retrieveResult(requestId); // This retrieves the path of the JAR file

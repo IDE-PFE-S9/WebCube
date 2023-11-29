@@ -2,10 +2,14 @@
 	import { onMount } from 'svelte';
 	import TpButton from './TpButton.svelte';
 
+	import Cookies from "js-cookie"
+
 	let apiUrl = process.env.API_URL;
 
 	let headersList = {
-		Accept: '*/*'
+		Accept: '*/*',
+		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
+		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
 	};
 
 	let tpJson = [];
