@@ -2,6 +2,7 @@
 	import { terminalOutput, openedArchive } from '$lib/stores.js';
 	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 	import Cookies from 'js-cookie';
+	import { workTestPopup } from '/src/lib/PopUps/popup.js';
 
 	let apiUrl = process.env.API_URL;
 
@@ -33,6 +34,8 @@
 		resultList.forEach((message) => {
 			$terminalOutput = [...$terminalOutput, objectToString(message)];
 		});
+
+		workTestPopup();
 	}
 
 	function objectToString(obj) {

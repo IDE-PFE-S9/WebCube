@@ -2,6 +2,7 @@
 	import { openedArchive, archiveHandle, archiveMode } from '$lib/stores.js';
 	import DownloadIcon from '$lib/assets/TerminalNavbarIcons/DownloadIcon.svelte';
 	import { get } from 'svelte/store';
+	import { archiveDownloadPopup } from '/src/lib/PopUps/popup.js';
 
 	import JSZip from 'jszip';
 
@@ -39,6 +40,8 @@
 		// Clean up: remove the anchor element and revoke the blob URL
 		document.body.removeChild(a);
 		URL.revokeObjectURL(blobUrl);
+
+		archiveDownloadPopup();
 	}
 </script>
 

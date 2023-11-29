@@ -1,7 +1,7 @@
 <script>
 	import { openedCodes, openedArchive } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
-	import Swal from 'sweetalert2';
+	import { workSavePopup } from '/src/lib/PopUps/popup.js';
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
 
@@ -79,12 +79,9 @@
 			}
 		}
 
-		resetModified($openedArchive)
+		resetModified($openedArchive);
 
-		Swal.fire({
-			title: 'Fichiers sauvegardés !',
-			icon: 'success'
-		});
+		workSavePopup();
 	}
 </script>
 

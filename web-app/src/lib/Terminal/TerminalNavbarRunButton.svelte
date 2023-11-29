@@ -2,6 +2,7 @@
 	import { terminalOutput, openedArchive } from '$lib/stores.js';
 	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
 	import Cookies from 'js-cookie';
+	import { workCompilePopup } from '/src/lib/PopUps/popup.js';
 	
 	let apiUrl = process.env.API_URL;
 
@@ -63,6 +64,8 @@
 
 		// const exitCode = await cheerpjRunJar("/str/application.jar");
 		// $terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
+
+		workCompilePopup();
 	}
 </script>
 
