@@ -8,8 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -58,7 +62,7 @@ public class TPService {
 
 		String username = uniqueName.split("@")[0].replace(".", "-");
 
-		User user = userRepository.findByUniqueName(uniqueName);
+		User user = userRepository.findByUniqueName(uniqueName).get();
 
 		// TODO: fix the path to use the token.
 		Path permDir = Paths.get(
@@ -132,6 +136,25 @@ public class TPService {
 	}
 
 	public List<TpResponse> getCompletionsByTpId(Integer tpId) {
-        return userTpRepository.findTpResponseByTpId(tpId);
+		List<Object[]> tpObjects = userTpRepository.findTpResponseByTpId(tpId);
+		List<TpResponse> tpResponseList = new ArrayList<>();
+
+		for (Object[] result : tpObjects) {
+			String uniqueName = (String) result[0];
+			String firstname = (String) result[1];
+			String surname = (String) result[2];
+			Integer completion = (Integer) result[3];
+			String rolesString = (String) result[4];
+
+			// Diviser la chaîne des rôles en utilisant la virgule
+			String[] rolesArray = rolesString.split(",");
+
+			// Convertir le tableau de chaînes en un ensemble de rôles (de type String)
+			Set<String> rolesSet = new HashSet<>(Arrays.asList(rolesArray));
+			
+			// Ajouter l'instance à la liste
+			tpResponseList.add(new TpResponse(uniqueName, firstname, surname, completion, rolesSet));
+		}
+        return tpResponseList;
     }
 }

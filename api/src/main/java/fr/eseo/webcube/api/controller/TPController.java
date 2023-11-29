@@ -135,7 +135,7 @@ public class TPController {
 
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-
+            
         List<TpResponse> tpResponses = tpService.getCompletionsByTpId(id);
 
         if (tpResponses != null && !tpResponses.isEmpty()) {

@@ -18,7 +18,7 @@ public class UserService {
 
 
 	public Set<Role> getRolesByUniqueName(String uniqueName) {
-		User user = userRepository.findByUniqueName(uniqueName);
+		User user = userRepository.findByUniqueName(uniqueName).get();
 
 		if (user != null && user.getRoles() != null) {
 			// Si l'utilisateur est trouvé et a des rôles, retournez les rôles.

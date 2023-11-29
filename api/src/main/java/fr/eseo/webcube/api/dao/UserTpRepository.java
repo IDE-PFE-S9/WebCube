@@ -21,8 +21,14 @@ public interface UserTpRepository extends JpaRepository<UserTP, UserTpKey> {
     @Query("SELECT new fr.eseo.webcube.api.Details.TpDetails(u.completion, u.tp.id, u.tp.name, u.tp.type, u.tp.gitLink) FROM UserTP u WHERE u.user.uniqueName = :uniqueName AND u.tp.id = :tpId")
     List<TpDetails> findDetailsByUniqueNameAndTpId(@Param("uniqueName") String uniqueName, @Param("tpId") Integer tpId);
 
-    @Query("SELECT new fr.eseo.webcube.api.Response.TpResponse(u.user.uniqueName, u.user.firstname, u.user.surname, u.completion) " +
-            "FROM UserTP u WHERE u.tp.id = :tpId")
-    List<TpResponse> findTpResponseByTpId(@Param("tpId") Integer tpId);
+    @Query(value = "SELECT user.unique_name, user.firstname, user.surname, user_tp.completion, GROUP_CONCAT(role.role) as roles " +
+        "FROM user " +
+        "JOIN user_tp ON user.unique_name = user_tp.unique_name " +
+        "JOIN tp ON user_tp.tp_id = tp.id " +
+        "JOIN user_roles ON user.unique_name = user_roles.unique_name " +
+        "JOIN role ON user_roles.role_id = role.id_role " +
+        "WHERE tp.id = :tpId " +
+        "GROUP BY user.unique_name, user.firstname, user.surname, user_tp.completion", nativeQuery = true)
+    List<Object[]> findTpResponseByTpId(@Param("tpId") Integer tpId);
      
 }
