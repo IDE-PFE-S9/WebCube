@@ -4,6 +4,7 @@
 
     export let name;
     export let completions;
+    export let groups;
 
     let color = "rgb(52,120,198)";
     let data = []
@@ -12,10 +13,35 @@
 
     $: {
         let somme = 0;
-        for (let i = 0; i < completions.length; i++) {
-            somme += completions[i];
+        let percentage = 0;
+        let occurence = 0;
+
+        if(name == "Global"){
+            for (let i = 0; i < completions.length; i++) {
+                somme += completions[i];
+            }
+            percentage = somme / completions.length;
+        } 
+        
+        else if (name == "Groupe A") {
+            for (let i = 0; i < completions.length; i++) {
+                if (groups[i] == "ROLE_GROUPE_A") {
+                    somme += completions[i];
+                    occurence++;
+                }
+                percentage = somme / occurence;
+            }
+        } 
+        
+        else if (name == "Groupe B") {
+            for (let i = 0; i < completions.length; i++) {
+                if (groups[i] == "ROLE_GROUPE_B") {
+                    somme += completions[i];
+                    occurence++;
+                }
+                percentage = somme / occurence;
+            }
         }
-        let percentage = somme / completions.length;
 
         color = "rgb(52,120,198)";
         if (percentage === 100) {

@@ -6,6 +6,7 @@
 
     let completions = [];
     let names = [];
+    let groups = [];
     let selectedTp = 1; 
 
     let apiUrl = process.env.API_URL;
@@ -35,10 +36,11 @@
         }
 
         const dataReturned = await response.json();
+
         names = dataReturned.map(student => `${student.firstname} ${student.surname}`);
         completions = dataReturned.map(student => student.completion);
-
-        return {names, completions};
+        groups = dataReturned.map(student => student.roles);
+        return {names, completions, groups};
     }
 
     $:{
@@ -61,11 +63,11 @@
     </div>
 
     <div class="graph-container">
-        <GlobalAdvancement name={"Groupe A"} completions={completions}></GlobalAdvancement>
+        <GlobalAdvancement name={"Groupe A"} completions={completions} groups={groups}></GlobalAdvancement>
 
-        <GlobalAdvancement name={"Groupe B"} completions={completions}></GlobalAdvancement>
+        <GlobalAdvancement name={"Groupe B"} completions={completions} groups={groups}></GlobalAdvancement>
 
-        <GlobalAdvancement name={"Global"} completions={completions}></GlobalAdvancement>
+        <GlobalAdvancement name={"Global"} completions={completions} groups={groups}></GlobalAdvancement>
     </div>
 
     <div class="avancement-individuel">
