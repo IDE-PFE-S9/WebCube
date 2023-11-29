@@ -6,7 +6,18 @@
 
     let completions = [];
     let names = [];
-    let selectedTp = "1"; 
+    let selectedTp = 1; 
+
+    let apiUrl = process.env.API_URL;
+    let tpJson = [];
+
+    onMount(async () => {
+		const tpResponse = await fetch(`${apiUrl}/api/tp`, {
+			method: 'GET',
+		});
+		tpJson = await tpResponse.json(); 
+        tpJson.sort((a, b) => a.name.localeCompare(b.name));
+	});
 
     async function getAdvancementTp(tpId) {
         const response = await fetch('http://localhost:4444/api/tp/completion/etudiants/'+tpId, {
@@ -27,11 +38,6 @@
         names = dataReturned.map(student => `${student.firstname} ${student.surname}`);
         completions = dataReturned.map(student => student.completion);
 
-        console.log(dataReturned);
-
-        console.log('Noms:', names);
-        console.log('Completions:', completions);
-
         return {names, completions};
     }
 
@@ -47,9 +53,9 @@
         <div class="tp-selector">
             <label for="tpDropdown">Sélectionner un TP :</label>
             <select id="tpDropdown" bind:value={selectedTp}>
-                <option value="1">TP 1</option>
-                <option value="2">TP 2</option>
-                <option value="3">TP 3</option>
+                {#each tpJson as tp (tp.id)}
+                    <option value={tp.id}>{tp.name}</option>
+                {/each}
             </select>
         </div>
     </div>
@@ -91,9 +97,33 @@
     .tp-selector {
         display: flex;
         align-items: center;
-        margin-left: auto;
+
         label {
             margin-right: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        select {
+            padding: 0.4rem;
+            font-size: 0.8rem;
+            border: 2.5px solid;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+
+            &:hover,
+            &:focus {
+                border-color: #3498db;
+            }
+        
+            appearance: none; // Supprime le style par défaut du navigateur
+            padding-right: 2rem; // Ajoute de l'espace pour la flèche du dropdown
+            background-color: white; // Couleur de fond du dropdown
+            background-image: url('data:image/svg+xml,\
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%233498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>'); // Ajoute une petite flèche à droite
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
         }
     }
     .graph-container{
