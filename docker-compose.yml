@@ -14,6 +14,9 @@ services:
     depends_on:
       - api
     container_name: web-app
+    dns:
+      - IP_DNS
+      - webcube.pfe.dns
 
   api:
     build:
@@ -24,4 +27,7 @@ services:
     ports:
       - "4444:4444"
     container_name: api
+    dns:
+      - IP_DNS
+      - webcube.pfe.dns
     
