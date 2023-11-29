@@ -51,10 +51,24 @@ export function workSavePopup() {
     });
 }
 
+export function workSaveErrorPopup() {
+    Toast.fire({
+        icon: "error",
+        title: "Travail non enregistré"
+    });
+}
+
 export function archiveDownloadPopup() {
     Toast.fire({
         icon: "success",
         title: "Archive téléchargée !"
+    });
+}
+
+export function archiveDownloadErrorPopup() {
+    Toast.fire({
+        icon: "error",
+        title: "Téléchargement échoué"
     });
 }
 
@@ -65,7 +79,21 @@ export function workCompilePopup() {
     });
 }
 
+export function workCompileErrorPopup() {
+    Toast.fire({
+        icon: "error",
+        title: "Compilation échouée"
+    });
+}
+
 export function workTestPopup() {
+    Toast.fire({
+        icon: "success",
+        title: "Test échoué"
+    });
+}
+
+export function workTestErrorPopup() {
     Toast.fire({
         icon: "success",
         title: "Code testé !"

@@ -2,40 +2,45 @@
 	import { terminalOutput, openedArchive } from '$lib/stores.js';
 	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 	import Cookies from 'js-cookie';
-	import { workTestPopup } from '/src/lib/PopUps/popup.js';
+	import { workTestPopup, workTestErrorPopup} from '/src/lib/PopUps/popup.js';
 
 	let apiUrl = process.env.API_URL;
 
 	async function testCode() {
-		$terminalOutput = [...$terminalOutput, 'Compiling...'];
+		try{
+			$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
-		let headersList = {
-		Accept: '*/*',
-		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
-		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
-	};
+			let headersList = {
+				Accept: '*/*',
+				'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
+				'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
+			};
 
-		let username = "arthur"
+			let username = "arthur"
 
-		// API call to compile the code and get the API response
-		let compilationResponse = await fetch(
-			`${apiUrl}/api/compileAndTest?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}/${$openedArchive.name}`,
-			{
-				method: 'GET',
-				headers: headersList
-			}
-		);
-		let compilationResult = await compilationResponse.text();
+			// API call to compile the code and get the API response
+			let compilationResponse = await fetch(
+				`${apiUrl}/api/compileAndTest?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}/${$openedArchive.name}`,
+				{
+					method: 'GET',
+					headers: headersList
+				}
+			);
+			let compilationResult = await compilationResponse.text();
 
-		// parse results
-		const resultList = parseInput(compilationResult);
+			// parse results
+			const resultList = parseInput(compilationResult);
 
-		console.log(resultList);
-		resultList.forEach((message) => {
-			$terminalOutput = [...$terminalOutput, objectToString(message)];
-		});
+			console.log(resultList);
+			resultList.forEach((message) => {
+				$terminalOutput = [...$terminalOutput, objectToString(message)];
+			});
 
-		workTestPopup();
+			workTestPopup();
+		} catch (error) {
+			console.error('Une erreur est survenue lors du test du fichier :', error);
+            workTestErrorPopup();
+        }
 	}
 
 	function objectToString(obj) {
