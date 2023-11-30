@@ -8,7 +8,19 @@
 
     let completions = [];
     let names = [];
-    let selectedTp = "1"; 
+    let groups = [];
+    let selectedTp = 1; 
+
+    let apiUrl = process.env.API_URL;
+    let tpJson = [];
+
+    onMount(async () => {
+		const tpResponse = await fetch(`${apiUrl}/api/tp`, {
+			method: 'GET',
+		});
+		tpJson = await tpResponse.json(); 
+        tpJson.sort((a, b) => a.name.localeCompare(b.name));
+	});
 
     async function getAdvancementTp(tpId) {
         const response = await fetch(`${apiUrl}/api/tp/completion/etudiants/${tpId}`, {
@@ -26,15 +38,11 @@
         }
 
         const dataReturned = await response.json();
+
         names = dataReturned.map(student => `${student.firstname} ${student.surname}`);
         completions = dataReturned.map(student => student.completion);
-
-        console.log(dataReturned);
-
-        console.log('Noms:', names);
-        console.log('Completions:', completions);
-
-        return {names, completions};
+        groups = dataReturned.map(student => student.roles);
+        return {names, completions, groups};
     }
 
     $:{
@@ -49,19 +57,19 @@
         <div class="tp-selector">
             <label for="tpDropdown">Sélectionner un TP :</label>
             <select id="tpDropdown" bind:value={selectedTp}>
-                <option value="1">TP 1</option>
-                <option value="2">TP 2</option>
-                <option value="3">TP 3</option>
+                {#each tpJson as tp (tp.id)}
+                    <option value={tp.id}>{tp.name}</option>
+                {/each}
             </select>
         </div>
     </div>
 
     <div class="graph-container">
-        <GlobalAdvancement name={"Groupe A"} completions={completions}></GlobalAdvancement>
+        <GlobalAdvancement name={"Groupe A"} completions={completions} groups={groups}></GlobalAdvancement>
 
-        <GlobalAdvancement name={"Groupe B"} completions={completions}></GlobalAdvancement>
+        <GlobalAdvancement name={"Groupe B"} completions={completions} groups={groups}></GlobalAdvancement>
 
-        <GlobalAdvancement name={"Global"} completions={completions}></GlobalAdvancement>
+        <GlobalAdvancement name={"Global"} completions={completions} groups={groups}></GlobalAdvancement>
     </div>
 
     <div class="avancement-individuel">
@@ -93,9 +101,37 @@
     .tp-selector {
         display: flex;
         align-items: center;
-        margin-left: auto;
+
         label {
             margin-right: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        select {
+            padding: 0.4rem;
+            max-width: 150px;
+            font-size: 0.8rem;
+            border: 2.5px solid;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &:hover,
+            &:focus {
+                border-color: #3498db;
+            }
+        
+            appearance: none;   
+            padding-right: 2rem; 
+            background-color: white; 
+            background-image: url('data:image/svg+xml,\
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%233498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>'); // Ajoute une petite flèche à droite
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
         }
     }
     .graph-container{

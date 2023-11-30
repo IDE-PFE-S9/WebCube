@@ -1,7 +1,7 @@
 <script>
 	import { openedCodes, openedArchive } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
-	import Swal from 'sweetalert2';
+	import { workSavePopup, workSaveErrorPopup} from '/src/lib/PopUps/popup.js';
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
 
@@ -31,16 +31,17 @@
 	}
 
 	async function saveFile() {
-		// Function to recursively update the archive
-		function updateArchive(node) {
-			if (node.type === 'file') {
-				const codeToUpdate = $openedCodes.find((code) => code.name === node.name);
-				if (codeToUpdate) {
-					node.data = codeToUpdate.code; // Update the data field
-					node.modified = true;
+		try{	// Function to recursively update the archive
+			function updateArchive(node) {
+				if (node.type === 'file') {
+					const codeToUpdate = $openedCodes.find((code) => code.name === node.name);
+					if (codeToUpdate) {
+						node.data = codeToUpdate.code; // Update the data field
+						node.modified = true
+					}
+				} else if (node.children) {
+					node.children.forEach(updateArchive); // Recurse into directories
 				}
-			} else if (node.children) {
-				node.children.forEach(updateArchive); // Recurse into directories
 			}
 		}
 		updateArchive($openedArchive);
@@ -84,14 +85,12 @@
 			} else if (node.children) {
 				node.children.forEach(resetModified); // Recurse into directories
 			}
-		}
 
-		resetModified($openedArchive);
-
-		Swal.fire({
-			title: 'Fichiers sauvegardés !',
-			icon: 'success'
-		});
+			workSavePopup();
+		} catch (error) {
+			console.error('Une erreur est survenue lors de la sauvegarde du fichier :', error);
+            workSaveErrorPopup();
+        }
 	}
 </script>
 
