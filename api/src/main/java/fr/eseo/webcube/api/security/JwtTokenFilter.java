@@ -39,7 +39,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } else {
             String token = getAccessToken(request);
-            if (!jwtUtil.validateAccessToken(token)) {
+            if (!jwtUtil.validateAccessToken(token, response)) {
                 filterChain.doFilter(request, response);
             } else {
                 if (userDetailsService == null) {
@@ -47,7 +47,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext);
                     userDetailsService = context.getBean(UserDetailsService.class);
                 }
-                setAuthenticationContext(token, request);
+                setAuthenticationContext(token, request, response);
                 filterChain.doFilter(request, response);
             }
         }
@@ -63,12 +63,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         return header.split(" ")[1].trim();
     }
 
-    private void setAuthenticationContext(String token, HttpServletRequest request) {
+    private void setAuthenticationContext(String token, HttpServletRequest request, HttpServletResponse response) {
         String username = jwtUtil.getUniqueName(token);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.validateAccessToken(token)) {
+            if (jwtUtil.validateAccessToken(token, response)) {
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
