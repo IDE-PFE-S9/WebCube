@@ -25,7 +25,7 @@
         
         else if (name == "Groupe A") {
             for (let i = 0; i < completions.length; i++) {
-                if (groups[i] == "ROLE_GROUPE_A") {
+                if (groups[i] == "ROLE_GROUP_A") {
                     somme += completions[i];
                     occurence++;
                 }
@@ -35,7 +35,7 @@
         
         else if (name == "Groupe B") {
             for (let i = 0; i < completions.length; i++) {
-                if (groups[i] == "ROLE_GROUPE_B") {
+                if (groups[i] == "ROLE_GROUP_B") {
                     somme += completions[i];
                     occurence++;
                 }
