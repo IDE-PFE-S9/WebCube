@@ -5,6 +5,7 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	define: {
 		'process.env.API_URL': JSON.stringify('http://localhost:4444'),
-		'process.env.WS_URL': JSON.stringify('ws://localhost:4444')
+		'process.env.WS_URL': JSON.stringify('ws://localhost:4444'),
+		// 'process.env.CLIENT_HOST': JSON.stringify('http://localhost:3000')
 	}
 });

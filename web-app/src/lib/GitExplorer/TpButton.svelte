@@ -14,6 +14,8 @@
 	};
 
 	const getArchive = async () => {
+		console.log(headersList);
+
 		let archiveResponse = await fetch(`${apiUrl}/api/tp/archive/${tp.id}`, {
 			method: 'GET',
 			headers: headersList

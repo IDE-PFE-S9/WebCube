@@ -2,21 +2,28 @@
 	import { terminalOutput, openedArchive } from '$lib/stores.js';
 	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 	import Cookies from 'js-cookie';
-	import { workTestPopup, workTestErrorPopup} from '/src/lib/PopUps/popup.js';
+	import { workTestPopup, workTestErrorPopup } from '/src/lib/PopUps/popup.js';
 
 	let apiUrl = process.env.API_URL;
 
 	async function testCode() {
-		try{
+		try {
 			$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
 			let headersList = {
 				Accept: '*/*',
-				'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
-				'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
+				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
-			let username = "arthur"
+			const userRes = await fetch(`${apiUrl}/api/user`, {
+				method: 'GET',
+				headers: headersList
+			});
+
+			const user = await userRes.json();
+
+			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			// API call to compile the code and get the API response
 			let compilationResponse = await fetch(
@@ -39,8 +46,8 @@
 			workTestPopup();
 		} catch (error) {
 			console.error('Une erreur est survenue lors du test du fichier :', error);
-            workTestErrorPopup();
-        }
+			workTestErrorPopup();
+		}
 	}
 
 	function objectToString(obj) {

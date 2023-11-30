@@ -3,7 +3,7 @@
     export let icon;
 
     import { currentTab, archiveMode, openedArchive} from '$lib/stores.js';
-	import { showDeniedPopup } from '/src/lib/PopUps/popup.js';
+	  import { showDeniedPopup } from '/src/lib/PopUps/popup.js';
 
     let showText = false;
 
