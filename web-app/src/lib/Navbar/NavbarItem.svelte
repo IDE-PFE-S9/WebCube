@@ -2,8 +2,8 @@
     export let text;
     export let icon;
 
-    import { currentTab, archiveMode } from '$lib/stores.js'
-    import { login } from '$lib/auth.js'
+    import { currentTab, archiveMode, openedArchive} from '$lib/stores.js';
+	import { showDeniedPopup } from '/src/lib/PopUps/popup.js';
 
     let showText = false;
 
@@ -16,15 +16,22 @@
     }
 
     function handleClick() {
-        currentTab.set(text);
-        if ($currentTab == "Archive") {
-            archiveMode.set(true);
-        } else if ($currentTab == "Explorer") {
-            archiveMode.set(false);
-        } else if ($currentTab == "Utilisateur") {
-            // login()
-        }
+		console.log($openedArchive)
+		if($openedArchive==null & text == "Uml"){
+			showDeniedPopup();
+		} else {
+			currentTab.set(text);
+			if ($currentTab == "Archive") {
+				archiveMode.set(true);
+			} else if ($currentTab == "Explorer") {
+				archiveMode.set(false);
+			} else if ($currentTab == "Utilisateur") {
+				//TODO: check if teacher or student 
+			}
+		}
     }
+
+
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->

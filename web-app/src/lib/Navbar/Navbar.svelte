@@ -1,6 +1,5 @@
 <script>
 	import NavbarItem from "./NavbarItem.svelte";
-    import ParametersIcon from "/src/lib/assets/NavbarIcons/ParametersIcon.svelte";
     import FilesIcon from "/src/lib/assets/NavbarIcons/FilesIcon.svelte";
     import GitIcon from "/src/lib/assets/NavbarIcons/GitIcon.svelte";
     import UmlIcon from "/src/lib/assets/NavbarIcons/UmlIcon.svelte";
@@ -11,7 +10,6 @@
         { text: "Archive", icon: GitIcon },
         { text: "Uml", icon: UmlIcon },
         { text: "Utilisateur", icon: UserIcon },
-        { text: "Paramètres", icon: ParametersIcon },
     ];
 </script>
 
