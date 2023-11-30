@@ -10,8 +10,6 @@
     let names = [];
     let groups = [];
     let selectedTp = 1; 
-
-    let apiUrl = process.env.API_URL;
     let tpJson = [];
 
     onMount(async () => {
