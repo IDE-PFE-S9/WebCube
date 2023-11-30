@@ -2,14 +2,16 @@
     import GlobalAdvancement from './GlobalAdvancement.svelte';
     import StudentAdvancement from './StudentAdvancement.svelte';
     import Cookies from 'js-cookie';
-    import { onMount } from 'svelte';
+
+    let apiUrl = process.env.API_URL;
+    
 
     let completions = [];
     let names = [];
     let selectedTp = "1"; 
 
     async function getAdvancementTp(tpId) {
-        const response = await fetch('http://localhost:4444/api/tp/completion/etudiants/'+tpId, {
+        const response = await fetch(`${apiUrl}/api/tp/completion/etudiants/${tpId}`, {
             headers: {
                 'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
                 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")

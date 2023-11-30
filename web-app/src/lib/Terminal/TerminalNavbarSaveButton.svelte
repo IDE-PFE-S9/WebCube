@@ -37,7 +37,7 @@
 				const codeToUpdate = $openedCodes.find((code) => code.name === node.name);
 				if (codeToUpdate) {
 					node.data = codeToUpdate.code; // Update the data field
-					node.modified = true
+					node.modified = true;
 				}
 			} else if (node.children) {
 				node.children.forEach(updateArchive); // Recurse into directories
@@ -48,12 +48,19 @@
 		const zipBlob = await createZip($openedArchive);
 
 		let headersList = {
-		Accept: '*/*',
-		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
-		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
-	};
+			Accept: '*/*',
+			'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+			'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+		};
 
-		let username = 'arthur';
+		const userRes = await fetch(`${apiUrl}/api/user`, {
+			method: 'GET',
+			headers: headersList
+		}); 
+
+		const user = await userRes.json();
+
+		let username = user.uniqueName.split("@")[0].replace(".", "-");
 
 		const formData = new FormData();
 		formData.append(
@@ -79,7 +86,7 @@
 			}
 		}
 
-		resetModified($openedArchive)
+		resetModified($openedArchive);
 
 		Swal.fire({
 			title: 'Fichiers sauvegardés !',

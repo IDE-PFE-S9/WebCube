@@ -245,7 +245,7 @@
 			parsedOutput.classes.push(...listener.getOutput().classes);
 			parsedOutput.interfaces.push(...listener.getOutput().interfaces);
 			parsedOutput.enums.push(...listener.getOutput().enums);
-		} else if (node.type === 'directory' && node.children) {
+		} else if (node.type === 'directory' && node.children && !node.name.includes("test")) {
 			node.children.forEach((child) => traverseAndParse(child, parsedOutput));
 		}
 	}

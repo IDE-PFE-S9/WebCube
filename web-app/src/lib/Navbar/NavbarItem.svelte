@@ -3,7 +3,6 @@
     export let icon;
 
     import { currentTab, archiveMode } from '$lib/stores.js'
-    import { login } from '$lib/auth.js'
 
     let showText = false;
 

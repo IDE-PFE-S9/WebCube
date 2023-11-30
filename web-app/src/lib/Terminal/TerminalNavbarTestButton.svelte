@@ -9,12 +9,19 @@
 		$terminalOutput = [...$terminalOutput, 'Compiling...'];
 
 		let headersList = {
-		Accept: '*/*',
-		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
-		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
-	};
+			Accept: '*/*',
+			'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+			'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+		};
 
-		let username = "arthur"
+		const userRes = await fetch(`${apiUrl}/api/user`, {
+			method: 'GET',
+			headers: headersList
+		});
+
+		const user = await userRes.json();
+
+		let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 		// API call to compile the code and get the API response
 		let compilationResponse = await fetch(

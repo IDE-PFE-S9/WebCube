@@ -63,20 +63,21 @@ public class JobWorker {
                     String projectPath = messageMap.get("projectPath");
                     String action = messageMap.get("action");
 
-                    System.out.println(" [x] Received '" + projectPath + "' for action '" + action + "'"); 
+                    System.out.println(" [x] Received '" + projectPath + "' for action '" + action + "'");
 
                     if (action != null) {
                         if (action.equals("test")) {
-                            compileAndTest(projectPath, requestId, channel); 
+                            compileAndTest(projectPath, requestId, channel);
                         } else if (action.equals("jar")) {
                             compileAndJar(projectPath, requestId, channel);
+                        } else if (action.equals("run")) {
+                            compileAndRun(projectPath, requestId, channel);
                         } else {
                             throw new Exception("Unknown action: " + action);
                         }
                     } else {
                         throw new Exception("No action specified");
                     }
-
                     channel.basicAck(deliveryTag, false); // Manual acknowledgment
                     System.out.println(" [x] Acknowledged"); // Acknowledgment log
                 } catch (Exception e) {
@@ -86,8 +87,110 @@ public class JobWorker {
                     channel.basicNack(deliveryTag, false, true);
                 }
             }
-        };channel.basicConsume(queueName,false,consumer);
+        };
+        channel.basicConsume(queueName, false, consumer);
 
+    }
+
+    private static void compileAndRun(String projectPath, String requestId, Channel channel) {
+        long startTime = System.currentTimeMillis();
+        long endTime;
+        long compilationTime, runTime;
+        String result;
+        try {
+            File projectDir = new File(projectPath);
+            File srcDir = new File(projectDir, "src");
+            File libDir = new File(projectDir, "lib");
+            File classesDir = new File(projectDir, "classes");
+            classesDir.mkdir(); // Create classes directory to hold compiled classes
+
+            // Build the classpath from the jars in the lib directory
+            StringBuilder classpath = new StringBuilder();
+            for (File file : libDir.listFiles()) {
+                if (file.getName().endsWith(".jar")) {
+                    classpath.append(file.getAbsolutePath()).append(File.pathSeparator);
+                }
+            }
+
+            // Search for Main.java in the src directory
+            Path mainJavaPath = Files.walk(srcDir.toPath())
+                    .filter(path -> path.getFileName().toString().equals("Main.java"))
+                    .findFirst()
+                    .orElseThrow(() -> new FileNotFoundException("Main.java not found"));
+
+            // Compile the source files
+            Process compileProcess = new ProcessBuilder(
+                    "javac",
+                    "-d", classesDir.getAbsolutePath(),
+                    "-cp", classpath.toString(),
+                    "-sourcepath", srcDir.getAbsolutePath(),
+                    mainJavaPath.toString()).directory(projectDir).start();
+            int compileExitCode = compileProcess.waitFor();
+            endTime = System.currentTimeMillis();
+            compilationTime = endTime - startTime;
+            String compilationErrors = logProcessOutput("Compilation", compileProcess);
+
+            if (compileExitCode != 0) {
+                System.err.println("Compilation failed with exit code " + compileExitCode);
+                result = "Compilation failed with exit code " + compileExitCode + "\n"
+                        + "Output: \n" + compilationErrors + "\n"
+                        + "Total execution time: " + compilationTime + " ms";
+                sendOutput(result, requestId, channel);
+                return; // Exit early if compilation failed
+            }
+
+            // Run the compiled project
+            String mainClass = mainJavaPath.toString()
+                    .substring(srcDir.getAbsolutePath().length() + 1)
+                    .replace(".java", "")
+                    .replace(File.separator, ".");
+            Process runProcess = new ProcessBuilder(
+                    "java",
+                    "-cp", classpath.append(classesDir.getAbsolutePath()).toString(),
+                    mainClass).directory(projectDir).start();
+
+            StringBuilder output = new StringBuilder();
+            StringBuilder error = new StringBuilder();
+
+            try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(runProcess.getInputStream()));
+                    BufferedReader errorReader = new BufferedReader(
+                            new InputStreamReader(runProcess.getErrorStream()))) {
+
+                String line;
+                while ((line = outputReader.readLine()) != null) {
+                    output.append(line).append(System.lineSeparator());
+                }
+                while ((line = errorReader.readLine()) != null) {
+                    error.append(line).append(System.lineSeparator());
+                }
+            }
+
+            int runExitCode = runProcess.waitFor();
+
+            endTime = System.currentTimeMillis();
+            runTime = endTime - startTime;
+
+            if (runExitCode != 0) {
+                System.err.println("Run failed with exit code " + runExitCode);
+                System.err.println("Error output: " + error.toString());
+                result = "Compilation successful (" + compilationTime + " ms)\n"
+                        + "Run failed with exit code " + runExitCode + "\n"
+                        + "Output: \n" + output.toString() + error.toString() + "\n"
+                        + "Total execution time: " + runTime + " milliseconds";
+                sendOutput(result, requestId, channel);
+            } else {
+                System.out.println("Run succeeded with output: \n");
+                System.out.println(output.toString());
+                result = "Compilation successful (" + compilationTime + " ms)\n"
+                        + "Run succeed with exit code " + runExitCode + "\n"
+                        + "Output: \n" + output.toString() + "\n"
+                        + "Total execution time: " + runTime + " milliseconds";
+            }
+
+            sendOutput(result, requestId, channel);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void compileAndJar(String projectPath, String requestId, Channel channel) {
@@ -471,7 +574,8 @@ public class JobWorker {
         List<String> command = new ArrayList<>();
         command.add("java");
         command.add("-jar");
-        command.add("/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/junit-platform-console-standalone.jar");
+        command.add(
+                "/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/junit-platform-console-standalone.jar");
         command.add("--class-path");
         command.add(classesSrcDir.getAbsolutePath() + File.pathSeparator + classesTestDir.getAbsolutePath());
         command.add("--scan-class-path");
