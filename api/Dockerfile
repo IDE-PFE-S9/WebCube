@@ -14,6 +14,9 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:11-jdk-slim
 
+RUN mkdir -p /etc/apt/apt.conf.d/ && \
+    echo 'Acquire::http::Proxy "http://192.168.4.8:3128";' > /etc/apt/apt.conf.d/proxy
+
 WORKDIR /api
 
 COPY --from=build /api/target/api-0.0.1-SNAPSHOT.jar /api/api.jar

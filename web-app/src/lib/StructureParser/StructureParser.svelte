@@ -1,5 +1,5 @@
 <script>
-	import { openedCodes, selectedFile, editorUpdateTrigger } from '$lib/stores.js';
+	import { openedCodes, selectedArchiveFile, editorUpdateTrigger } from '$lib/stores.js';
 
 	import antlr4 from 'antlr4';
 	import { CharStreams, CommonTokenStream } from 'antlr4';
@@ -10,11 +10,6 @@
 
 	let parsedOutput = {};
 
-	let showDetails = {}; // Object to keep track of which class details are shown
-	function toggleDetails(index) {
-		showDetails[index] = !showDetails[index];
-	}
-
 	class JavaListener extends JavaParserListener {
 		constructor() {
 			super();
@@ -22,37 +17,20 @@
 		}
 
 		enterClassDeclaration(ctx) {
-			// Search through the children array for an instance of IdentifierContext.
 			const identifierContext = ctx.children.find(
 				(child) => child.constructor.name === 'IdentifierContext'
 			);
-			// If IdentifierContext is found, retrieve the text of the identifier.
 			const className = identifierContext ? identifierContext.getText() : '';
-			// If className is retrieved, push a new object representing the class to the classes array.
 			if (className) {
-				const classObj = { name: className, methods: [], fields: [] };
+				const classObj = {
+					name: className,
+					modifiers: this.getModifiers(ctx),
+					superClass: this.getSuperClass(ctx),
+					implementedInterfaces: this.getImplementedInterfaces(ctx),
+					methods: [],
+					fields: []
+				};
 				this.output.classes.push(classObj);
-			}
-		}
-
-		enterEnumDeclaration(ctx) {
-			const identifierContext = ctx.children.find(
-				(child) => child.constructor.name === 'IdentifierContext'
-			);
-			const enumName = identifierContext ? identifierContext.getText() : '';
-			if (enumName) {
-				this.output.enums.push({ name: enumName, methods: [], fields: [] });
-			}
-		}
-
-		enterEnumConstant(ctx) {
-			const identifierContext = ctx.children.find(
-				(child) => child.constructor.name === 'IdentifierContext'
-			);
-			const fieldName = identifierContext ? identifierContext.getText() : '';
-			if (fieldName) {
-				const currentEnum = this.output.enums[this.output.enums.length - 1];
-				currentEnum.fields.push({ name: fieldName });
 			}
 		}
 
@@ -62,83 +40,131 @@
 			);
 			const interfaceName = identifierContext ? identifierContext.getText() : '';
 			if (interfaceName) {
-				this.output.interfaces.push({ name: interfaceName, methods: [], fields: [] });
-			}
-		}
-
-		enterInterfaceMethodDeclaration(ctx) {
-			const identifierContext = ctx.children.find(
-				(child) => child.constructor.name === 'IdentifierContext'
-			);
-			const methodName = identifierContext ? identifierContext.getText() : '';
-			if (methodName) {
-				const currentInterface = this.output.interfaces[this.output.interfaces.length - 1];
-				currentInterface.methods.push({ name: methodName });
+				const interfaceObj = {
+					name: interfaceName,
+					modifiers: this.getModifiers(ctx),
+					extendedInterfaces: this.getExtendedInterfaces(ctx),
+					methods: []
+				};
+				this.output.interfaces.push(interfaceObj);
 			}
 		}
 
 		enterMethodDeclaration(ctx) {
-			// Search through the children array for an instance of IdentifierContext.
 			const identifierContext = ctx.children.find(
 				(child) => child.constructor.name === 'IdentifierContext'
 			);
-			// If IdentifierContext is found, retrieve the text of the identifier.
 			const methodName = identifierContext ? identifierContext.getText() : '';
-
-			// Ensure there is a current class, enum, or interface
-			const currentClass = this.output.classes[this.output.classes.length - 1];
-			const currentEnum = this.output.enums[this.output.enums.length - 1];
-			const currentInterface = this.output.interfaces[this.output.interfaces.length - 1];
-
-			// Determine the current container (class, enum, or interface)
-			const currentContainer = currentClass || currentEnum || currentInterface;
-
-			if (currentContainer) {
-				// If methodName is retrieved, push a new object representing the method to the methods array.
-				if (methodName) {
-					currentContainer.methods = currentContainer.methods || [];
-					currentContainer.methods.push({ name: methodName });
-				}
-			} else {
-				console.error('No current class, enum, or interface found for method declaration');
+			const currentClassOrInterface = this.getCurrentClassOrInterface();
+			if (currentClassOrInterface && methodName) {
+				currentClassOrInterface.methods.push({ name: methodName });
 			}
 		}
 
 		enterFieldDeclaration(ctx) {
-			// Find VariableDeclaratorsContext among the children
-			const variableDeclaratorsContext = ctx.children.find(
-				(child) => child.constructor.name === 'VariableDeclaratorsContext'
-			);
+			// Find the type of the field
+			const typeContext = ctx.typeType();
+			const fieldType = typeContext ? typeContext.getText() : '';
 
+			// Extract modifiers (if any)
+			const fieldModifiers = this.getModifiers(ctx);
+
+			// Extract all variable declarators (fields can declare multiple variables of the same type)
+			const variableDeclaratorsContext = ctx.variableDeclarators();
 			if (variableDeclaratorsContext) {
-				// Assume the first child of VariableDeclaratorsContext is the field identifier
-				// This assumption may need to be adjusted based on the actual structure
-				const fieldIdentifierContext = variableDeclaratorsContext.children[0];
+				variableDeclaratorsContext.variableDeclarator().forEach((variableDeclaratorCtx) => {
+					// Find the IdentifierContext within the variableDeclarator context
+					const identifierContext = variableDeclaratorCtx
+						.variableDeclaratorId()
+						.children.find((child) => child.constructor.name === 'IdentifierContext');
+					const variableName = identifierContext ? identifierContext.getText() : '';
 
-				if (fieldIdentifierContext) {
-					// Assume getText method will provide the field name
-					// This assumption may need to be adjusted based on the actual structure
-					const fieldName = fieldIdentifierContext.getText();
-
-					// Ensure there is a current class, enum, or interface
-					const currentClass = this.output.classes[this.output.classes.length - 1];
-					const currentEnum = this.output.enums[this.output.enums.length - 1];
-					const currentInterface = this.output.interfaces[this.output.interfaces.length - 1];
-
-					// Determine the current container (class, enum, or interface)
-					const currentContainer = currentClass || currentEnum || currentInterface;
-
-					if (currentContainer) {
-						// If fieldName is retrieved, push a new object representing the field to the fields array.
-						if (fieldName) {
-							currentContainer.fields = currentContainer.fields || [];
-							currentContainer.fields.push({ name: fieldName });
-						}
-					} else {
-						console.error('No current class, enum, or interface found for field declaration');
+					const currentClassOrInterface = this.getCurrentClassOrInterface();
+					if (currentClassOrInterface && variableName) {
+						currentClassOrInterface.fields.push({
+							name: variableName,
+							type: fieldType,
+							modifiers: fieldModifiers
+						});
 					}
+				});
+			}
+		}
+
+		getModifiers(ctx) {
+			let modifiers = [];
+			console.log(ctx.children)
+			// If not, you might need to iterate through children and find modifier nodes
+			if (ctx.children) {
+				ctx.children.forEach((child) => {
+					if (child.constructor.name === 'ClassOrInterfaceModifierContext') {
+						modifiers.push(child.getText());
+					}
+				});
+			}
+
+			return modifiers;
+		}
+
+		getSuperClass(ctx) {
+			// Assuming ctx corresponds to a classDeclaration context
+			if (ctx.EXTENDS()) {
+				// Check if the EXTENDS keyword is present
+				const typeTypeCtx = ctx.typeType();
+				if (typeTypeCtx) {
+					return typeTypeCtx.getText(); // Get the text of the typeType context, which should be the superclass
 				}
 			}
+			return null; // Return null if no superclass is found
+		}
+
+		getImplementedInterfaces(ctx) {
+			let implementedInterfaces = [];
+
+			if (ctx.IMPLEMENTS()) {
+				const typeListArray = ctx.typeList();
+				if (typeListArray) {
+					typeListArray.forEach((typeListCtx) => {
+						if (typeListCtx.children) {
+							typeListCtx.children.forEach((child) => {
+								if (child.constructor.name === 'TypeTypeContext') {
+									implementedInterfaces.push(child.getText());
+								}
+							});
+						}
+					});
+				}
+			}
+
+			return implementedInterfaces;
+		}
+
+		getExtendedInterfaces(ctx) {
+			let extendedInterfaces = [];
+
+			if (ctx.EXTENDS()) {
+				const typeListArray = ctx.typeList();
+				if (typeListArray) {
+					typeListArray.forEach((typeListCtx) => {
+						if (typeListCtx.children) {
+							typeListCtx.children.forEach((child) => {
+								if (child.constructor.name === 'TypeTypeContext') {
+									extendedInterfaces.push(child.getText());
+								}
+							});
+						}
+					});
+				}
+			}
+
+			return extendedInterfaces;
+		}
+
+		getCurrentClassOrInterface() {
+			return (
+				this.output.classes[this.output.classes.length - 1] ||
+				this.output.interfaces[this.output.interfaces.length - 1]
+			);
 		}
 
 		getOutput() {
@@ -148,14 +174,14 @@
 
 	// Reactive statement to run parseJava whenever editorUpdateTrigger changes
 	const getCode = editorUpdateTrigger.subscribe(() => {
-		if (!$selectedFile) {
+		if (!$selectedArchiveFile) {
 			parsedOutput = {};
 			return;
 		}
-		const codes = $openedCodes;
-		const selectedFileName = $selectedFile?.name;
-		const fileExtension = selectedFileName?.split('.').pop();
 
+		const codes = $openedCodes;
+		const selectedFileName = $selectedArchiveFile;
+		const fileExtension = selectedFileName?.split('.').pop();
 
 		if (fileExtension === 'java') {
 			const codeObj = codes.find((code) => code.name === selectedFileName);
@@ -210,17 +236,6 @@
 				font-weight: 300;
 				color: rgb(187, 187, 187);
 			}
-		}
-
-		.class-name,
-		.field,
-		.method {
-			font-family: 'Courier New', monospace;
-			margin-left: 20px;
-		}
-
-		.collapsible {
-			display: none;
 		}
 	}
 </style>

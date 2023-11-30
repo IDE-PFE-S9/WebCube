@@ -3,8 +3,9 @@
 	import * as marked from 'marked';
 	import { openedCodes, selectedFile, selectedArchiveFile } from '$lib/stores.js';
 
-    let filename = $selectedFile.name;
+    let filename = $selectedArchiveFile;
     console.log(filename)
+	console.log($selectedArchiveFile)
 	let codeObj = $openedCodes.find((code) => code.name === filename);
     console.log($openedCodes)
 	console.log(codeObj);

@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import Cookies from "js-cookie"
 
 let wsUrl = process.env.WS_URL;
 
@@ -13,6 +14,9 @@ export const openedTabs = writable([]);
 export const terminalNavbarActiveItem = writable('Problèmes');
 export const terminalOutput = writable([]);
 
+// user panel stores
+export const adminNavbarActiveItem = writable('Général');
+
 // editor store
 export const editorUpdateTrigger = writable(null);
 export const readOnly = writable(false);
@@ -25,6 +29,10 @@ export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
 export const archiveHandle = writable(null);
 
+// modelling stores
+export const entitiesList = writable([]);
+export const showedEntities = writable([]);
+
 // navbar stores
 export const currentTab = writable("Explorer");
 
@@ -34,6 +42,12 @@ export const screenChangeCount = persist('screenChangeCount', 0);
 
 export const logs = persist('logs', [])
 
+// connection
+export const token = writable(checkToken());
+
+function checkToken() {
+    return Cookies.get('apiJWT');
+}
 
 // web-sockets 
 // Check if running in a browser and setup WebSocket
@@ -74,7 +88,7 @@ function setupWebSocket() {
             case 'userCount':
                 userCount.set(message.data)
                 break;
-            // Add more cases as needed for different message types
+                // Add more cases as needed for different message types
         }
     };
 

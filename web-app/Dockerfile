@@ -11,12 +11,12 @@ RUN npm install
 
 COPY . .
 
-RUN rm -f node_modules/antlr4/package.json
-COPY fix-antlr4/package.json node_modules/antlr4/package.json
-
 RUN npm run build
 
 FROM node:lts-alpine AS production
+
+RUN mkdir -p /etc/apt/apt.conf.d/ && \
+    echo 'Acquire::http::Proxy "http://192.168.4.8:3128";' > /etc/apt/apt.conf.d/proxy
 
 COPY --from=build /app/build .
 COPY --from=build /app/package.json .

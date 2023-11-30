@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import fr.eseo.webcube.api.model.TP;
 
 @Repository
-public interface TPDAO extends JpaRepository<TP, Integer>{
+public interface TpRepository extends JpaRepository<TP, Integer>{
     
 }

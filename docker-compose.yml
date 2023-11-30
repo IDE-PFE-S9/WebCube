@@ -2,6 +2,19 @@ version: "3.8"
 
 services:
 
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+    depends_on:
+      - web-app
+    container_name: nginx-proxy
+    dns:
+      - IP_DNS
+      - webcube.pfe.dns
+      
   web-app:
     build:
       context: ./web-app
@@ -13,6 +26,10 @@ services:
       - "3000:3000"
     depends_on:
       - api
+    container_name: web-app
+    dns:
+      - IP_DNS
+      - webcube.pfe.dns
 
   api:
     build:
@@ -22,3 +39,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4444:4444"
+    container_name: api
+    dns:
+      - IP_DNS
+      - webcube.pfe.dns
+    volumes:
+      - /code:/code
+    
