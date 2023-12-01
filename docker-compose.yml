@@ -44,5 +44,5 @@ services:
       - IP_DNS
       - webcube.pfe.dns
     volumes:
-      - /code:/code
+      - /code:/api/code
     
