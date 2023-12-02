@@ -33,6 +33,15 @@ export const archiveHandle = writable(null);
 export const entitiesList = writable([]);
 export const showedEntities = writable([]);
 
+// CheerpJ stores
+export const cheerpjState = writable({
+    showPopup: false,
+    runJar: false,
+    reloadJar: true,
+});
+export const cheerpjWidth = writable(500)
+export const cheerpjHeight = writable(400)
+
 // navbar stores
 export const currentTab = writable("Explorer");
 
@@ -88,7 +97,7 @@ function setupWebSocket() {
             case 'userCount':
                 userCount.set(message.data)
                 break;
-                // Add more cases as needed for different message types
+            // Add more cases as needed for different message types
         }
     };
 

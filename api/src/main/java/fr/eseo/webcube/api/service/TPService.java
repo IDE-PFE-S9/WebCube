@@ -19,6 +19,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.eclipse.jgit.api.Git;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ import fr.eseo.webcube.api.model.UserTpKey;
 
 @Service
 public class TPService {
+
+	@Value("${project.path}")
+	private String projectPath;
 
 	@Autowired
 	private TpRepository tpRepository;
@@ -65,9 +69,7 @@ public class TPService {
 		User user = userRepository.findByUniqueName(uniqueName).get();
 
 		// TODO: fix the path to use the token.
-		Path permDir = Paths.get(
-				"/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/"
-						+ username + "/" + name);
+		Path permDir = Paths.get(projectPath + "/" + username + "/" + name);
 
 		// Check if the directory already exists
 		if (!Files.exists(permDir)) {

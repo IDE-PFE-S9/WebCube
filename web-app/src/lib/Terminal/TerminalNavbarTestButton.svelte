@@ -5,6 +5,7 @@
 	import { workTestPopup, workTestErrorPopup } from '/src/lib/PopUps/popup.js';
 
 	let apiUrl = process.env.API_URL;
+	let projectPath = process.env.PROJECT_PATH; 
 
 	async function testCode() {
 		try {
@@ -27,7 +28,7 @@
 
 			// API call to compile the code and get the API response
 			let compilationResponse = await fetch(
-				`${apiUrl}/api/compileAndTest?projectPath=/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}/${$openedArchive.name}`,
+				`${apiUrl}/api/compileAndTest?projectPath=${path}/${username}/${$openedArchive.name}`,
 				{
 					method: 'GET',
 					headers: headersList
