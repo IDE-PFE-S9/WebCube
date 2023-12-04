@@ -13,6 +13,7 @@
 	import ConfigPanel from '$lib/Modeling/ConfigPanel.svelte';
 
 	import { markdownMode, currentTab } from '$lib/stores.js';
+	import CheerpJDisplay from '../../lib/CheerpJ/CheerpJDisplay.svelte';
 
 	let startX;
 	let startWidth;
@@ -79,6 +80,7 @@
 			{/if}
 		</div>
 	{/if}
+	<CheerpJDisplay />
 	<slot />
 </div>
 

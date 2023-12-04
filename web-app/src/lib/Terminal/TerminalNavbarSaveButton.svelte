@@ -1,11 +1,12 @@
 <script>
-	import { openedCodes, openedArchive } from '$lib/stores.js';
+	import { openedCodes, openedArchive, cheerpjState } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
 	import { workSavePopup, workSaveErrorPopup } from '/src/lib/PopUps/popup.js';
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
 
 	let apiUrl = process.env.API_URL;
+	let projectPath = process.env.PROJECT_PATH;
 
 	async function createZip(directoryStructure) {
 		const zip = new JSZip();
@@ -67,7 +68,7 @@
 			const formData = new FormData();
 			formData.append(
 				'directory',
-				`/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}/${$openedArchive.name}`
+				`${projectPath}/${username}/${$openedArchive.name}`
 			);
 			formData.append('file', zipBlob, 'archive.zip');
 
@@ -87,6 +88,8 @@
 					node.children.forEach(resetModified); // Recurse into directories
 				}
 			}
+
+			$cheerpjState.reloadJar = true; 
 
 			workSavePopup();
 		} catch (error) {

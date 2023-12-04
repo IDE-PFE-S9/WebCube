@@ -56,9 +56,7 @@ public class JobProducer {
     }
 
     @GetMapping("/compileAndJar")
-    public ResponseEntity<Resource> compileAndJar(@RequestParam String projectPath,
-    @RequestHeader(name = "Authorization-Azure") String tokenAzure,
-    @RequestHeader(name = "Authorization-API") String tokenApi) throws Exception {
+    public ResponseEntity<Resource> compileAndJar(@RequestParam String projectPath) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
         sendJob(projectPath, requestId, "jar");
         String jarFilePath = retrieveResult(requestId); // This retrieves the path of the JAR file
