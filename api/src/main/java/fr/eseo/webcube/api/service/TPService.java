@@ -18,6 +18,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.HttpTransport;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -74,10 +77,15 @@ public class TPService {
 		// Check if the directory already exists
 		if (!Files.exists(permDir)) {
 			// If it does not exist, create it and clone the repo
+
+			// Disable SSL verify
 			Files.createDirectories(permDir);
 			Git.cloneRepository()
 					.setURI(gitLink)
 					.setDirectory(permDir.toFile())
+					.setCredentialsProvider(
+						new UsernamePasswordCredentialsProvider("meyniear", "glpat-REWFnLwzzczXAstaQGNU")
+					)
 					.call();
 
 			// Store the TP in database
@@ -128,8 +136,8 @@ public class TPService {
 	public TpResponse getCompletionByUniqueName(String uniqueName) {
 		List<TpDetails> tpDetails = userTpRepository.findDetailsByUniqueName(uniqueName);
 		TpResponse tpResponse = new TpResponse(uniqueName, tpDetails);
-        return tpResponse;
-    }
+		return tpResponse;
+	}
 
 	public TpResponse getCompletionByUniqueNameAndTpId(String uniqueName, Integer tpId) {
 		List<TpDetails> tpDetails = userTpRepository.findDetailsByUniqueNameAndTpId(uniqueName, tpId);
@@ -153,10 +161,10 @@ public class TPService {
 
 			// Convertir le tableau de chaînes en un ensemble de rôles (de type String)
 			Set<String> rolesSet = new HashSet<>(Arrays.asList(rolesArray));
-			
+
 			// Ajouter l'instance à la liste
 			tpResponseList.add(new TpResponse(uniqueName, firstname, surname, completion, rolesSet));
 		}
-        return tpResponseList;
-    }
+		return tpResponseList;
+	}
 }

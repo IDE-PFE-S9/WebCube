@@ -86,7 +86,7 @@ public class FileController {
                 // TODO: CHANGE THE PASSWORD WITH A TOKEN FOR THE ACCOUNT !!!
                 git.push()
                         .setCredentialsProvider(
-                                new UsernamePasswordCredentialsProvider("arthur.meyniel@icloud.com", "your_token_here"))
+                                new UsernamePasswordCredentialsProvider("meyniear", "glpat-REWFnLwzzczXAstaQGNU"))
                         .setRefSpecs(new RefSpec(branchName))
                         .call();
             } catch (IOException | GitAPIException e) {
