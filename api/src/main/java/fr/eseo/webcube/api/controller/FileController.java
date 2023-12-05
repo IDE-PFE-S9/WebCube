@@ -83,7 +83,7 @@ public class FileController {
                 git.commit().setMessage("test commit message").call();
 
                 // Push the commit to the branch
-                // TODO: CHANGE THE PASSWORD WITH A TOKEN FOR THE ACCOUNT !!!
+                // TODO: GET ANOTHER GITLAB ACCOUNT
                 git.push()
                         .setCredentialsProvider(
                                 new UsernamePasswordCredentialsProvider("meyniear", "glpat-REWFnLwzzczXAstaQGNU"))

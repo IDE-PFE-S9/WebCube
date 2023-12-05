@@ -79,6 +79,8 @@ public class TPService {
 			// If it does not exist, create it and clone the repo
 
 			// Disable SSL verify
+			System.setProperty("http.sslVerify", "false");
+
 			Files.createDirectories(permDir);
 			Git.cloneRepository()
 					.setURI(gitLink)
