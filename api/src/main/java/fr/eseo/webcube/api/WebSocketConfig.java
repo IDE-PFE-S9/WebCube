@@ -17,7 +17,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketHandler(), "/ws").setAllowedOrigins("http://" + clientHost);
+        registry.addHandler(new WebSocketHandler(), "/ws").setAllowedOrigins("https://" + clientHost);
         // Note: setAllowedOrigins("*") is insecure and should be restricted in production
     }
 }
