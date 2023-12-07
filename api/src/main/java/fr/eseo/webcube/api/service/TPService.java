@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.transaction.Transactional;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.HttpTransport;
@@ -168,5 +170,10 @@ public class TPService {
 			tpResponseList.add(new TpResponse(uniqueName, firstname, surname, completion, rolesSet));
 		}
 		return tpResponseList;
+	}
+
+	@Transactional
+	public void updateCompletion(String uniqueName, Integer tpId, Integer completion) {
+		userTpRepository.updateCompletion(uniqueName, tpId, completion);
 	}
 }
