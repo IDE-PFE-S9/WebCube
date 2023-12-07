@@ -70,5 +70,50 @@ async function getTokenApi() {
     return dataReturned;
 }
 
+async function getUserInformations() {
+    
+        const response = await fetch(`${apiUrl}/api/user`, {
+            headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT") }
+        });
+
+        if (await isResponseOk(response)) {
+
+            const dataReturned = await response.json();
+            console.log('Données retournées par l\'API :', dataReturned);
+            return dataReturned;
+        }
+}
+
+async function isResponseOk(response) {
+
+    if (response.status === 401) {
+        // Si c'est le cas, vérifiez si l'en-tête 'Token-Status' est présent dans la réponse
+        if (response.headers.has('Token-Status')) {
+            // Lisez la valeur de l'en-tête 'Token-Status'
+            const tokenStatus = response.headers.get('Token-Status');
+            // Faites quelque chose avec la valeur (par exemple, affichez un message à l'utilisateur)
+            console.log('Token Status:', tokenStatus);
+
+            // Si le token est expiré, vous pouvez gérer cela ici
+            // Par exemple, affichez un message à l'utilisateur ou effectuez une action appropriée
+            if (tokenStatus === 'Expired') {
+                console.log('Le token est expiré. Veuillez vous reconnecter.');
+                Cookies.remove('apiJWT');
+                Cookies.remove('azureJWT');
+                return false;
+            }
+        }
+        console.log('Unauthorized');
+    }
+    else if (!response.ok) {
+        const errorData = await response.json();
+        console.log(errorData);
+        alert('Une erreur est survenue lors de la requête API : ' + errorData.error);
+        return false;
+    }
+    return true;
+}
+
+
 // Export the login function to use in your components
-export { login };
+export { login, getUserInformations };
