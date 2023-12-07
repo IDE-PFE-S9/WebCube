@@ -41,9 +41,10 @@ public class ApplicationSecurity {
         http.authorizeRequests()
                 .antMatchers("/api/auth").permitAll() // Endpoint public accessible sans authentification
                 //.antMatchers("/**").permitAll()
+                .antMatchers("/ws/**").permitAll()
                 .anyRequest().authenticated();
 
-         http
+        http
                 .rememberMe()
                 .rememberMeCookieName("monCookie")
                 .tokenValiditySeconds(86400);
