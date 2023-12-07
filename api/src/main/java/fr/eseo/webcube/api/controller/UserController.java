@@ -48,7 +48,8 @@ public class UserController {
 
             Optional<User> user = userService.getUserByUniqueName(uniqueName);
             if (user.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur non trouvé dans la base de données");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Utilisateur non trouvé dans la base de données");
             }
 
             String accesToken = jwtTokenUtil.generateAccessToken(user.get());
@@ -66,7 +67,7 @@ public class UserController {
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
 
-        String uniqueName = (String) claims.get("uniqueName");
+        String uniqueName = (String) claims.get("unique_name");
         String firstName = (String) claims.get("firstname");
         String surname = (String) claims.get("surname");
         Set<Role> roles = new HashSet<>(claims.get("roles", List.class));

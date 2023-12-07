@@ -47,8 +47,8 @@ public class TPController {
 
     @GetMapping("/tp/{id}")
     public ResponseEntity<?> getTPById(@PathVariable Integer id,
-    @RequestHeader(name = "Authorization-Azure") String tokenAzure,
-    @RequestHeader(name = "Authorization-API") String tokenApi) {
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi) {
         Optional<TP> tpOptional = tpService.getTp(id);
 
         if (tpOptional.isPresent()) {
@@ -66,7 +66,7 @@ public class TPController {
         try {
             tokenApi = tokenApi.substring(7);
             Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-            String uniqueName = claims.get("uniqueName").toString();
+            String uniqueName = claims.get("unique_name").toString();
 
             Resource archive = tpService.getArchive(id, uniqueName);
 
@@ -89,7 +89,7 @@ public class TPController {
 
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-        String uniqueName = claims.get("uniqueName").toString();
+        String uniqueName = claims.get("unique_name").toString();
         String firstname = claims.get("firstname").toString();
         String surname = claims.get("surname").toString();
 
@@ -112,7 +112,7 @@ public class TPController {
 
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-        String uniqueName = claims.get("uniqueName").toString();
+        String uniqueName = claims.get("unique_name").toString();
         String firstname = claims.get("firstname").toString();
         String surname = claims.get("surname").toString();
 
@@ -137,7 +137,7 @@ public class TPController {
 
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-            
+
         List<TpResponse> tpResponses = tpService.getCompletionsByTpId(id);
 
         if (tpResponses != null && !tpResponses.isEmpty()) {
@@ -156,8 +156,8 @@ public class TPController {
 
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-        String uniqueName = claims.get("uniqueName").toString();
-    
+        String uniqueName = claims.get("unique_name").toString();
+
         tpService.updateCompletion(uniqueName, id, updatedCompletion);
 
         return ResponseEntity.noContent().build();
