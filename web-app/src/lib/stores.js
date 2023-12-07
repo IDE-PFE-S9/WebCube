@@ -28,6 +28,7 @@ export const openedArchive = writable(null);
 export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
 export const archiveHandle = writable(null);
+export const tpId = writable(null);
 
 // modelling stores
 export const entitiesList = writable([]);
@@ -97,7 +98,7 @@ function setupWebSocket() {
             case 'userCount':
                 userCount.set(message.data)
                 break;
-            // Add more cases as needed for different message types
+                // Add more cases as needed for different message types
         }
     };
 

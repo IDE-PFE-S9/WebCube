@@ -3,7 +3,7 @@
 
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
-	import { openedArchive, archiveMode, currentTab } from '$lib/stores.js';
+	import { openedArchive, archiveMode, currentTab, tpId } from '$lib/stores.js';
 
 	let apiUrl = process.env.API_URL;
 
@@ -40,6 +40,7 @@
 
 		console.log($openedArchive);
 
+		tpId.set(tp.id);
 		currentTab.set('Archive');
 	};
 
