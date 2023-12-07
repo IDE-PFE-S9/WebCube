@@ -19,7 +19,7 @@
 		}
 
 		enterClassDeclaration(ctx) {
-			const className = this.extractName(ctx);
+			const className = ctx.identifier().getText();
 			const classObj = {
 				name: className,
 				superClass: this.getSuperClass(ctx),
@@ -36,7 +36,7 @@
 		}
 
 		enterInterfaceDeclaration(ctx) {
-			const interfaceName = this.extractName(ctx);
+			const interfaceName = ctx.identifier().getText();
 			const interfaceObj = {
 				name: interfaceName,
 				extendedInterfaces: this.getExtendedInterfaces(ctx),
@@ -52,9 +52,7 @@
 
 		enterFieldDeclaration(ctx) {
 			const fieldType = ctx.typeType().getText();
-			const fieldName = this.extractName(
-				ctx.variableDeclarators().variableDeclarator(0).variableDeclaratorId()
-			);
+			const fieldName = ctx.variableDeclarators().variableDeclarator(0).variableDeclaratorId().identifier().getText();
 			const fieldObj = {
 				type: fieldType,
 				name: fieldName,
@@ -166,14 +164,6 @@
 			this.getCurrentContext().fields.push(fieldObj);
 		}
 
-		// Utility methods
-		extractName(ctx) {
-			const identifierContext = ctx.children.find(
-				(child) => child.constructor.name === 'IdentifierContext'
-			);
-			return identifierContext ? identifierContext.getText() : '';
-		}
-
 		getSuperClass(ctx) {
 			if (ctx.EXTENDS()) {
 				const typeTypeCtx = ctx.typeType();
@@ -192,7 +182,7 @@
 					typeListArray.forEach((typeListCtx) => {
 						if (typeListCtx.children) {
 							typeListCtx.children.forEach((child) => {
-								if (child.constructor.name === 'TypeTypeContext') {
+								if (child.getText() != ',') {
 									implementedInterfaces.push(child.getText());
 								}
 							});
@@ -211,8 +201,8 @@
 					typeListArray.forEach((typeListCtx) => {
 						if (typeListCtx.children) {
 							typeListCtx.children.forEach((child) => {
-								if (child.constructor.name === 'TypeTypeContext') {
-									extendedInterfaces.push(child.getText());
+								if (child.getText() != ',') {
+									implementedInterfaces.push(child.getText());
 								}
 							});
 						}
