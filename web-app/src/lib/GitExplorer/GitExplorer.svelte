@@ -2,25 +2,26 @@
 	import { onMount } from 'svelte';
 	import TpButton from './TpButton.svelte';
 
-	import Cookies from "js-cookie"
+	import Cookies from 'js-cookie';
 
 	let apiUrl = process.env.API_URL;
 
 	let headersList = {
 		Accept: '*/*',
-		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
-		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
+		'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+		'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 	};
 
 	let tpJson = [];
 
 	onMount(async () => {
-		const tpResponse = await fetch(`${apiUrl}/api/tp`, {
-			method: 'GET',
-			headers: headersList
-		});
-
-		tpJson = await tpResponse.json();
+		if (Cookies.get('azureJWT') != undefined && Cookies.get('apiJWT') != undefined) {
+			const tpResponse = await fetch(`${apiUrl}/api/tp`, {
+				method: 'GET',
+				headers: headersList
+			});
+			tpJson = await tpResponse.json();
+		}
 	});
 
 	// 1 - recuperer la liste de tous les TPs
@@ -98,7 +99,5 @@
 				color: rgb(187, 187, 187);
 			}
 		}
-
 	}
 </style>
-

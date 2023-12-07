@@ -47,6 +47,7 @@ async function login() {
             Cookies.set("azureJWT", response.accessToken);
             getTokenApi();
             Swal.close();
+            window.location.reload();
         }
     } catch (error) {
         console.error(error);

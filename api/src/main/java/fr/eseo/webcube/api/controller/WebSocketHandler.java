@@ -23,11 +23,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
-        // Here you can add logic to handle different types of messages
-        // For now, it's just echoing the received message to all other sessions
         for (WebSocketSession webSocketSession : sessions) {
             if (webSocketSession.isOpen() && !session.getId().equals(webSocketSession.getId())) {
-                webSocketSession.sendMessage(message);
+                sendMessage(webSocketSession, message);
             }
         }
     }
@@ -43,7 +41,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         String userCountMessage = constructJsonMessage("userCount", sessions.size());
         for (WebSocketSession webSocketSession : sessions) {
             if (webSocketSession.isOpen()) {
-                webSocketSession.sendMessage(new TextMessage(userCountMessage));
+                sendMessage(webSocketSession, new TextMessage(userCountMessage));
             }
         }
     }
@@ -55,6 +53,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
         } catch (IOException e) {
             // Log error, handle exception, or return a fallback message
             return "{\"type\": \"error\", \"data\": \"An error occurred\"}";
+        }
+    }
+
+    // Synchronized method to send a message to a session
+    private synchronized void sendMessage(WebSocketSession session, TextMessage message) throws IOException {
+        if (session.isOpen()) {
+            session.sendMessage(message);
         }
     }
 }
