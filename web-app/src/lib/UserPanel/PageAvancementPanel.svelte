@@ -2,6 +2,7 @@
     import GlobalAdvancement from './GlobalAdvancement.svelte';
     import StudentAdvancement from './StudentAdvancement.svelte';
     import Cookies from 'js-cookie';
+    import { onMount } from 'svelte';
 
     let apiUrl = process.env.API_URL;
     
@@ -40,6 +41,7 @@
         names = dataReturned.map(student => `${student.firstname} ${student.surname}`);
         completions = dataReturned.map(student => student.completion);
         groups = dataReturned.map(student => student.roles);
+        console.log(groups)
         return {names, completions, groups};
     }
 
