@@ -1,10 +1,9 @@
 <script>
-	import { terminalOutput, openedArchive } from '$lib/stores.js';
+	import { terminalOutput, openedArchive, tpId } from '$lib/stores.js';
 	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 	import Cookies from 'js-cookie';
 	import { workTestPopup, workTestErrorPopup } from '/src/lib/PopUps/popup.js';
 	import { getUserInformations } from '$lib/auth.js';
-
 
 	let apiUrl = process.env.API_URL;
 	let projectPath = process.env.PROJECT_PATH; 
@@ -36,12 +35,23 @@
 			// parse results
 			const resultList = parseInput(compilationResult);
 
-			console.log(resultList);
+			let successCount = 0;
 			resultList.forEach((message) => {
 				$terminalOutput = [...$terminalOutput, objectToString(message)];
+				if (message.Status === "SUCCESS") {
+					successCount++;
+				}
+			});
+
+			let completion = successCount / resultList.length;
+			await fetch(`${apiUrl}api/tp/myCompletion/${tpId}`, {
+				method: 'PUT',
+				headers: headersList,
+				body: JSON.stringify(completion)
 			});
 
 			workTestPopup();
+
 		} catch (error) {
 			console.error('Une erreur est survenue lors du test du fichier :', error);
 			workTestErrorPopup();

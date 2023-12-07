@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -143,5 +145,21 @@ public class TPController {
         } else {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Collections.emptyList());
         }
+    }
+
+    @PutMapping("/tp/myCompletion/{id}")
+    public ResponseEntity<Void> updateMyCompletion(
+            @PathVariable Integer id,
+            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
+            @RequestHeader(name = "Authorization-API") String tokenApi,
+            @RequestBody Integer updatedCompletion) {
+
+        tokenApi = tokenApi.substring(7);
+        Claims claims = jwtTokenUtil.parseClaims(tokenApi);
+        String uniqueName = claims.get("uniqueName").toString();
+    
+        tpService.updateCompletion(uniqueName, id, updatedCompletion);
+
+        return ResponseEntity.noContent().build();
     }
 }

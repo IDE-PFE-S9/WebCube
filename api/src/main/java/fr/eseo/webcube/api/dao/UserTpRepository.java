@@ -3,6 +3,7 @@ package fr.eseo.webcube.api.dao;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -30,5 +31,9 @@ public interface UserTpRepository extends JpaRepository<UserTP, UserTpKey> {
         "WHERE tp.id = :tpId " +
         "GROUP BY user.unique_name, user.firstname, user.surname, user_tp.completion", nativeQuery = true)
     List<Object[]> findTpResponseByTpId(@Param("tpId") Integer tpId);
+
+    @Modifying
+    @Query("UPDATE UserTP u SET u.completion = :completion WHERE u.user.uniqueName = :uniqueName AND u.tp.id = :tpId")
+    void updateCompletion(@Param("uniqueName") String uniqueName, @Param("tpId") Integer tpId, @Param("completion") Integer completion);
      
 }
