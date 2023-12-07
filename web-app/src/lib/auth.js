@@ -5,13 +5,14 @@ import { token } from "./stores";
 import Swal from "sweetalert2";
 
 let apiUrl = process.env.API_URL;
+let clientHost = process.env.CLIENT_HOST;
 
 // MSAL configuration
 const msalConfig = {
     auth: {
         clientId: '818da7d4-8cbc-40f9-8054-d03ff4cfbd17', // Replace with your client ID
         authority: 'https://login.microsoftonline.com/organizations', //"https://login.microsoftonline.com/YOUR_TENANT_ID", // Replace with your tenant ID
-        redirectUri: 'http://localhost:5173' // Replace with your redirect URI
+        redirectUri: clientHost // Replace with your redirect URI
     },
     cache: {
         cacheLocation: "localStorage",
