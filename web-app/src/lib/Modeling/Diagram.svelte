@@ -245,7 +245,7 @@
 			parsedOutput.classes.push(...listener.getOutput().classes);
 			parsedOutput.interfaces.push(...listener.getOutput().interfaces);
 			parsedOutput.enums.push(...listener.getOutput().enums);
-		} else if (node.type === 'directory' && node.children && !node.name.includes("test")) {
+		} else if (node.type === 'directory' && node.children && !node.name.includes('test')) {
 			node.children.forEach((child) => traverseAndParse(child, parsedOutput));
 		}
 	}
@@ -278,8 +278,11 @@
 
 			// Add fields with modifiers
 			cls.fields.forEach((field) => {
-				const fieldString = processModifiers(field.modifiers) + field.type + ' ' + field.name;
-				mermaidSyntax += `  ${fieldString}\n`;
+				if (!isCustomType(field.type, data)) {
+					// If the field is not a custom type, add the field name and type
+					const fieldString = processModifiers(field.modifiers) + field.type + ' ' + field.name;
+					mermaidSyntax += `  ${fieldString}\n`;
+				}
 			});
 
 			// Add methods with modifiers, return type, and arguments
@@ -311,7 +314,7 @@
 			// Process fields for association
 			cls.fields.forEach((field) => {
 				if (isCustomType(field.type, data)) {
-					mermaidSyntax += `${cls.name} --> ${field.type}\n`;
+					mermaidSyntax += `${cls.name} "1..*" -- "1..* ${field.name}" ${field.type}\n`;
 				}
 			});
 
@@ -357,6 +360,7 @@
 			mermaidSyntax += '}\n\n'; // Extra newline for separation
 		});
 
+		console.log(mermaidSyntax);
 		return mermaidSyntax;
 	}
 
@@ -410,7 +414,7 @@
 	}
 
 	const filterOutput = (showedEntities, parsedOutput) => {
-		console.log(showedEntities)
+		console.log(showedEntities);
 		const filteredClasses = parsedOutput.classes
 			.filter((cls) => showedEntities.includes(cls.name))
 			.map((cls) => ({
@@ -452,8 +456,8 @@
 
 	const updateDiagram = () => {
 		const filteredOutput = filterOutput($showedEntities, parsedOutput);
-		console.log($showedEntities)
-		console.log(filteredOutput)
+		console.log($showedEntities);
+		console.log(filteredOutput);
 		if (
 			filteredOutput.classes.length === 0 &&
 			filteredOutput.enums.length === 0 &&
@@ -467,7 +471,7 @@
 			diagram = toMermaidSyntax(filteredOutput);
 			renderDiagram(diagram);
 		}
-	}
+	};
 
 	const getEntityNames = (output) => {
 		let classesList = output.classes.map((cls) => cls.name);
@@ -484,7 +488,7 @@
 		}
 
 		$entitiesList = [...getEntityNames(parsedOutput)];
-		console.log($entitiesList)
+		console.log($entitiesList);
 		$showedEntities = [...$entitiesList]; // Show all entities by default
 
 		let diagram = toMermaidSyntax(parsedOutput);
@@ -496,7 +500,7 @@
 
 		await renderDiagram(diagram);
 
-		mounted = true
+		mounted = true;
 	});
 
 	let parsedOutput = { classes: [], enums: [], interfaces: [] };
@@ -505,9 +509,9 @@
 	let mounted = false;
 
 	$: if (mounted) {
-        $showedEntities;
-        updateDiagram();
-    }
+		$showedEntities;
+		updateDiagram();
+	}
 </script>
 
 {#if openedArchive}
@@ -516,7 +520,7 @@
 	<h3 class="message">Veuillez d'abord ouvrir un tp</h3>
 {/if}
 
-<style>
+<style lang="scss">
 	.diagram {
 		display: flex;
 		justify-content: center;
@@ -524,6 +528,11 @@
 		width: 100%;
 		height: 100%;
 	}
+
+	:global(.edgeLabel) {
+		color: #666666 !important;
+	}
+
 
 	.message {
 		display: flex;
