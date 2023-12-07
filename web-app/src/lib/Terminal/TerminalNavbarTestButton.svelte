@@ -25,7 +25,7 @@
 
 			// API call to compile the code and get the API response
 			let compilationResponse = await fetch(
-				`${apiUrl}/api/compileAndTest?projectPath=${path}/${username}/${$openedArchive.name}`,
+				`${apiUrl}/api/compileAndTest?projectPath=${projectPath}/${username}/${$openedArchive.name}`,
 				{
 					method: 'GET',
 					headers: headersList
