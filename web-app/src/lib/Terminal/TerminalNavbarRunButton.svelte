@@ -19,7 +19,7 @@
 					'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 				};
 
-				const user = getUserInformations();
+				const user = await getUserInformations();
 				let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 				// Returns a jar inside a blob
@@ -71,7 +71,7 @@
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
-			const user = getUserInformations();
+			const user = await getUserInformations();
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			// API call to compile the code and get the API response

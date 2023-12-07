@@ -57,7 +57,7 @@
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
-			const user = getUserInformations();
+			const user = await getUserInformations();
 
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 

@@ -14,12 +14,12 @@
 
 			let headersList = {
 				Accept: '*/*',
+				'Content-Type': 'application/json',
 				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
-			const user = getUserInformations();
-
+			const user = await getUserInformations();
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			// API call to compile the code and get the API response
@@ -43,8 +43,9 @@
 				}
 			});
 
-			let completion = successCount / resultList.length;
-			await fetch(`${apiUrl}api/tp/myCompletion/${tpId}`, {
+			let completion = Math.round(successCount / resultList.length * 100);
+			console.log(completion)
+			await fetch(`${apiUrl}/api/tp/myCompletion/${$tpId}`, {
 				method: 'PUT',
 				headers: headersList,
 				body: JSON.stringify(completion)

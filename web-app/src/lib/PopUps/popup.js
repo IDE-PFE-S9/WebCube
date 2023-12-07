@@ -87,14 +87,14 @@ export function workCompileErrorPopup() {
     });
 }
 
-export function workTestPopup() {
+export function workTestErrorPopup() {
     Toast.fire({
-        icon: "success",
+        icon: "error",
         title: "Test échoué"
     });
 }
 
-export function workTestErrorPopup() {
+export function workTestPopup() {
     Toast.fire({
         icon: "success",
         title: "Code testé !"
