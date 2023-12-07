@@ -189,7 +189,7 @@
 	class:selected={$openedArchive?.name === tp.name}
 	on:click={getArchive}
 >
-	{tp.name}: 76% complété
+	{tp.name}
 </button>
 
 <style lang="scss">
