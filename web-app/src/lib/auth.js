@@ -45,7 +45,7 @@ async function login() {
             // Use response.accessToken to make your API calls
             console.log('Access Token:', response.accessToken);
             Cookies.set("azureJWT", response.accessToken);
-            getTokenApi();
+            await getTokenApi();
             Swal.close();
             window.location.reload();
         }
