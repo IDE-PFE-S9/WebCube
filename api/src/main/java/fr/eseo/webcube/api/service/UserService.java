@@ -1,6 +1,7 @@
 package fr.eseo.webcube.api.service;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,4 +32,8 @@ public class UserService {
 			return Collections.emptySet();
 		}
 	}
+
+  public Optional<User> getUserByUniqueName(String uniqueName) {
+    return userRepository.findByUniqueName(uniqueName);
+  }
 }

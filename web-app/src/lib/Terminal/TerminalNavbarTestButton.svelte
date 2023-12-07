@@ -3,6 +3,8 @@
 	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 	import Cookies from 'js-cookie';
 	import { workTestPopup, workTestErrorPopup } from '/src/lib/PopUps/popup.js';
+	import { getUserInformations } from '$lib/auth.js';
+
 
 	let apiUrl = process.env.API_URL;
 	let projectPath = process.env.PROJECT_PATH; 
@@ -17,12 +19,7 @@
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
-			const userRes = await fetch(`${apiUrl}/api/user`, {
-				method: 'GET',
-				headers: headersList
-			});
-
-			const user = await userRes.json();
+			const user = getUserInformations();
 
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 

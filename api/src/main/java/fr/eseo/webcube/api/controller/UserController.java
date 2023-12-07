@@ -1,9 +1,9 @@
 package fr.eseo.webcube.api.controller;
 
-import java.util.Date;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +19,9 @@ import com.nimbusds.jwt.JWTParser;
 
 import fr.eseo.webcube.api.Response.UserResponse;
 import fr.eseo.webcube.api.model.Role;
+import fr.eseo.webcube.api.model.User;
 import fr.eseo.webcube.api.security.AuthResponse;
 import fr.eseo.webcube.api.security.JwtTokenUtil;
-import fr.eseo.webcube.api.security.UserTokenAzure;
 import fr.eseo.webcube.api.service.UserService;
 import io.jsonwebtoken.Claims;
 
@@ -45,14 +45,13 @@ public class UserController {
             String firstName = (String) claimsAzure.getClaim("given_name");
             String lastName = (String) claimsAzure.getClaim("family_name");
             String uniqueName = (String) claimsAzure.getClaim("upn");
-            Date expirationTokenAzure = (Date) claimsAzure.getClaim("exp");
 
-            Set<Role> roles = userService.getRolesByUniqueName(uniqueName);
-            UserTokenAzure user = new UserTokenAzure(firstName, lastName);
-            user.setRole(roles);
-            user.setExpirationToken(expirationTokenAzure);
-            user.setUniqueName((uniqueName));
-            String accesToken = jwtTokenUtil.generateAccessToken(user);
+            Optional<User> user = userService.getUserByUniqueName(uniqueName);
+            if (user.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur non trouvé dans la base de données");
+            }
+
+            String accesToken = jwtTokenUtil.generateAccessToken(user.get());
 
             AuthResponse response = new AuthResponse(firstName, lastName, accesToken);
             return ResponseEntity.ok().body(response);
@@ -74,6 +73,5 @@ public class UserController {
         UserResponse userResponse = new UserResponse(uniqueName, firstName, surname, roles);
 
         return ResponseEntity.ok().body(userResponse);
-
     }
 }

@@ -2,7 +2,7 @@
 	import { terminalOutput, openedArchive, cheerpjState, graphical } from '$lib/stores.js';
 	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
 	import Cookies from 'js-cookie';
-
+	import { getUserInformations } from '$lib/auth.js';
 	import { workCompilePopup, workCompileErrorPopup } from '/src/lib/PopUps/popup.js';
 
 	let apiUrl = process.env.API_URL;
@@ -19,12 +19,7 @@
 					'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 				};
 
-				const userRes = await fetch(`${apiUrl}/api/user`, {
-					method: 'GET',
-					headers: headersList
-				});
-
-				const user = await userRes.json();
+				const user = getUserInformations();
 				let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 				// Returns a jar inside a blob
@@ -76,12 +71,7 @@
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
-			const userRes = await fetch(`${apiUrl}/api/user`, {
-				method: 'GET',
-				headers: headersList
-			});
-
-			const user = await userRes.json();
+			const user = getUserInformations();
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			// API call to compile the code and get the API response
