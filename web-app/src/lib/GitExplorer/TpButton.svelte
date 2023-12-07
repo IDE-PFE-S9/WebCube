@@ -3,7 +3,7 @@
 
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
-	import { openedArchive, archiveMode, currentTab, tpId } from '$lib/stores.js';
+	import { openedArchive, archiveMode, currentTab, graphical, tpId } from '$lib/stores.js';
 
 	let apiUrl = process.env.API_URL;
 
@@ -117,12 +117,14 @@
 				if (descriptor) return descriptor;
 			}
 		}
-		return null;
+		return null
 	}
 
 	function parseXml(xml) {
 		const parser = new DOMParser();
 		const xmlDoc = parser.parseFromString(xml, 'application/xml');
+		graphical.set(xmlDoc.documentElement.getElementsByTagName('Parameters')[0].attributes.getNamedItem("graphical").value);
+		// TODO: ADD USER SIGNATURE
 		return xmlDoc;
 	}
 
@@ -142,6 +144,7 @@
 						const xmlFolders = Array.from(xmlChild.getElementsByTagName('Folder'));
 						const xmlFiles = Array.from(xmlChild.getElementsByTagName('File'));
 
+
 						const directXmlFolders = xmlFolders.filter((folder) => folder.parentNode === xmlChild);
 						const directXmlFiles = xmlFiles.filter((file) => file.parentNode === xmlChild);
 
@@ -153,7 +156,7 @@
 
 		const rootFolders = Array.from(xmlElement.getElementsByTagName('Folder'));
 		const rootFiles = Array.from(xmlElement.getElementsByTagName('File'));
-
+		
 		const directRootFolders = rootFolders.filter((folder) => folder.parentNode === xmlElement);
 		const directRootFiles = rootFiles.filter((file) => file.parentNode === xmlElement);
 

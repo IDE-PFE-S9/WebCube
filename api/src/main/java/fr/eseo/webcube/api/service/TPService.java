@@ -2,6 +2,7 @@ package fr.eseo.webcube.api.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,9 +21,10 @@ import java.util.zip.ZipOutputStream;
 import javax.transaction.Transactional;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.HttpTransport;
+import org.eclipse.jgit.storage.file.FileBasedConfig;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.util.FS;
+import org.eclipse.jgit.util.SystemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -73,29 +75,37 @@ public class TPService {
 
 		User user = userRepository.findByUniqueName(uniqueName).get();
 
-		// TODO: fix the path to use the token.
 		Path permDir = Paths.get(projectPath + "/" + username + "/" + name);
 
 		// Check if the directory already exists
 		if (!Files.exists(permDir)) {
 			// If it does not exist, create it and clone the repo
 
-			// Disable SSL verify
-			System.setProperty("http.sslVerify", "false");
-
 			Files.createDirectories(permDir);
+
+			URI gitServer = URI.create(gitLink);
+			
+			// TODO: Disable SSL verify
+			if (gitServer.getScheme().equals("https")) {
+				FileBasedConfig config = SystemReader.getInstance().openUserConfig(null, FS.DETECTED);
+				synchronized (config) {
+					config.load();
+					config.setBoolean(
+							"http",
+							"https://" + gitServer.getHost() + ':'
+									+ (gitServer.getPort() == -1 ? 443 : gitServer.getPort()),
+							"sslVerify", false);
+					config.save();
+				}
+			}
+
 			Git.cloneRepository()
 					.setURI(gitLink)
 					.setDirectory(permDir.toFile())
 					.setCredentialsProvider(
-						new UsernamePasswordCredentialsProvider("meyniear", "glpat-REWFnLwzzczXAstaQGNU")
-					)
+							new UsernamePasswordCredentialsProvider("meyniear", "glpat-REWFnLwzzczXAstaQGNU"))
 					.call();
 
-			// Store the TP in database
-			// here i want to create an entry inside the userTP table with the id of the tp,
-			// the uniqueName of the user and the completion set to 0
-			// Create and store the UserTP in database
 			UserTpKey userTPKey = new UserTpKey(uniqueName, tp.getId());
 			UserTP userTP = new UserTP();
 			userTP.setId(userTPKey);
@@ -105,7 +115,6 @@ public class TPService {
 			userTpRepository.save(userTP);
 		}
 
-		
 		Path zipPath = Files.createTempFile("archive", ".wc");
 		zipFolder(permDir, zipPath);
 

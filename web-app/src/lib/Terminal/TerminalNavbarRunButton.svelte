@@ -1,14 +1,12 @@
 <script>
-	import { terminalOutput, openedArchive, cheerpjState } from '$lib/stores.js';
+	import { terminalOutput, openedArchive, cheerpjState, graphical } from '$lib/stores.js';
 	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
 	import Cookies from 'js-cookie';
-
+	import { getUserInformations } from '$lib/auth.js';
 	import { workCompilePopup, workCompileErrorPopup } from '/src/lib/PopUps/popup.js';
 
 	let apiUrl = process.env.API_URL;
 	let projectPath = process.env.PROJECT_PATH;
-
-	let graphical = true;
 
 	async function runGraphicalCode() {
 		try {
@@ -21,12 +19,7 @@
 					'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 				};
 
-				const userRes = await fetch(`${apiUrl}/api/user`, {
-					method: 'GET',
-					headers: headersList
-				});
-
-				const user = await userRes.json();
+				const user = getUserInformations();
 				let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 				// Returns a jar inside a blob
@@ -78,17 +71,12 @@
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
-			const userRes = await fetch(`${apiUrl}/api/user`, {
-				method: 'GET',
-				headers: headersList
-			});
-
-			const user = await userRes.json();
+			const user = getUserInformations();
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			// API call to compile the code and get the API response
 			let compilationResponse = await fetch(
-				`${apiUrl}/api/compileAndJar?projectPath=${projectPath}/${username}/${$openedArchive.name}`,
+				`${apiUrl}/api/compileAndRun?projectPath=${projectPath}/${username}/${$openedArchive.name}`,
 				{
 					method: 'GET',
 					headers: headersList
@@ -104,7 +92,7 @@
 	}
 </script>
 
-{#if graphical}
+{#if ($graphical === "true")}
 	<button class="run-button" on:click={runGraphicalCode}>
 		<RunIcon />
 	</button>

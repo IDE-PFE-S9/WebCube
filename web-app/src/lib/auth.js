@@ -5,13 +5,14 @@ import { token } from "./stores";
 import Swal from "sweetalert2";
 
 let apiUrl = process.env.API_URL;
+let clientHost = process.env.CLIENT_HOST;
 
 // MSAL configuration
 const msalConfig = {
     auth: {
         clientId: '818da7d4-8cbc-40f9-8054-d03ff4cfbd17', // Replace with your client ID
         authority: 'https://login.microsoftonline.com/organizations', //"https://login.microsoftonline.com/YOUR_TENANT_ID", // Replace with your tenant ID
-        redirectUri: 'http://localhost:5173' // Replace with your redirect URI
+        redirectUri: clientHost // Replace with your redirect URI
     },
     cache: {
         cacheLocation: "localStorage",
@@ -70,5 +71,50 @@ async function getTokenApi() {
     return dataReturned;
 }
 
+async function getUserInformations() {
+    
+        const response = await fetch(`${apiUrl}/api/user`, {
+            headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT") }
+        });
+
+        if (await isResponseOk(response)) {
+
+            const dataReturned = await response.json();
+            console.log('Données retournées par l\'API :', dataReturned);
+            return dataReturned;
+        }
+}
+
+async function isResponseOk(response) {
+
+    if (response.status === 401) {
+        // Si c'est le cas, vérifiez si l'en-tête 'Token-Status' est présent dans la réponse
+        if (response.headers.has('Token-Status')) {
+            // Lisez la valeur de l'en-tête 'Token-Status'
+            const tokenStatus = response.headers.get('Token-Status');
+            // Faites quelque chose avec la valeur (par exemple, affichez un message à l'utilisateur)
+            console.log('Token Status:', tokenStatus);
+
+            // Si le token est expiré, vous pouvez gérer cela ici
+            // Par exemple, affichez un message à l'utilisateur ou effectuez une action appropriée
+            if (tokenStatus === 'Expired') {
+                console.log('Le token est expiré. Veuillez vous reconnecter.');
+                Cookies.remove('apiJWT');
+                Cookies.remove('azureJWT');
+                return false;
+            }
+        }
+        console.log('Unauthorized');
+    }
+    else if (!response.ok) {
+        const errorData = await response.json();
+        console.log(errorData);
+        alert('Une erreur est survenue lors de la requête API : ' + errorData.error);
+        return false;
+    }
+    return true;
+}
+
+
 // Export the login function to use in your components
-export { login };
+export { login, getUserInformations };

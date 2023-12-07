@@ -42,6 +42,7 @@ export const cheerpjState = writable({
 });
 export const cheerpjWidth = writable(500)
 export const cheerpjHeight = writable(400)
+export const graphical = writable(false)
 
 // navbar stores
 export const currentTab = writable("Explorer");
