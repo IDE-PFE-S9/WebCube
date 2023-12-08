@@ -7,12 +7,17 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
@@ -37,29 +42,31 @@ public class UserController {
 
     @GetMapping("/auth")
     public ResponseEntity<?> azureAuth(@RequestHeader("Authorization-Azure") String token) {
-
-        token = token.substring(7);
-
-        try {
-            JWTClaimsSet claimsAzure = JWTParser.parse(token).getJWTClaimsSet();
-            String firstName = (String) claimsAzure.getClaim("given_name");
-            String lastName = (String) claimsAzure.getClaim("family_name");
-            String uniqueName = (String) claimsAzure.getClaim("upn");
-
-            Optional<User> user = userService.getUserByUniqueName(uniqueName);
-            if (user.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Utilisateur non trouvé dans la base de données");
+        
+            if (!isMicrosoftTokenValid(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
             }
+            try {
+                token = token.substring(7);
+                JWTClaimsSet claimsAzure = JWTParser.parse(token).getJWTClaimsSet();
+                String firstName = (String) claimsAzure.getClaim("given_name");
+                String lastName = (String) claimsAzure.getClaim("family_name");
+                String uniqueName = (String) claimsAzure.getClaim("upn");
 
-            String accesToken = jwtTokenUtil.generateAccessToken(user.get());
+                Optional<User> user = userService.getUserByUniqueName(uniqueName);
+                if (user.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body("Utilisateur non trouvé dans la base de données");
+                }
 
-            AuthResponse response = new AuthResponse(firstName, lastName, accesToken);
-            return ResponseEntity.ok().body(response);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur lors du traitement du token JWT.");
-        }
+                String accesToken = jwtTokenUtil.generateAccessToken(user.get());
+
+                AuthResponse response = new AuthResponse(firstName, lastName, accesToken);
+                return ResponseEntity.ok().body(response);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur lors du traitement du token JWT.");
+            }
     }
 
     @GetMapping("/user")
@@ -75,4 +82,26 @@ public class UserController {
 
         return ResponseEntity.ok().body(userResponse);
     }
+
+    private boolean isMicrosoftTokenValid(String accessToken){
+        try{
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            headers.set("Authorization", accessToken);
+
+            HttpEntity<String> entity = new HttpEntity<>(null, headers);
+
+            String result = restTemplate.exchange("https://graph.microsoft.com/v1.0/me", HttpMethod.GET,
+                    entity, String.class).getBody();
+
+            return true;        
+        }
+        catch(Exception e){
+            return false;
+        }   
+    }
+
 }
