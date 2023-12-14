@@ -4,7 +4,7 @@
 	
     import PageGeneralPanel from './PageGeneralPanel.svelte';
     import PageExamenPanel from './PageExamenPanel.svelte';
-    import PageAvancementTeacherPanel from './PageAvancementStudentPanel.svelte';
+    import PageAvancementTeacherPanel from './PageAvancementTeacherPanel.svelte';
     import PageAvancementStudentPanel from './PageAvancementStudentPanel.svelte';
     import PageAutresPanel from './PageAutresPanel.svelte';
 
@@ -35,7 +35,8 @@
 
         {#if $adminNavbarActiveItem === 'Avancement'}
             <!--//TODO If teacher or if student
-            <PageAvancementTeacherPanel />-->
+            <PageAvancementTeacherPanel />
+            <PageAvancementStudentPanel />-->
             <PageAvancementStudentPanel />
         {/if}
 
