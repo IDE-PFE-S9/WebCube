@@ -20,7 +20,7 @@
 			method: 'GET',
 			headers: headersList
 		});
-		if(isResponseOk){
+		if(isResponseOk(archiveResponse)){
 			let archive = await archiveResponse.blob();
 
 			let archiveStructure = await handleArchive(archive);

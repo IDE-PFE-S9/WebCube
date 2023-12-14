@@ -54,7 +54,7 @@ async function login() {
 
 async function getTokenApi() {
     const response = await fetch(`${apiUrl}/api/auth`, {
-        headers: {'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT")}
+        headers: { 'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT") }
     });
 
     if (!response.ok) {
@@ -70,16 +70,17 @@ async function getTokenApi() {
 }
 
 async function getUserInformations() {
-    
-        const response = await fetch(`${apiUrl}/api/user`, {
-            headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT") }
-        });
 
-        if (await isResponseOk(response)) {
+    const response = await fetch(`${apiUrl}/api/user`, {
+        headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT") }
+    });
 
-            const dataReturned = await response.json();
-            return dataReturned;
-        }
+    if (await isResponseOk(response)) {
+        const dataReturned = await response.json();
+        return dataReturned;
+    } else {
+        return null;
+    }
 }
 
 async function isResponseOk(response) {

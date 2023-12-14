@@ -27,7 +27,7 @@ public class JwtTokenUtil {
     @Value("spring.security.oauth2.client.registration.azure.client-secret")
     private String CLIENT_SECRET;
 
-    private static final long EXPIRE_COURTE = (long) 24 * 60 * 60 * 1000; // 1 minute
+    private static final long EXPIRE_COURTE = (long) 20 * 1000; // 1 minute
 
     public String generateAccessToken(User user) {
         return Jwts.builder()

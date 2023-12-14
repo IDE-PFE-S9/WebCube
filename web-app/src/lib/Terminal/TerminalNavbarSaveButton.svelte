@@ -74,7 +74,7 @@
 				headers: headersList,
 				body: formData
 			});
-			if (isResponseOk) {
+			if (isResponseOk(response)) {
 				const responseData = await response.text();
 			}
 

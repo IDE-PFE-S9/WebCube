@@ -3,8 +3,8 @@
 	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
 	import Cookies from 'js-cookie';
 	import { getUserInformations } from '$lib/auth.js';
-	import { workCompilePopup, workCompileErrorPopup } from '/src/lib/PopUps/popup.js';
-	import {isResponseOk} from '$lib/auth.js';
+	import { workCompilePopup, workCompileErrorPopup, showLoginPopup } from '/src/lib/PopUps/popup.js';
+	import { isResponseOk } from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 	let projectPath = process.env.PROJECT_PATH;
@@ -21,6 +21,12 @@
 				};
 
 				const user = await getUserInformations();
+
+				if (!user) {
+					showLoginPopup();
+					return;
+				}
+
 				let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 				// Returns a jar inside a blob
@@ -31,8 +37,7 @@
 						headers: headersList
 					}
 				);
-				if(isResponseOk){
-
+				if (isResponseOk(compilationResponse)) {
 					// The Jar File to be executed
 					let compilationResult = await compilationResponse.blob();
 
@@ -75,6 +80,12 @@
 			};
 
 			const user = await getUserInformations();
+
+			if (!user) {
+				showLoginPopup();
+				return;
+			}
+
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			// API call to compile the code and get the API response
@@ -85,7 +96,7 @@
 					headers: headersList
 				}
 			);
-			if(isResponseOk){
+			if (isResponseOk(compilationResponse)) {
 				let compilationResult = await compilationResponse.text();
 				$terminalOutput = [...$terminalOutput, compilationResult];
 				workCompilePopup();
@@ -97,7 +108,7 @@
 	}
 </script>
 
-{#if ($graphical === "true")}
+{#if $graphical === 'true'}
 	<button class="run-button" on:click={runGraphicalCode}>
 		<RunIcon />
 	</button>

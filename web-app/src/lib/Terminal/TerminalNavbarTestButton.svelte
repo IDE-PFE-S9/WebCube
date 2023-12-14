@@ -2,12 +2,12 @@
 	import { terminalOutput, openedArchive, tpId } from '$lib/stores.js';
 	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 	import Cookies from 'js-cookie';
-	import { workTestPopup, workTestErrorPopup } from '/src/lib/PopUps/popup.js';
+	import { workTestPopup, workTestErrorPopup, showLoginPopup } from '/src/lib/PopUps/popup.js';
 	import { getUserInformations } from '$lib/auth.js';
-	import {isResponseOk} from '$lib/auth.js';
+	import { isResponseOk } from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
-	let projectPath = process.env.PROJECT_PATH; 
+	let projectPath = process.env.PROJECT_PATH;
 
 	async function testCode() {
 		try {
@@ -21,6 +21,12 @@
 			};
 
 			const user = await getUserInformations();
+
+			if (!user) {
+				showLoginPopup();
+				return;
+			}
+
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			// API call to compile the code and get the API response
@@ -31,7 +37,7 @@
 					headers: headersList
 				}
 			);
-			if (isResponseOk){
+			if (isResponseOk(compilationResponse)) {
 				let compilationResult = await compilationResponse.text();
 
 				// parse results
@@ -40,13 +46,13 @@
 				let successCount = 0;
 				resultList.forEach((message) => {
 					$terminalOutput = [...$terminalOutput, objectToString(message)];
-					if (message.Status === "SUCCESS") {
+					if (message.Status === 'SUCCESS') {
 						successCount++;
 					}
 				});
 
-				let completion = Math.round(successCount / resultList.length * 100);
-				console.log(completion)
+				let completion = Math.round((successCount / resultList.length) * 100);
+				console.log(completion);
 				await fetch(`${apiUrl}/api/tp/myCompletion/${$tpId}`, {
 					method: 'PUT',
 					headers: headersList,

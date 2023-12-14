@@ -18,7 +18,7 @@
 			method: 'GET',
 			headers: headersList
 		});
-		if(isResponseOk){
+		if(isResponseOk(tpResponse)) {
 			tpJson = await tpResponse.json();
 		}
 	});

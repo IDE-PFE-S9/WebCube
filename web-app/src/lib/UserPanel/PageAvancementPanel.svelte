@@ -21,7 +21,7 @@
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			}
 		});
-		if (isResponseOk){
+		if (isResponseOk(tpResponse)){
 			console.log(tpResponse);
 			tpJson = await tpResponse.json();
 			tpJson.sort((a, b) => a.name.localeCompare(b.name));
@@ -36,7 +36,7 @@
 			}
 		});
 
-		if(!isResponseOk){
+		if(isResponseOk(response)){
 
 			const dataReturned = await response.json();
 
