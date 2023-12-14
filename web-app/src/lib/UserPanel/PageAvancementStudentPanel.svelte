@@ -1,13 +1,12 @@
 <script>
-	import GlobalAdvancement from './GlobalAdvancement.svelte';
-	import StudentAdvancement from './StudentAdvancement.svelte';
+	import GlobalAdvancement from './GaugeChartAdvancement.svelte';
 	import Cookies from 'js-cookie';
 	import { onMount } from 'svelte';
 
 	let apiUrl = process.env.API_URL;
 
 	let completions = [];
-	let names = [];
+	let names = []; 
 	let groups = [];
 	let selectedTp = 1;
 	let tpJson = [];
@@ -78,7 +77,7 @@
 
 	<div class="avancement-individuel">
 		<h1 class="individuel-title">Avancement Individuel</h1>
-		<StudentAdvancement {names} {completions} />
+		<StudentsAdvancement {names} {completions} />
 	</div>
 </div>
 

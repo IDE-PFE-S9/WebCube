@@ -1,0 +1,53 @@
+.DS_Store
+node_modules
+/web-app/build
+.svelte-kit
+/web-app/package
+.env
+.env.*
+!.env.example
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+LSP/.metadata
+
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+eclipse.jdt.ls/.mvn/wrapper/maven-wrapper.jar
+eclipse.jdt.ls/org.eclipse.jdt.ls.core/lib/java-decompiler-engine-231.9011.34.jar
+eclipse.jdt.ls/org.eclipse.jdt.ls.tests/lib/lombok-1.18.28.jar
+eclipse.jdt.ls/org.eclipse.jdt.ls.core/lib/remark-1.2.0.jar
+eclipse.jdt.ls/org.eclipse.jdt.ls.core/lib/jsoup-1.14.2.jar
+eclipse.jdt.ls/org.eclipse.jdt.ls.core/gradle/checksums/versions.json
+eclipse.jdt.ls/org.eclipse.jdt.ls.core/gradle/checksums/checksums.json
+eclipse.jdt.ls
