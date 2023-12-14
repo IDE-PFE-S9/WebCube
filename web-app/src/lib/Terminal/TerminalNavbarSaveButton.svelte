@@ -5,6 +5,7 @@
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
 	import { getUserInformations } from '$lib/auth.js';
+	import {isResponseOk} from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 	let projectPath = process.env.PROJECT_PATH;
@@ -73,8 +74,9 @@
 				headers: headersList,
 				body: formData
 			});
-
-			const responseData = await response.text();
+			if (isResponseOk) {
+				const responseData = await response.text();
+			}
 
 			// traverse the $openedArchive and change all the modified fields to false
 			function resetModified(node) {

@@ -4,6 +4,7 @@
 	import Cookies from 'js-cookie';
 	import { workTestPopup, workTestErrorPopup } from '/src/lib/PopUps/popup.js';
 	import { getUserInformations } from '$lib/auth.js';
+	import {isResponseOk} from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 	let projectPath = process.env.PROJECT_PATH; 
@@ -30,29 +31,30 @@
 					headers: headersList
 				}
 			);
-			let compilationResult = await compilationResponse.text();
+			if (isResponseOk){
+				let compilationResult = await compilationResponse.text();
 
-			// parse results
-			const resultList = parseInput(compilationResult);
+				// parse results
+				const resultList = parseInput(compilationResult);
 
-			let successCount = 0;
-			resultList.forEach((message) => {
-				$terminalOutput = [...$terminalOutput, objectToString(message)];
-				if (message.Status === "SUCCESS") {
-					successCount++;
-				}
-			});
+				let successCount = 0;
+				resultList.forEach((message) => {
+					$terminalOutput = [...$terminalOutput, objectToString(message)];
+					if (message.Status === "SUCCESS") {
+						successCount++;
+					}
+				});
 
-			let completion = Math.round(successCount / resultList.length * 100);
-			console.log(completion)
-			await fetch(`${apiUrl}/api/tp/myCompletion/${$tpId}`, {
-				method: 'PUT',
-				headers: headersList,
-				body: JSON.stringify(completion)
-			});
+				let completion = Math.round(successCount / resultList.length * 100);
+				console.log(completion)
+				await fetch(`${apiUrl}/api/tp/myCompletion/${$tpId}`, {
+					method: 'PUT',
+					headers: headersList,
+					body: JSON.stringify(completion)
+				});
 
-			workTestPopup();
-
+				workTestPopup();
+			}
 		} catch (error) {
 			console.error('Une erreur est survenue lors du test du fichier :', error);
 			workTestErrorPopup();

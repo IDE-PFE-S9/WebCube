@@ -1,25 +1,24 @@
 <script>
 	import { onMount } from 'svelte';
 	import TpButton from './TpButton.svelte';
-
+	import {isResponseOk} from '$lib/auth.js';
 	import Cookies from 'js-cookie';
 
 	let apiUrl = process.env.API_URL;
 
-	let headersList = {
-		Accept: '*/*',
-		'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
-		'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
-	};
-
 	let tpJson = [];
 
 	onMount(async () => {
-		if (Cookies.get('azureJWT') != undefined && Cookies.get('apiJWT') != undefined) {
-			const tpResponse = await fetch(`${apiUrl}/api/tp`, {
-				method: 'GET',
-				headers: headersList
-			});
+		let headersList = {
+			Accept: '*/*',
+			'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+			'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+		};
+		const tpResponse = await fetch(`${apiUrl}/api/tp`, {
+			method: 'GET',
+			headers: headersList
+		});
+		if(isResponseOk){
 			tpJson = await tpResponse.json();
 		}
 	});

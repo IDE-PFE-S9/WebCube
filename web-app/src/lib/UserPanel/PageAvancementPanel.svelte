@@ -3,6 +3,7 @@
 	import StudentAdvancement from './StudentAdvancement.svelte';
 	import Cookies from 'js-cookie';
 	import { onMount } from 'svelte';
+	import { isResponseOk } from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 
@@ -20,9 +21,11 @@
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			}
 		});
-		console.log(tpResponse);
-		tpJson = await tpResponse.json();
-		tpJson.sort((a, b) => a.name.localeCompare(b.name));
+		if (isResponseOk){
+			console.log(tpResponse);
+			tpJson = await tpResponse.json();
+			tpJson.sort((a, b) => a.name.localeCompare(b.name));
+		}
 	});
 
 	async function getAdvancementTp(tpId) {
@@ -33,20 +36,16 @@
 			}
 		});
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			console.log(errorData);
-			alert('Une erreur est survenue lors de la requête API : ' + errorData.error);
-			return null;
+		if(!isResponseOk){
+
+			const dataReturned = await response.json();
+
+			names = dataReturned.map((student) => `${student.firstname} ${student.surname}`);
+			completions = dataReturned.map((student) => student.completion);
+			groups = dataReturned.map((student) => student.roles);
+			console.log(groups);
+			return { names, completions, groups };
 		}
-
-		const dataReturned = await response.json();
-
-		names = dataReturned.map((student) => `${student.firstname} ${student.surname}`);
-		completions = dataReturned.map((student) => student.completion);
-		groups = dataReturned.map((student) => student.roles);
-		console.log(groups);
-		return { names, completions, groups };
 	}
 
 	$: {
