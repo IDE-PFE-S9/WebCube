@@ -56,10 +56,17 @@ public class JobProducer {
     }
 
     @GetMapping("/compileAndJar")
-    public ResponseEntity<Resource> compileAndJar(@RequestParam String projectPath) throws Exception {
+    public ResponseEntity<?> compileAndJar(@RequestParam String projectPath) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
         sendJob(projectPath, requestId, "jar");
         String jarFilePath = retrieveResult(requestId); // This retrieves the path of the JAR file
+
+        // can also return a compilation error
+        if (jarFilePath.startsWith("Compilation failed with exit code")) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
+                    .body(jarFilePath);
+        }
 
         Path path = Paths.get(jarFilePath);
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
