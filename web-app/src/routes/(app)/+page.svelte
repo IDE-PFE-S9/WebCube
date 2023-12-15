@@ -3,7 +3,7 @@
 	import { token } from '$lib/stores.js';
 	import { screenChangeCount, examMode, logs, selectedFile } from '$lib/stores.js';
 	import Swal from 'sweetalert2';
-	import {showLoginPopup} from '/src/lib/PopUps/popup.js';
+	import { showLoginPopup } from '/src/lib/PopUps/popup.js';
 
 	let isExamModeActive = false;
 

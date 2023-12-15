@@ -2,8 +2,9 @@
 	import { terminalOutput, openedArchive, tpId } from '$lib/stores.js';
 	import TestIcon from '../assets/TerminalNavbarIcons/TestIcon.svelte';
 	import Cookies from 'js-cookie';
-	import { workTestPopup, workTestErrorPopup } from '/src/lib/PopUps/popup.js';
+	import { workTestPopup, workTestErrorPopup, showLoginPopup } from '/src/lib/PopUps/popup.js';
 	import { getUserInformations } from '$lib/auth.js';
+	import { isResponseOk } from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 	let projectPath = process.env.PROJECT_PATH;
@@ -20,6 +21,12 @@
 			};
 
 			const user = await getUserInformations();
+
+			if (!user) {
+				showLoginPopup();
+				return;
+			}
+
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			// API call to compile the code and get the API response
@@ -30,7 +37,9 @@
 					headers: headersList
 				}
 			);
-			let compilationResult = await compilationResponse.text();
+			if (isResponseOk(compilationResponse)) {
+				let compilationResult = await compilationResponse.text();
+			}
 
 			if (compilationResult.includes('Compilation failed')) {
 				$terminalOutput = [...$terminalOutput, compilationResult.split('\n')[0]];
@@ -152,7 +161,7 @@
 	function resolveFilePath(classPath, projectStructure) {
 		// Convert classPath to a relative file path
 		let relativePath = classPath.replace(/\./g, '/') + '.java';
-		
+
 		// Logic to match relativePath with actual file path in projectStructure
 		return findFilePathInStructure(relativePath, projectStructure);
 	}
