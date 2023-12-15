@@ -4,8 +4,12 @@
 		openedCodes,
 		selectedFile,
 		editorUpdateTrigger,
+		goToLineTrigger,
+		goToLineColumnTrigger,
 		archiveMode,
 		selectedArchiveFile,
+		openedArchive,
+		openedArchiveTabs,
 		readOnly,
 		logs
 	} from '$lib/stores.js';
@@ -35,6 +39,91 @@
 			editor.setValue(codeObj.code);
 		}
 	};
+
+	const editorGoToLine = async (file, line) => {
+		let lineNumber = parseInt(line);
+		selectedArchiveFile.set(file);
+		openedArchiveTabs.update((tabs) => {
+			if (!tabs.includes(file)) {
+				return [...tabs, file];
+			}
+			return tabs;
+		});
+		openedCodes.update((codes) => {
+			// Check if the code from this file is already opened
+			const isAlreadyOpened = codes.some((code) => code.name === file);
+			if (!isAlreadyOpened) {
+				let fileCode = getFileCode(file);
+				console.log(fileCode);
+				return [
+					...codes,
+					{
+						name: file,
+						code: fileCode,
+						status: 'saved'
+					}
+				];
+			}
+			return codes;
+		});
+		await editorUpdateTrigger.set(file);
+		editor.revealLineInCenter(lineNumber, 0);
+		editor.setPosition({ lineNumber: lineNumber, column: 1000 });
+		editor.focus();
+	};
+
+	const editorGoToLineColumn = async (file, line, column) => {
+		let lineNumber = parseInt(line);
+		selectedArchiveFile.set(file);
+		openedArchiveTabs.update((tabs) => {
+			if (!tabs.includes(file)) {
+				return [...tabs, file];
+			}
+			return tabs;
+		});
+		openedCodes.update((codes) => {
+			// Check if the code from this file is already opened
+			const isAlreadyOpened = codes.some((code) => code.name === file);
+			if (!isAlreadyOpened) {
+				let fileCode = getFileCode(file);
+				console.log(fileCode);
+				return [
+					...codes,
+					{
+						name: file,
+						code: fileCode,
+						status: 'saved'
+					}
+				];
+			}
+			return codes;
+		});
+		await editorUpdateTrigger.set(file);
+		editor.revealLineInCenter(lineNumber, 0);
+		editor.setPosition({ lineNumber: lineNumber, column: column });
+		editor.focus();
+	};
+
+	function getFileCode(file, directory) {
+		// If the directory is not provided, use the root of the archive
+		const currentDirectory = directory || $openedArchive;
+
+		for (const child of currentDirectory.children) {
+			if (child.type === 'file') {
+				console.log(child.name, file);
+			}
+			if (child.type === 'file' && child.name === file) {
+				return child.data; // Return the data if the file is found
+			} else if (child.type === 'directory') {
+				const found = getFileCode(file, child); // Recursively search in the subdirectory
+				if (found) {
+					return found; // Return the data if found in a subdirectory
+				}
+			}
+		}
+
+		return null; // Return null if the file is not found
+	}
 
 	onMount(async () => {
 		const monaco = await import('monaco-editor');
@@ -100,6 +189,22 @@
 			updateEditorContent();
 		});
 
+		const unsubscribeGoToLine = goToLineTrigger.subscribe(({ filePath, lineNumber }) => {
+			console.log('goToLineTrigger', filePath, lineNumber);
+			if (filePath && lineNumber) {
+				editorGoToLine(filePath, lineNumber);
+			}
+		});
+
+		const unsubscribeGoToLineColumn = goToLineColumnTrigger.subscribe(
+			({ file, lineNumber, column }) => {
+				console.log('goToLineColumnTrigger', file, lineNumber, column);
+				if (file && lineNumber && column) {
+					editorGoToLineColumn(file, lineNumber, column);
+				}
+			}
+		);
+
 		const updateReadOnlyStatus = (status) => {
 			if (editor) {
 				editor.updateOptions({ readOnly: status });
@@ -113,6 +218,8 @@
 		return () => {
 			unsubscribeReadOnly();
 			unsubscribe();
+			unsubscribeGoToLine();
+			unsubscribeGoToLineColumn();
 		};
 	});
 </script>
