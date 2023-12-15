@@ -14,6 +14,9 @@
 		logs
 	} from '$lib/stores.js';
 
+	import prettier from 'prettier';
+	import javaParser from 'prettier-plugin-java';
+
 	let editor;
 	let editorContainer;
 
@@ -104,6 +107,20 @@
 		editor.focus();
 	};
 
+	function formatJavaCode(code) {
+		try {
+			return prettier.format(code, {
+				parser: 'java',
+				plugins: [javaParser],
+				tabWidth: 4,
+            	useTabs: true,
+			});
+		} catch (error) {
+			console.error('Error formatting Java code: ', error);
+			return code; // return the original code in case of an error
+		}
+	}
+
 	function getFileCode(file, directory) {
 		// If the directory is not provided, use the root of the archive
 		const currentDirectory = directory || $openedArchive;
@@ -162,6 +179,26 @@
 				return codes;
 			});
 		};
+
+		editor.addAction({
+			// An unique identifier for the action
+			id: 'format-java-code',
+
+			// A label for the action, will be displayed in the context menu
+			label: 'Format Java Code',
+
+			// An optional array of keybindings for the action
+			keybindings: [
+				monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF | monaco.KeyCode.Alt   // Bind to Ctrl+Alt+F or Cmd+Alt+F
+			],
+
+			// A method that will be executed when the action is triggered
+			run: function (editor) {
+				const unformattedCode = editor.getValue();
+				const formattedCode = formatJavaCode(unformattedCode);
+				editor.setValue(formattedCode);
+			}
+		});
 
 		// Listen for changes in the editor content and update the store
 		editor.onDidChangeModelContent(updateCode);
