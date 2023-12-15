@@ -39,6 +39,7 @@
 			);
 			if (isResponseOk(compilationResponse)) {
 				let compilationResult = await compilationResponse.text();
+			}
 
 			if (compilationResult.includes('Compilation failed')) {
 				$terminalOutput = [...$terminalOutput, compilationResult.split('\n')[0]];
@@ -160,7 +161,7 @@
 	function resolveFilePath(classPath, projectStructure) {
 		// Convert classPath to a relative file path
 		let relativePath = classPath.replace(/\./g, '/') + '.java';
-		
+
 		// Logic to match relativePath with actual file path in projectStructure
 		return findFilePathInStructure(relativePath, projectStructure);
 	}
