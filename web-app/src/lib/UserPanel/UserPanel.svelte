@@ -1,6 +1,9 @@
 <script>
     import UserPanelNavItem from './UserPanelNavItem.svelte';
     import { adminNavbarActiveItem, terminalOutput, archiveMode } from '$lib/stores.js';
+
+    import Cookies from 'js-cookie';
+    import { onMount } from 'svelte';
 	
     import PageGeneralPanel from './PageGeneralPanel.svelte';
     import PageExamenPanel from './PageExamenPanel.svelte';
@@ -9,10 +12,30 @@
     import PageAutresPanel from './PageAutresPanel.svelte';
 
     const navbarItems = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Autres' }];
+    let apiUrl = process.env.API_URL;
+    let isTeacher = false;
 
     function manageItemClick(itemText) {
 		adminNavbarActiveItem.set(itemText);
 	}
+
+    onMount(async () => {
+		const userResponse = await fetch(`${apiUrl}/api/user`, {
+			method: 'GET',
+			headers: {
+				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+			}
+		});
+		let userJson = await userResponse.json();
+        
+        userJson.roles.forEach(roles => {
+            if(roles.role == 'ROLE_TEACHER'){
+                isTeacher = true;
+            }
+        });
+        
+	});
 </script>
 
 <div class="container">
@@ -34,10 +57,11 @@
         {/if}
 
         {#if $adminNavbarActiveItem === 'Avancement'}
-            <!--//TODO If teacher or if student
-            <PageAvancementTeacherPanel />
-            <PageAvancementStudentPanel />-->
-            <PageAvancementStudentPanel />
+            {#if isTeacher}
+                <PageAvancementTeacherPanel />
+            {:else}
+                <PageAvancementStudentPanel />
+            {/if}
         {/if}
 
         {#if $adminNavbarActiveItem === 'Autres'}
