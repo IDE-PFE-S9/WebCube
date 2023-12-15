@@ -207,7 +207,7 @@ public class JobWorker {
             String classpath = buildClasspath(libDir, classesSrcDir, classesTestDir);
 
             // compile sources
-            compileJavaFiles(srcDir, classesSrcDir, classpath, projectDir);
+            compileJavaFiles(srcDir, classesSrcDir, classpath, projectDir, requestId, channel);
 
             createJarFile(classesSrcDir, projectDir, srcDir, libDir);
 
@@ -235,10 +235,10 @@ public class JobWorker {
             String classpath = buildClasspath(libDir, classesSrcDir, classesTestDir);
 
             // compile sources
-            compileJavaFiles(srcDir, classesSrcDir, classpath, projectDir);
+            compileJavaFiles(srcDir, classesSrcDir, classpath, projectDir, requestId, channel);
 
             // compile tests
-            compileJavaFiles(testDir, classesTestDir, classpath, projectDir);
+            compileJavaFiles(testDir, classesTestDir, classpath, projectDir, requestId, channel);
 
             // run the tests
             List<TestResult> results = runTests(classesTestDir, classesSrcDir);
@@ -307,8 +307,10 @@ public class JobWorker {
         }
     }
 
-    private static void compileJavaFiles(File sourceDir, File outputDir, String classpath, File projectDir)
-            throws IOException, InterruptedException {
+    private static void compileJavaFiles(File sourceDir, File outputDir, String classpath, File projectDir, String requestId, Channel channel)
+            throws Exception {
+        
+        long startTime = System.currentTimeMillis();
         List<String> command = new ArrayList<>();
         command.add("javac");
         command.add("-d");
@@ -325,10 +327,15 @@ public class JobWorker {
         processBuilder.directory(projectDir);
         Process compileProcess = processBuilder.start();
         int compileExitCode = compileProcess.waitFor();
-        logProcessOutput("Compilation", compileProcess);
+        long endTime = System.currentTimeMillis();
+        long compilationTime = endTime - startTime;
+        String compilationErrors = logProcessOutput("Compilation", compileProcess);
         if (compileExitCode != 0) {
-            System.err.println("Compilation failed with exit code " + compileExitCode);
-            // Handle compilation failure
+            String result = "Compilation failed with exit code " + compileExitCode + "\n"
+                    + "Output: \n" + compilationErrors + "\n"
+                    + "Total execution time: " + compilationTime + " ms";
+            sendOutput(result, requestId, channel);
+            return;
         }
     }
 
