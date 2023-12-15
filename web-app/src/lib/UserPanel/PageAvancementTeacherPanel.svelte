@@ -1,6 +1,6 @@
 <script>
-	import GlobalAdvancement from './GlobalAdvancement.svelte';
-	import StudentAdvancement from './StudentAdvancement.svelte';
+	import GlobalAdvancement from './GaugeChartAdvancement.svelte';
+	import StudentsAdvancement from './BarChartAdvancement.svelte';
 	import Cookies from 'js-cookie';
 	import { onMount } from 'svelte';
 	import { isResponseOk } from '$lib/auth.js';
@@ -77,7 +77,7 @@
 
 	<div class="avancement-individuel">
 		<h1 class="individuel-title">Avancement Individuel</h1>
-		<StudentAdvancement {names} {completions} />
+		<StudentsAdvancement {names} {completions} />
 	</div>
 </div>
 

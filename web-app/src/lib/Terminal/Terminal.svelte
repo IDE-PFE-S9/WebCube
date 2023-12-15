@@ -2,13 +2,13 @@
 	import TerminalNavbar from './TerminalNavbar.svelte';
 	import Out from './Out.svelte';
 	import { terminalNavbarActiveItem } from '$lib/stores.js';
+	import Problems from './Problems.svelte';
 </script>
 
 <div class="terminal">
 	<TerminalNavbar />
 	{#if $terminalNavbarActiveItem === 'Problèmes'}
-		<!-- TODO: IMPLEMENT THE PROBLEMS COMPONENT -->
-		<h1>TODO: IMPLEMENT THE PROBLEMS COMPONENT</h1>
+		<Problems />
 	{:else if $terminalNavbarActiveItem === 'Sortie'}
 		<Out />
 	{/if}

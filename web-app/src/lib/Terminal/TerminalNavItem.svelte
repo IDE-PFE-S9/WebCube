@@ -1,14 +1,28 @@
 <script>
 	export let onClick;
 	export let text;
-	import { terminalNavbarActiveItem } from '$lib/stores.js';
-
+	import { terminalNavbarActiveItem, problems } from '$lib/stores.js';
 </script>
 
-<button class="navbar-item" on:click={onClick()} class:selected={$terminalNavbarActiveItem === text}>
-	<h3 class="nav-title">{text}</h3>
-	<div class="indicator" class:selected={$terminalNavbarActiveItem === text} />
-</button>
+{#if text === 'Problèmes'}
+	<button
+		class="navbar-item"
+		on:click={onClick()}
+		class:selected={$terminalNavbarActiveItem === text}
+	>
+		<h3 class="nav-title">{text} ({$problems.length})</h3>
+		<div class="indicator" class:selected={$terminalNavbarActiveItem === text} />
+	</button>
+{:else}
+	<button
+		class="navbar-item"
+		on:click={onClick()}
+		class:selected={$terminalNavbarActiveItem === text}
+	>
+		<h3 class="nav-title">{text}</h3>
+		<div class="indicator" class:selected={$terminalNavbarActiveItem === text} />
+	</button>
+{/if}
 
 <style lang="scss">
 	.navbar-item {

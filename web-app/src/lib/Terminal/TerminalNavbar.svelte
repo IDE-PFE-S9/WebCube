@@ -7,6 +7,7 @@
 	import TerminalNavbarRunButton from './TerminalNavbarRunButton.svelte';
 	import TerminalNavbarDownloadArchiveButton from './TerminalNavbarDownloadArchiveButton.svelte';
 
+
 	const navbarItems = [{ text: 'Problèmes' }, { text: 'Sortie' }];
 
 	function manageItemClick(itemText) {
