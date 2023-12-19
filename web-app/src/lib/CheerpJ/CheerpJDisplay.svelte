@@ -25,16 +25,16 @@
 		cheerpjState.subscribe(({ showPopup, runJar }) => {
 			if (showPopup) {
 				popup.style.display = 'flex';
-				if (runJar) {
-					iframe.src = 'about:blank';
-					iframe.onload = async () => {
-						const iframeWindow = iframe.contentWindow;
-						cheerpjCreateDisplay(-1, -1, iframeWindow.document.body);
-						const exitCode = await cheerpjRunJar('/str/application.jar');
-						$terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
-						console.log('Program exited with code', exitCode);
-					};
-				}
+			}
+			if (runJar) {
+				iframe.src = 'about:blank';
+				iframe.onload = async () => {
+					const iframeWindow = iframe.contentWindow;
+					cheerpjCreateDisplay(-1, -1, iframeWindow.document.body);
+					const exitCode = await cheerpjRunJar('/str/application.jar');
+					$terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
+					console.log('Program exited with code', exitCode);
+				};
 			}
 		});
 

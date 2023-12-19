@@ -42,7 +42,6 @@ async function login() {
             });
 
             // Use response.accessToken to make your API calls
-            console.log('Access Token:', response.accessToken);
             Cookies.set("azureJWT", response.accessToken);
             await getTokenApi();
             Swal.close();
@@ -91,7 +90,6 @@ async function isResponseOk(response) {
             // Lisez la valeur de l'en-tête 'Token-Status'
             const tokenStatus = response.headers.get('Token-Status');
             // Faites quelque chose avec la valeur (par exemple, affichez un message à l'utilisateur)
-            console.log('Token Status:', tokenStatus);
 
             // Si le token est expiré, vous pouvez gérer cela ici
             // Par exemple, affichez un message à l'utilisateur ou effectuez une action appropriée

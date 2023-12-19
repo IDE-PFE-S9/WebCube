@@ -13,8 +13,6 @@ export function showDeniedPopup() {
 }
 
 export function showLoginPopup() {
-    console.log("ici")
-    console.log(login)
     Swal.fire({
         title: "Vous devez d'abord vous connecter",
         icon: 'warning',
@@ -27,7 +25,6 @@ export function showLoginPopup() {
         allowEnterKey: false,
         didOpen: () => {
             const loginBtn = document.getElementById('loginBtn');
-            console.log(loginBtn)
             loginBtn.addEventListener('click', login);
         }
     });

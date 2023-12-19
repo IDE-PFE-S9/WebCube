@@ -39,46 +39,45 @@
 			);
 			if (isResponseOk(compilationResponse)) {
 				let compilationResult = await compilationResponse.text();
-			}
 
-			if (compilationResult.includes('Compilation failed')) {
-				$terminalOutput = [...$terminalOutput, compilationResult.split('\n')[0]];
-				let errors = parseCompilationErrors(compilationResult);
-				let newProblems = [];
-				errors.forEach((error) => {
-					const buttonTag = `<button class="terminal-link-button" data-filepath="${error.filePath}" data-linenumber="${error.lineNumber}">${error.filePath}:${error.lineNumber} error: ${error.errorMessage}</button>`;
-					$terminalOutput = [...$terminalOutput, buttonTag];
-					newProblems.push({
-						message: error.errorMessage,
-						file: error.filePath,
-						line: error.lineNumber,
-						codeSnippet: error.codeSnippet
+				if (compilationResult.includes('Compilation failed')) {
+					$terminalOutput = [...$terminalOutput, compilationResult.split('\n')[0]];
+					let errors = parseCompilationErrors(compilationResult);
+					let newProblems = [];
+					errors.forEach((error) => {
+						const buttonTag = `<button class="terminal-link-button" data-filepath="${error.filePath}" data-linenumber="${error.lineNumber}">${error.filePath}:${error.lineNumber} error: ${error.errorMessage}</button>`;
+						$terminalOutput = [...$terminalOutput, buttonTag];
+						newProblems.push({
+							message: error.errorMessage,
+							file: error.filePath,
+							line: error.lineNumber,
+							codeSnippet: error.codeSnippet
+						});
+					});	
+					problems.set(newProblems);
+					workCompileErrorPopup();
+					return;
+				} else {
+					// parse results
+					const resultList = parseInput(compilationResult);
+
+					let successCount = 0;
+					resultList.forEach((message) => {
+						$terminalOutput = [...$terminalOutput, objectToString(message)];
+						if (message.Status === 'SUCCESS') {
+							successCount++;
+						}
 					});
-				});
-				problems.set(newProblems);
-				workCompileErrorPopup();
-				return;
-			} else {
-				// parse results
-				const resultList = parseInput(compilationResult);
 
-				let successCount = 0;
-				resultList.forEach((message) => {
-					$terminalOutput = [...$terminalOutput, objectToString(message)];
-					if (message.Status === 'SUCCESS') {
-						successCount++;
-					}
-				});
-
-				let completion = Math.round((successCount / resultList.length) * 100);
-				console.log(completion);
-				await fetch(`${apiUrl}/api/tp/myCompletion/${$tpId}`, {
-					method: 'PUT',
-					headers: headersList,
-					body: JSON.stringify(completion)
-				});
-
-				workTestPopup();
+					let completion = Math.round((successCount / resultList.length) * 100);
+					console.log(completion);
+					await fetch(`${apiUrl}/api/tp/myCompletion/${$tpId}`, {
+						method: 'PUT',
+						headers: headersList,
+						body: JSON.stringify(completion)
+					});
+					workTestPopup();
+				}
 			}
 		} catch (error) {
 			console.error('Une erreur est survenue lors du test du fichier :', error);
