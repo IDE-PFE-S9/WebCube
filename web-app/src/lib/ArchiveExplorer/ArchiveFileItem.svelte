@@ -38,7 +38,6 @@
 					}
 				];
 			}
-			console.log($openedCodes);
 			return codes;
 		});
 		if (fileExtension === 'md') {
