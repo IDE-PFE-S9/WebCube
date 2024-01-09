@@ -1,5 +1,5 @@
 <script>
-	import { openedCodes, openedArchive, cheerpjState } from '$lib/stores.js';
+	import { openedCodes, openedArchive, cheerpjState, tpId, dateOpened } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
 	import { workSavePopup, workSaveErrorPopup } from '/src/lib/PopUps/popup.js';
 	import JSZip from 'jszip';
@@ -57,6 +57,24 @@
 				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
+
+			let headersList2 = {
+				Accept: '*/*',
+				'Content-Type': 'application/json',
+				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+			};
+
+			const now = new Date();
+			const timeElapsedInMilliseconds = now - $dateOpened;
+			const timeElapsedInMinutes = Math.floor(timeElapsedInMilliseconds / 60000);
+			
+			console.log(timeElapsedInMinutes)
+
+			await fetch(`${apiUrl}/api/tp/timeElapsed/${$tpId}`, {
+				method: 'PUT',
+				headers: headersList2,
+				body: JSON.stringify(timeElapsedInMinutes)
+			});
 
 			const user = await getUserInformations();
 

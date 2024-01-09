@@ -16,13 +16,16 @@
 		problems,
 		terminalOutput,
 		markdownMode, 
-		editorUpdateTrigger
+		editorUpdateTrigger,
+		dateOpened
 	} from '$lib/stores.js';
 	import { isResponseOk } from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 
 	const getArchive = async () => {
+		dateOpened.set(new Date());
+
 		let headersList = {
 			Accept: '*/*',
 			'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),

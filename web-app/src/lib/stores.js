@@ -32,6 +32,7 @@ export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
 export const archiveHandle = writable(null);
 export const tpId = writable(null);
+export const dateOpened = writable(null);
 
 // modelling stores
 export const entitiesList = writable([]);
