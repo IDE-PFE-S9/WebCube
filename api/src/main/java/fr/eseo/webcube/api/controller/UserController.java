@@ -42,7 +42,6 @@ public class UserController {
 
     @GetMapping("/auth")
     public ResponseEntity<?> azureAuth(@RequestHeader("Authorization-Azure") String token) {
-        
             if (!isMicrosoftTokenValid(token)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
             }
@@ -99,7 +98,8 @@ public class UserController {
 
             return true;        
         }
-        catch(Exception e){
+        catch (Exception e) {
+            System.out.println(e);
             return false;
         }   
     }

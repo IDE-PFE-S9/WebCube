@@ -85,7 +85,6 @@ public class TPService {
 
 			URI gitServer = URI.create(gitLink);
 			
-			// TODO: Disable SSL verify
 			if (gitServer.getScheme().equals("https")) {
 				FileBasedConfig config = SystemReader.getInstance().openUserConfig(null, FS.DETECTED);
 				synchronized (config) {
@@ -111,7 +110,8 @@ public class TPService {
 			userTP.setId(userTPKey);
 			userTP.setUser(user);
 			userTP.setTp(tp);
-			userTP.setCompletion(0); // Assuming completion is a String
+			userTP.setCompletion(0);
+			userTP.setTimeElapsed(0);
 			userTpRepository.save(userTP);
 		}
 
@@ -184,5 +184,10 @@ public class TPService {
 	@Transactional
 	public void updateCompletion(String uniqueName, Integer tpId, Integer completion) {
 		userTpRepository.updateCompletion(uniqueName, tpId, completion);
+	}
+
+	@Transactional
+	public void updateTimeElapsed(String uniqueName, Integer tpId, Integer timeElapsed) {
+		userTpRepository.updateTimeElapsed(uniqueName, tpId, timeElapsed);
 	}
 }
