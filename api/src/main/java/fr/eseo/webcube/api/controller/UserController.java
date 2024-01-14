@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -41,31 +43,36 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/auth")
-    public ResponseEntity<?> azureAuth(@RequestHeader("Authorization-Azure") String token) {
-            if (!isMicrosoftTokenValid(token)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
+    public ResponseEntity<?> azureAuth(@RequestHeader("Authorization-Azure") String token, HttpServletRequest request) {
+        String realIp = request.getHeader("X-Forwarded-For");
+        if (realIp == null) {
+            realIp = request.getRemoteAddr();
+        }
+        System.out.println("IP: " + realIp);
+        if (!isMicrosoftTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
+        }
+        try {
+            token = token.substring(7);
+            JWTClaimsSet claimsAzure = JWTParser.parse(token).getJWTClaimsSet();
+            String firstName = (String) claimsAzure.getClaim("given_name");
+            String lastName = (String) claimsAzure.getClaim("family_name");
+            String uniqueName = (String) claimsAzure.getClaim("upn");
+
+            Optional<User> user = userService.getUserByUniqueName(uniqueName);
+            if (user.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Utilisateur non trouvé dans la base de données");
             }
-            try {
-                token = token.substring(7);
-                JWTClaimsSet claimsAzure = JWTParser.parse(token).getJWTClaimsSet();
-                String firstName = (String) claimsAzure.getClaim("given_name");
-                String lastName = (String) claimsAzure.getClaim("family_name");
-                String uniqueName = (String) claimsAzure.getClaim("upn");
 
-                Optional<User> user = userService.getUserByUniqueName(uniqueName);
-                if (user.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                            .body("Utilisateur non trouvé dans la base de données");
-                }
+            String accesToken = jwtTokenUtil.generateAccessToken(user.get());
 
-                String accesToken = jwtTokenUtil.generateAccessToken(user.get());
-
-                AuthResponse response = new AuthResponse(firstName, lastName, accesToken);
-                return ResponseEntity.ok().body(response);
-            } catch (ParseException e) {
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur lors du traitement du token JWT.");
-            }
+            AuthResponse response = new AuthResponse(firstName, lastName, accesToken);
+            return ResponseEntity.ok().body(response);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur lors du traitement du token JWT.");
+        }
     }
 
     @GetMapping("/user")

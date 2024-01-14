@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { token } from '$lib/stores.js';
+	import { token, sendMessage } from '$lib/stores.js';
 	import { screenChangeCount, examMode, logs, selectedFile, dateOpened } from '$lib/stores.js';
 	import Swal from 'sweetalert2';
 	import { showLoginPopup } from '/src/lib/PopUps/popup.js';
@@ -8,9 +8,14 @@
 	let isExamModeActive = false;
 	let quitDate;
 
-	$: if (!$token) {
-		showLoginPopup();
+	$: {
+		if (!$token) {
+			showLoginPopup();
+		} else {
+			sendMessage('token', $token)
+		}
 	}
+
 
 	onMount(() => {
 		// Subscribe to the examMode store
