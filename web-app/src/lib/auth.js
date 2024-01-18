@@ -25,6 +25,12 @@ const msalConfig = {
 
 // Function to login
 async function login() {
+    Object.keys(localStorage).forEach(function(key) {
+        if (key !== 'screenChangeCount' && key !== 'logs') {
+            localStorage.removeItem(key);
+        }
+    });
+    
     const msalInstance = new PublicClientApplication(msalConfig);
     await msalInstance.initialize();
     console.log('msalInstance', msalInstance);
@@ -47,7 +53,7 @@ async function login() {
             Cookies.set("azureJWT", response.accessToken);
             await getTokenApi();
             Swal.close();
-            window.location.reload();
+            //window.location.reload();
         }
     } catch (error) {
         console.error(error);
@@ -86,6 +92,34 @@ async function getUserInformations() {
         }
 }
 
+async function getPublicKeyTeacher() {
+    
+    const response = await fetch(`${apiUrl}/api/teacher/publicKey`, {
+        headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT"), 
+                     'Content-Type': 'text/plain'}
+    });
+
+    if (await isResponseOk(response)) {
+
+        const dataReturned = await response.text();
+        return dataReturned;
+    }
+}
+
+async function getPrivateKeyTeacher() {
+    
+    const response = await fetch(`${apiUrl}/api/teacher/privateKey`, {
+        headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT"),
+                    'Content-Type': 'text/plain' }
+    });
+
+    if (await isResponseOk(response)) {
+
+        const dataReturned = await response.text();
+        return dataReturned;
+    }
+}
+
 async function isResponseOk(response) {
 
     if (response.status === 401) {
@@ -118,4 +152,4 @@ async function isResponseOk(response) {
 
 
 // Export the login function to use in your components
-export { login, getUserInformations };
+export { login, getUserInformations, getPublicKeyTeacher, getPrivateKeyTeacher };

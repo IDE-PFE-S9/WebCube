@@ -100,3 +100,17 @@ export function workTestPopup() {
         title: "Code testé !"
     });
 }
+
+export function openLocalFilePopup() {
+    Toast.fire({
+        icon: "success",
+        title: "Archive ouverte !"
+    });
+}
+
+export function openLocalFileErrorPopup() {
+    Toast.fire({
+        icon: "error",
+        title: "Archive non valide"
+    });
+}
