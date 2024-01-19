@@ -63,14 +63,6 @@
 					// The Jar File to be executed
 					let compilationResult = await compilationResponse.blob();
 
-					// // download the jar file
-					// let a = document.createElement('a');
-					// a.href = URL.createObjectURL(compilationResult);
-					// a.download = 'application.jar';
-					// document.body.appendChild(a);
-					// a.click();
-					// document.body.removeChild(a);
-
 					// Create a new FileReader object
 					let reader = new FileReader();
 
@@ -90,9 +82,9 @@
 				}
 
 				if($graphical === 'true')
-					cheerpjState.set({ showPopup: true, runJar: true, reloadJar: false });
+					cheerpjState.set({ showPopup: true, runJar: true, reloadJar: true });
 				else
-					cheerpjState.set({ showPopup: false, runJar: true, reloadJar: false });
+					cheerpjState.set({ showPopup: false, runJar: true, reloadJar: true });
 
 				workCompilePopup();
 			}

@@ -7,6 +7,8 @@
         // Check if the user is already logged in
         if (Cookies.get('azureJWT') === null) {
             login()
+        } else {
+            console.log('Already logged in')
         }
     });
 </script>

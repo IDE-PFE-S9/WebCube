@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,12 +46,27 @@ public class JobProducer {
     }
 
     @GetMapping("/compileAndTest")
-    public String compileAndTest(@RequestParam String projectPath,
+    public ResponseEntity<?> compileAndTest(@RequestParam String projectPath,
             @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
         sendJob(projectPath, requestId, "test");
-        return retrieveResult(requestId);
+        String jarFilePath = retrieveResult(requestId); // This retrieves the path of the JAR file
+
+        // can also return a compilation error
+        if (jarFilePath.startsWith("Compilation failed with exit code")) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
+                    .body(jarFilePath);
+        }
+
+        Path path = Paths.get(jarFilePath);
+        ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + path.getFileName().toString())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     @GetMapping("/compileAndJar")
