@@ -29,7 +29,6 @@
 
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
-			console.log("here")
 			// API call to compile the code and get the API response
 			let compilationResponse = await fetch(
 				`${apiUrl}/api/compileAndTest?projectPath=${projectPath}/${username}/${$openedArchive.name}`,
@@ -38,28 +37,26 @@
 					headers: headersList
 				}
 			);
-			console.log("there")
 			if (isResponseOk(compilationResponse)) {
-				console.log(compilationResponse)
-				// if (compilationResponse.headers.get('Content-Type') !== 'application/octet-stream') {
-				// 	let compilationResult = await compilationResponse.text();
-				// 	$terminalOutput = [...$terminalOutput, compilationResult.split('\n')[0]];
-				// 	let errors = parseCompilationErrors(compilationResult);
-				// 	let newProblems = [];
-				// 	errors.forEach((error) => {
-				// 		const buttonTag = `<button class="terminal-link-button" data-filepath="${error.filePath}" data-linenumber="${error.lineNumber}">${error.filePath}:${error.lineNumber} error: ${error.errorMessage}</button>`;
-				// 		$terminalOutput = [...$terminalOutput, buttonTag];
-				// 		newProblems.push({
-				// 			message: error.errorMessage,
-				// 			file: error.filePath,
-				// 			line: error.lineNumber,
-				// 			codeSnippet: error.codeSnippet
-				// 		});
-				// 	});
-				// 	problems.set(newProblems);
-				// 	workCompileErrorPopup();
-				// 	return;
-				// }
+				if (compilationResponse.headers.get('Content-Type') !== 'application/octet-stream') {
+					let compilationResult = await compilationResponse.text();
+					$terminalOutput = [...$terminalOutput, compilationResult.split('\n')[0]];
+					let errors = parseCompilationErrors(compilationResult);
+					let newProblems = [];
+					errors.forEach((error) => {
+						const buttonTag = `<button class="terminal-link-button" data-filepath="${error.filePath}" data-linenumber="${error.lineNumber}">${error.filePath}:${error.lineNumber} error: ${error.errorMessage}</button>`;
+						$terminalOutput = [...$terminalOutput, buttonTag];
+						newProblems.push({
+							message: error.errorMessage,
+							file: error.filePath,
+							line: error.lineNumber,
+							codeSnippet: error.codeSnippet
+						});
+					});
+					problems.set(newProblems);
+					workCompileErrorPopup();
+					return;
+				}
 
 				// The Jar File to be executed
 				let compilationResult = await compilationResponse.blob();
