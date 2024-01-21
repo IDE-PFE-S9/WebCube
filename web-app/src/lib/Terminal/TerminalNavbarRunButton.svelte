@@ -15,7 +15,7 @@
 
 	async function runGraphicalCode() {
 		try {
-			if ($cheerpjState.reloadJar) {
+			if (true) {  // change the condition to handle the reloading of the jar
 				let headersList = {
 					Accept: '*/*',
 					'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
@@ -82,10 +82,17 @@
 				}
 
 				if($graphical === 'true')
-					cheerpjState.set({ showPopup: true, runJar: true, reloadJar: true });
+					cheerpjState.set({ showPopup: true, runJar: true, reloadJar: false });
 				else
-					cheerpjState.set({ showPopup: false, runJar: true, reloadJar: true });
+					cheerpjState.set({ showPopup: false, runJar: true, reloadJar: false });
 
+				workCompilePopup();
+			} else {
+				if($graphical === 'true')
+					cheerpjState.set({ showPopup: true, runJar: true, reloadJar: false });
+				else
+					cheerpjState.set({ showPopup: false, runJar: true, reloadJar: false });
+				
 				workCompilePopup();
 			}
 		} catch (error) {

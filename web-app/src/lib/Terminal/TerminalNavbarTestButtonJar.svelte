@@ -11,75 +11,80 @@
 
 	async function testCode() {
 		try {
-			$terminalOutput = [...$terminalOutput, 'Testing...'];
+			if (true) { // change the condition to handle the reloading of the jar
+				$terminalOutput = [...$terminalOutput, 'Testing...'];
 
-			let headersList = {
-				Accept: '*/*',
-				'Content-Type': 'application/json',
-				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
-				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
-			};
+				let headersList = {
+					Accept: '*/*',
+					'Content-Type': 'application/json',
+					'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+					'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+				};
 
-			const user = await getUserInformations();
+				const user = await getUserInformations();
 
-			if (!user) {
-				showLoginPopup();
-				return;
-			}
-
-			let username = user.uniqueName.split('@')[0].replace('.', '-');
-
-			// API call to compile the code and get the API response
-			let compilationResponse = await fetch(
-				`${apiUrl}/api/compileAndTest?projectPath=${projectPath}/${username}/${$openedArchive.name}`,
-				{
-					method: 'GET',
-					headers: headersList
-				}
-			);
-			if (isResponseOk(compilationResponse)) {
-				if (compilationResponse.headers.get('Content-Type') !== 'application/octet-stream') {
-					let compilationResult = await compilationResponse.text();
-					$terminalOutput = [...$terminalOutput, compilationResult.split('\n')[0]];
-					let errors = parseCompilationErrors(compilationResult);
-					let newProblems = [];
-					errors.forEach((error) => {
-						const buttonTag = `<button class="terminal-link-button" data-filepath="${error.filePath}" data-linenumber="${error.lineNumber}">${error.filePath}:${error.lineNumber} error: ${error.errorMessage}</button>`;
-						$terminalOutput = [...$terminalOutput, buttonTag];
-						newProblems.push({
-							message: error.errorMessage,
-							file: error.filePath,
-							line: error.lineNumber,
-							codeSnippet: error.codeSnippet
-						});
-					});
-					problems.set(newProblems);
-					workCompileErrorPopup();
+				if (!user) {
+					showLoginPopup();
 					return;
 				}
 
-				// The Jar File to be executed
-				let compilationResult = await compilationResponse.blob();
+				let username = user.uniqueName.split('@')[0].replace('.', '-');
 
-				// Create a new FileReader object
-				let reader = new FileReader();
+				// API call to compile the code and get the API response
+				let compilationResponse = await fetch(
+					`${apiUrl}/api/compileAndTest?projectPath=${projectPath}/${username}/${$openedArchive.name}`,
+					{
+						method: 'GET',
+						headers: headersList
+					}
+				);
+				if (isResponseOk(compilationResponse)) {
+					if (compilationResponse.headers.get('Content-Type') !== 'application/octet-stream') {
+						let compilationResult = await compilationResponse.text();
+						$terminalOutput = [...$terminalOutput, compilationResult.split('\n')[0]];
+						let errors = parseCompilationErrors(compilationResult);
+						let newProblems = [];
+						errors.forEach((error) => {
+							const buttonTag = `<button class="terminal-link-button" data-filepath="${error.filePath}" data-linenumber="${error.lineNumber}">${error.filePath}:${error.lineNumber} error: ${error.errorMessage}</button>`;
+							$terminalOutput = [...$terminalOutput, buttonTag];
+							newProblems.push({
+								message: error.errorMessage,
+								file: error.filePath,
+								line: error.lineNumber,
+								codeSnippet: error.codeSnippet
+							});
+						});
+						problems.set(newProblems);
+						workCompileErrorPopup();
+						return;
+					}
 
-				// Define a function to be run when the FileReader has finished reading the Blob
-				reader.onloadend = function () {
-					// The result of reading the Blob is available as an ArrayBuffer in reader.result
-					let arrayBuffer = reader.result;
+					// The Jar File to be executed
+					let compilationResult = await compilationResponse.blob();
 
-					// Convert the ArrayBuffer to a Uint8Array
-					let uint8Array = new Uint8Array(arrayBuffer);
+					// Create a new FileReader object
+					let reader = new FileReader();
 
-					// Now you can call cheerpjAddStringFile with the Uint8Array
-					cheerpOSAddStringFile('/str/application.jar', uint8Array);
-				};
+					// Define a function to be run when the FileReader has finished reading the Blob
+					reader.onloadend = function () {
+						// The result of reading the Blob is available as an ArrayBuffer in reader.result
+						let arrayBuffer = reader.result;
 
-				reader.readAsArrayBuffer(compilationResult);
+						// Convert the ArrayBuffer to a Uint8Array
+						let uint8Array = new Uint8Array(arrayBuffer);
 
-				cheerpjState.set({ showPopup: false, runJar: true, reloadJar: true });
+						// Now you can call cheerpjAddStringFile with the Uint8Array
+						cheerpOSAddStringFile('/str/applicationTest.jar', uint8Array);
+					};
 
+					reader.readAsArrayBuffer(compilationResult);
+
+					cheerpjState.set({ showPopup: false, runJar: false, runTestJar: true, reloadTestJar: false });
+
+					workTestPopup();
+				}
+			} else {
+				cheerpjState.set({ showPopup: false, runJar: false, runTestJar: true, reloadTestJar: false });
 				workTestPopup();
 			}
 		} catch (error) {

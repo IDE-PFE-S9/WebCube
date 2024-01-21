@@ -68,8 +68,6 @@
 			const timeElapsedInMilliseconds = now - $dateOpened;
 			const timeElapsedInMinutes = Math.floor(timeElapsedInMilliseconds / 60000);
 			
-			console.log(timeElapsedInMinutes)
-
 			await fetch(`${apiUrl}/api/tp/timeElapsed/${$tpId}`, {
 				method: 'PUT',
 				headers: headersList2,
@@ -106,6 +104,7 @@
 			}
 
 			$cheerpjState.reloadJar = true; 
+			$cheerpjState.reloadTestJar = true; 
 
 			workSavePopup();
 		} catch (error) {

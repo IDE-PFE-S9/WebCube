@@ -43,7 +43,10 @@ export const cheerpjState = writable({
     showPopup: false,
     runJar: false,
     reloadJar: true,
+    runTestJar: false,
+    reloadTestJar: true,
 });
+
 export const cheerpjWidth = writable(500)
 export const cheerpjHeight = writable(400)
 export const graphical = writable(false)
