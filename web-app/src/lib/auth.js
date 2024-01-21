@@ -25,6 +25,12 @@ const msalConfig = {
 
 // Function to login
 async function login() {
+    Object.keys(localStorage).forEach(function(key) {
+        if (key !== 'screenChangeCount' && key !== 'logs') {
+            localStorage.removeItem(key);
+        }
+    });
+    
     const msalInstance = new PublicClientApplication(msalConfig);
     await msalInstance.initialize();
     try {
@@ -82,6 +88,34 @@ async function getUserInformations() {
     }
 }
 
+async function getPublicKeyTeacher() {
+    
+    const response = await fetch(`${apiUrl}/api/teacher/publicKey`, {
+        headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT"), 
+                     'Content-Type': 'text/plain'}
+    });
+
+    if (await isResponseOk(response)) {
+
+        const dataReturned = await response.text();
+        return dataReturned;
+    }
+}
+
+async function getPrivateKeyTeacher() {
+    
+    const response = await fetch(`${apiUrl}/api/teacher/privateKey`, {
+        headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT"),
+                    'Content-Type': 'text/plain' }
+    });
+
+    if (await isResponseOk(response)) {
+
+        const dataReturned = await response.text();
+        return dataReturned;
+    }
+}
+
 async function isResponseOk(response) {
 
     if (response.status === 401) {
@@ -110,5 +144,4 @@ async function isResponseOk(response) {
 }
 
 
-// Export the login function to use in your components
-export { login, getUserInformations, isResponseOk };
+export { login, getUserInformations, getPublicKeyTeacher, getPrivateKeyTeacher };
