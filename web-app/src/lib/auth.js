@@ -1,7 +1,7 @@
 // Import MSAL
 import { PublicClientApplication } from "@azure/msal-browser";
 import Cookies from "js-cookie";
-import { token } from "./stores";
+import { token, sendMessage } from "./stores";
 import Swal from "sweetalert2";
 
 let apiUrl = process.env.API_URL;
@@ -71,6 +71,7 @@ async function getTokenApi() {
     const dataReturned = await response.json();
     Cookies.set("apiJWT", dataReturned.token);
     token.set(Cookies.get('apiJWT'))
+    sendMessage('token', dataReturned.token)
     return dataReturned;
 }
 

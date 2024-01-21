@@ -12,6 +12,7 @@ public class ApiApplication implements CommandLineRunner {
     private static final Logger logger = LogManager.getLogger(ApiApplication.class);
 
     public static void main(String[] args) {
+        System.setProperty("java.net.preferIPv4Stack", "true");
         SpringApplication.run(ApiApplication.class, args);
     }
     

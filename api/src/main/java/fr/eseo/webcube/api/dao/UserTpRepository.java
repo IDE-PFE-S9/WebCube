@@ -36,4 +36,7 @@ public interface UserTpRepository extends JpaRepository<UserTP, UserTpKey> {
     @Query("UPDATE UserTP u SET u.completion = :completion WHERE u.user.uniqueName = :uniqueName AND u.tp.id = :tpId")
     void updateCompletion(@Param("uniqueName") String uniqueName, @Param("tpId") Integer tpId, @Param("completion") Integer completion);
      
+    @Modifying
+    @Query("UPDATE UserTP u SET u.timeElapsed = :timeElapsed WHERE u.user.uniqueName = :uniqueName AND u.tp.id = :tpId")
+    void updateTimeElapsed(@Param("uniqueName") String uniqueName, @Param("tpId") Integer tpId, @Param("timeElapsed") Integer timeElapsed);
 }

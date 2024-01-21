@@ -5,24 +5,47 @@
 		cheerpjState,
 		cheerpjWidth,
 		cheerpjHeight,
-		openedArchive
+		openedArchive, 
+		tpId
 	} from '$lib/stores.js';
+	import Cookies from 'js-cookie';
+	let apiUrl = process.env.API_URL;
 
 	let previousContent = '';
 	let iframe;
 
+	let headersList = {
+				Accept: '*/*',
+				'Content-Type': 'application/json',
+				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+			};
+
 	const stopExecution = () => {
-		cheerpjState.set({ showPopup: true, runJar: false, reloadJar: false });
+		cheerpjState.set({ showPopup: false, runJar: false, reloadJar: false });
 		$terminalOutput = [...$terminalOutput, `Process terminated by the user`];
 		popup.style.display = 'none';
 	};
+
+	const countOccurrences = (str, subStr) => {
+		const matches = str.match(new RegExp(subStr, 'g'));
+		return matches ? matches.length : 0;
+	}
+
+	const removeBeforeLastOccurrence = (str, phrase) => {
+		const lastIndex = str.lastIndexOf(phrase);
+		if (lastIndex === -1) {
+			return str; // phrase not found, return original string
+		}
+		return str.substring(lastIndex);
+	}
 
 	onMount(async () => {
 		await cheerpjInit();
 		let popup = document.getElementById('popup');
 
 		// run the code when the button is pressed in another component
-		cheerpjState.subscribe(({ showPopup, runJar }) => {
+		cheerpjState.subscribe(({ showPopup, runJar, runTestJar }) => {
 			if (showPopup) {
 				popup.style.display = 'flex';
 			}
@@ -34,7 +57,32 @@
 					const exitCode = await cheerpjRunJar('/str/application.jar');
 					$terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
 					console.log('Program exited with code', exitCode);
+					cheerpjState.set({ showPopup: false, runJar: false, reloadJar: false });
 				};
+			} else if (runTestJar) {
+				iframe.src = 'about:blank';
+				iframe.onload = async () => {
+					const iframeWindow = iframe.contentWindow;
+					cheerpjCreateDisplay(-1, -1, iframeWindow.document.body);
+					const exitCode = await cheerpjRunJar('/str/applicationTest.jar');
+					$terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
+					console.log('Program exited with code', exitCode);
+					let terminalContent = $terminalOutput.join('\n');
+					let terminalContent2 = removeBeforeLastOccurrence(terminalContent, "Test Results:");
+					let nbSuccess = countOccurrences(terminalContent2, "Result: SUCCESSFUL");
+					let nbFailure = countOccurrences(terminalContent2, "Result: FAILED");
+					let completion = Math.round((nbSuccess / (nbSuccess+nbFailure)) * 100);
+					async function updateCompletion() {
+						console.log(completion);
+						await fetch(`${apiUrl}/api/tp/myCompletion/${$tpId}`, {
+							method: 'PUT',
+							headers: headersList,
+							body: JSON.stringify(completion)
+						});
+					}
+					updateCompletion();
+					cheerpjState.set({ showPopup: false, runTestJar: false, reloadTestJar: false });
+				}
 			}
 		});
 
@@ -64,6 +112,19 @@
 							}
 						}
 					});
+				// } else if (newContent.startsWith("Test Results:") || newContent.startsWith("   Stack Trace:")) {
+				// 	let lines = newContent.split('\n')
+				// 	console.log(lines)
+				// 	lines.forEach((line) => {
+				// 		if (line.startsWith('\tat')) {
+				// 			let error = parseLineError(line, $openedArchive);
+				// 			console.log(error)
+				// 			const buttonTag = `<button class="terminal-link-button" data-filepath="${error.filePath}" data-linenumber="${error.lineNumber}">${error.fullLogLine}</button>`;
+				// 			$terminalOutput = [...$terminalOutput, buttonTag];
+				// 		} else {
+				// 			$terminalOutput = [...$terminalOutput, line];
+				// 		}
+				// 	});
 				} else {
 					terminalOutput.update((output) => [...output, newContent]);
 				}
@@ -77,6 +138,36 @@
 			observer.disconnect();
 		};
 	});
+
+	function parseLineError(line, projectStructure) {
+		const regex = /at ([\w.]+)\((?:([\w.]+):(\d+)|Unknown Source)\)/;
+		const match = line.match(regex);
+		if (match) {
+			console.log("match")
+			const fullyQualifiedMethodName = match[1];
+			const fileName = match[2];
+			const lineNumber = match[3] ? parseInt(match[3], 10) : null;
+			const fullLogLine = match[0];
+
+			let filePath = null;
+			if (fileName !== 'Unknown Source') {
+				// Extract class path from the fully qualified method name
+				const classPath = fullyQualifiedMethodName.substring(
+					0,
+					fullyQualifiedMethodName.lastIndexOf('.')
+				);
+				// Resolve the full file path from the class path
+				filePath = resolveFilePath(classPath, projectStructure);
+
+				if (filePath) {
+					filePath = filePath.slice(1);
+				}
+			}
+
+			// Include the full log line in the return object
+			return { filePath, lineNumber, fullLogLine };
+		};
+	}
 
 	function parseRunningErrors(stackTrace, projectStructure) {
 		const lines = stackTrace.split('\n');

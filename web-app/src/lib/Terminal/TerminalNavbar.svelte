@@ -2,7 +2,7 @@
 	import TerminalNavItem from './TerminalNavItem.svelte';
 	import { terminalNavbarActiveItem, terminalOutput, archiveMode } from '$lib/stores.js';
 	import TerminalNavbarClearButton from './TerminalNavbarClearButton.svelte';
-	import TerminalNavbarTestButton from './TerminalNavbarTestButton.svelte';
+	import TerminalNavbarTestButton from './TerminalNavbarTestButtonJar.svelte';
 	import TerminalNavbarSaveButton from './TerminalNavbarSaveButton.svelte';
 	import TerminalNavbarRunButton from './TerminalNavbarRunButton.svelte';
 	import TerminalNavbarDownloadArchiveButton from './TerminalNavbarDownloadArchiveButton.svelte';

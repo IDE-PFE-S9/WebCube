@@ -1,5 +1,5 @@
 <script>
-	import { openedCodes, openedArchive, cheerpjState } from '$lib/stores.js';
+	import { openedCodes, openedArchive, cheerpjState, tpId, dateOpened } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
 	import { workSavePopup, workSaveErrorPopup } from '/src/lib/PopUps/popup.js';
 	import JSZip from 'jszip';
@@ -58,6 +58,22 @@
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
+			let headersList2 = {
+				Accept: '*/*',
+				'Content-Type': 'application/json',
+				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+			};
+
+			const now = new Date();
+			const timeElapsedInMilliseconds = now - $dateOpened;
+			const timeElapsedInMinutes = Math.floor(timeElapsedInMilliseconds / 60000);
+			
+			await fetch(`${apiUrl}/api/tp/timeElapsed/${$tpId}`, {
+				method: 'PUT',
+				headers: headersList2,
+				body: JSON.stringify(timeElapsedInMinutes)
+			});
+
 			const user = await getUserInformations();
 
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
@@ -88,6 +104,7 @@
 			}
 
 			$cheerpjState.reloadJar = true; 
+			$cheerpjState.reloadTestJar = true; 
 
 			workSavePopup();
 		} catch (error) {
