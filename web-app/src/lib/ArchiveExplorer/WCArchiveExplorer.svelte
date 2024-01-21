@@ -153,7 +153,6 @@
 			archiveMode.set(true);
 
 			openLocalFilePopup();
-
 		} catch (err) {
 			console.error('Error reading file:', err);
 		}

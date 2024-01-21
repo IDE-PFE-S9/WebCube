@@ -42,6 +42,7 @@ public class ApplicationSecurity {
                 .antMatchers("/api/auth").permitAll() // Endpoint public accessible sans authentification
                 //.antMatchers("/**").permitAll()
                 .antMatchers("/ws/**").permitAll()
+                .antMatchers("/api/tp").permitAll()
                 .anyRequest().authenticated();
 
         http

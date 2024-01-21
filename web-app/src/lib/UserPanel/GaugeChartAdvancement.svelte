@@ -37,6 +37,8 @@
 				}
 				percentage = somme / occurence;
 			}
+		} else {
+			percentage = completions;
 		}
 
 		color = 'rgb(52,120,198)';

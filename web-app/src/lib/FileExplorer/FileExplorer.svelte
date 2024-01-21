@@ -8,7 +8,6 @@
 		try {
 			const directoryHandle = await window.showDirectoryPicker();
 			const directoryStructure = await listFilesRecursive(directoryHandle);
-			// console.log(JSON.stringify(directoryStructure, null, 2));
 			directoryObject = directoryStructure;
 		} catch (error) {
 			console.error('Error:', error);

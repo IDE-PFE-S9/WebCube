@@ -3,45 +3,70 @@
 
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
-	import { openedArchive, archiveMode, currentTab, graphical, tpId } from '$lib/stores.js';
+	import {
+		openedArchive,
+		archiveMode,
+		currentTab,
+		graphical,
+		tpId,
+		openedArchiveTabs,
+		openedCodes,
+		selectedArchiveFile,
+		cheerpjState,
+		problems,
+		terminalOutput,
+		markdownMode, 
+		editorUpdateTrigger
+	} from '$lib/stores.js';
+	import { isResponseOk } from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 
-	let headersList = {
-		Accept: '*/*',
-		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
-		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
-	};
-
 	const getArchive = async () => {
-		console.log(headersList);
-
+		let headersList = {
+			Accept: '*/*',
+			'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
+			'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+		};
 		let archiveResponse = await fetch(`${apiUrl}/api/tp/archive/${tp.id}`, {
 			method: 'GET',
 			headers: headersList
 		});
+		if (isResponseOk(archiveResponse)) {
+			let archive = await archiveResponse.blob();
 
-		let archive = await archiveResponse.blob();
+			let archiveStructure = await handleArchive(archive);
 
-		let archiveStructure = await handleArchive(archive);
+			console.log(archiveStructure);
 
-		console.log(archiveStructure);
+			const xmlDescriptorString = findDescriptor(archiveStructure);
 
-		const xmlDescriptorString = findDescriptor(archiveStructure);
+			const parsedXml = parseXml(xmlDescriptorString);
 
-		const parsedXml = parseXml(xmlDescriptorString);
+			updateFromDescriptor(archiveStructure, parsedXml.documentElement);
 
-		updateFromDescriptor(archiveStructure, parsedXml.documentElement);
+			sortDirectoryStructure(archiveStructure);
 
-		sortDirectoryStructure(archiveStructure);
+			openedArchive.set(archiveStructure);
+			archiveMode.set(true);
 
-		openedArchive.set(archiveStructure);
-		archiveMode.set(true);
+			console.log($openedArchive);
 
-		console.log($openedArchive);
-
-		tpId.set(tp.id);
-		currentTab.set('Archive');
+			tpId.set(tp.id);
+			currentTab.set('Archive');
+			openedArchiveTabs.set([]);
+			selectedArchiveFile.set(null);
+			cheerpjState.set({
+				showPopup: false,
+				runJar: false,
+				reloadJar: true
+			});
+			problems.set([]);
+			terminalOutput.set([]);
+			markdownMode.set(false);
+			openedCodes.set([]);
+			editorUpdateTrigger.set(null);
+		}
 	};
 
 	async function handleArchive(file) {
@@ -117,13 +142,17 @@
 				if (descriptor) return descriptor;
 			}
 		}
-		return null
+		return null;
 	}
 
 	function parseXml(xml) {
 		const parser = new DOMParser();
 		const xmlDoc = parser.parseFromString(xml, 'application/xml');
-		graphical.set(xmlDoc.documentElement.getElementsByTagName('Parameters')[0].attributes.getNamedItem("graphical").value);
+		graphical.set(
+			xmlDoc.documentElement
+				.getElementsByTagName('Parameters')[0]
+				.attributes.getNamedItem('graphical').value
+		);
 		// TODO: ADD USER SIGNATURE
 		return xmlDoc;
 	}
@@ -144,7 +173,6 @@
 						const xmlFolders = Array.from(xmlChild.getElementsByTagName('Folder'));
 						const xmlFiles = Array.from(xmlChild.getElementsByTagName('File'));
 
-
 						const directXmlFolders = xmlFolders.filter((folder) => folder.parentNode === xmlChild);
 						const directXmlFiles = xmlFiles.filter((file) => file.parentNode === xmlChild);
 
@@ -156,7 +184,7 @@
 
 		const rootFolders = Array.from(xmlElement.getElementsByTagName('Folder'));
 		const rootFiles = Array.from(xmlElement.getElementsByTagName('File'));
-		
+
 		const directRootFolders = rootFolders.filter((folder) => folder.parentNode === xmlElement);
 		const directRootFiles = rootFiles.filter((file) => file.parentNode === xmlElement);
 

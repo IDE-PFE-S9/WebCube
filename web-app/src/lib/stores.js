@@ -13,6 +13,7 @@ export const openedTabs = writable([]);
 // terminal stores
 export const terminalNavbarActiveItem = writable('Problèmes');
 export const terminalOutput = writable([]);
+export const problems = writable([]);
 
 // user panel stores
 export const adminNavbarActiveItem = writable('Général');
@@ -21,6 +22,8 @@ export const adminNavbarActiveItem = writable('Général');
 export const editorUpdateTrigger = writable(null);
 export const readOnly = writable(false);
 export const markdownMode = writable(false);
+export const goToLineTrigger = writable({ file: null, line: null });
+export const goToLineColumnTrigger = writable({ file: null, line: null, column: null });
 
 // archive explorer stores
 export const archiveMode = writable(false);

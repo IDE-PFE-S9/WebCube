@@ -1,6 +1,12 @@
 <script>
 	import { onMount } from 'svelte';
-	import { terminalOutput, cheerpjState, cheerpjWidth, cheerpjHeight } from '$lib/stores.js';
+	import {
+		terminalOutput,
+		cheerpjState,
+		cheerpjWidth,
+		cheerpjHeight,
+		openedArchive
+	} from '$lib/stores.js';
 
 	let previousContent = '';
 	let iframe;
@@ -19,15 +25,16 @@
 		cheerpjState.subscribe(({ showPopup, runJar }) => {
 			if (showPopup) {
 				popup.style.display = 'flex';
-				if (runJar) {
-					iframe.src = 'about:blank';
-					iframe.onload = async () => {
-						const iframeWindow = iframe.contentWindow;
-						cheerpjCreateDisplay(-1, -1, iframeWindow.document.body);
-						const exitCode = await cheerpjRunJar('/str/application.jar');
-						$terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
-					};
-				}
+			}
+			if (runJar) {
+				iframe.src = 'about:blank';
+				iframe.onload = async () => {
+					const iframeWindow = iframe.contentWindow;
+					cheerpjCreateDisplay(-1, -1, iframeWindow.document.body);
+					const exitCode = await cheerpjRunJar('/str/application.jar');
+					$terminalOutput = [...$terminalOutput, `Program exited with code ${exitCode}`];
+					console.log('Program exited with code', exitCode);
+				};
 			}
 		});
 
@@ -37,7 +44,29 @@
 			let currentContent = consoleElement.innerText;
 			let newContent = currentContent.replace(previousContent, '');
 			if (newContent) {
-				terminalOutput.update((output) => [...output, newContent]);
+				if (newContent.startsWith('Exception')) {
+					let errors = parseRunningErrors(newContent, $openedArchive);
+					$terminalOutput = [...$terminalOutput, newContent.split('\n')[0]];
+					errors.frames.forEach((frame) => {
+						if (frame.filePath === null) {
+							const buttonTag = `${frame.fullLogLine}`;
+							$terminalOutput = [...$terminalOutput, buttonTag];
+						} else {
+							if (frame.lineNumber === null) {
+								frame.lineNumber = 1;
+								const buttonTag = `<button class="terminal-link-button" data-filepath="${
+									frame.filePath
+								}" data-linenumber="${frame.lineNumber}">${frame.fullLogLine}</button>`;
+								$terminalOutput = [...$terminalOutput, buttonTag];
+							} else {
+								const buttonTag = `<button class="terminal-link-button" data-filepath="${frame.filePath}" data-linenumber="${frame.lineNumber}">${frame.fullLogLine}</button>`;
+								$terminalOutput = [...$terminalOutput, buttonTag];
+							}
+						}
+					});
+				} else {
+					terminalOutput.update((output) => [...output, newContent]);
+				}
 			}
 			previousContent = currentContent;
 		});
@@ -48,6 +77,85 @@
 			observer.disconnect();
 		};
 	});
+
+	function parseRunningErrors(stackTrace, projectStructure) {
+		const lines = stackTrace.split('\n');
+		let parsedStackTrace = {
+			exception: null,
+			frames: []
+		};
+
+		if (lines.length > 0) {
+			// Parse the first line for the exception message
+			parsedStackTrace.exception = lines[0].trim();
+
+			// Regular expression to match the stack frame lines, making file and line optional
+			const frameRegex = /at ([\w.]+)\((?:([\w.]+):(\d+)|Unknown Source)\)/;
+
+			for (const line of lines) {
+				const match = line.match(frameRegex);
+				if (match) {
+					const fullyQualifiedMethodName = match[1];
+					const fileName = match[2];
+					const lineNumber = match[3] ? parseInt(match[3], 10) : null;
+					const fullLogLine = match[0];
+
+					let filePath = null;
+					if (fileName !== 'Unknown Source') {
+						// Extract class path from the fully qualified method name
+						const classPath = fullyQualifiedMethodName.substring(
+							0,
+							fullyQualifiedMethodName.lastIndexOf('.')
+						);
+						// Resolve the full file path from the class path
+						filePath = resolveFilePath(classPath, projectStructure);
+
+						if (filePath) {
+							filePath = filePath.slice(1);
+						}
+					}
+
+					parsedStackTrace.frames.push({
+						methodName: fullyQualifiedMethodName,
+						filePath,
+						lineNumber,
+						fullLogLine
+					});
+				}
+			}
+		}
+
+		return parsedStackTrace;
+	}
+
+	function resolveFilePath(classPath, projectStructure) {
+		// Convert classPath to a relative file path
+		let relativePath = classPath.replace(/\./g, '/') + '.java';
+
+		// Logic to match relativePath with actual file path in projectStructure
+		return findFilePathInStructure(relativePath, projectStructure);
+	}
+
+	function findFilePathInStructure(relativePath, structure, currentPath = '') {
+		if (structure.type === 'file' && structure.name.endsWith(relativePath)) {
+			return currentPath + '/' + structure.name;
+		}
+
+		if (structure.type === 'directory') {
+			let newPath = currentPath;
+			// Check if current directory is part of the relative path
+			if (relativePath.startsWith(structure.name)) {
+				newPath += (newPath ? '/' : '') + structure.name;
+			}
+
+			for (const child of structure.children) {
+				const result = findFilePathInStructure(relativePath, child, newPath);
+				if (result) return result;
+			}
+		}
+
+		return null;
+	}
 </script>
 
 <div id="popup">
@@ -89,33 +197,32 @@
 		}
 
 		button {
-			// Style adjustments to make it look like a macOS close button
 			align-self: flex-start;
-			display: flex; // Use flexbox to center content
-			justify-content: center; // Center horizontally
-			align-items: center; // Center vertically
-			width: 16px; // Adjusted for better usability
-			height: 16px; // Adjusted for better usability
-			border-radius: 50%; // Circular shape
-			border: none; // No border
-			background-color: #ff3b30; // Red background
-			padding: 0; // Remove padding
-			padding-top: 1px; // Remove padding
-			cursor: pointer; // Cursor pointer to indicate it's clickable
-			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); // Optional: adds a subtle shadow
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			border: none;
+			background-color: #ff3b30;
+			padding: 0;
+			padding-top: 1px;
+			cursor: pointer;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 
 			svg {
-				width: 12px; // Size of the SVG icon
-				height: 12px; // Size of the SVG icon
-				fill: black; // Color of the SVG icon
+				width: 12px;
+				height: 12px;
+				fill: black;
 			}
 
 			&:hover {
-				background-color: darken(#ff3b30, 10%); // Darker red when hovered
+				background-color: darken(#ff3b30, 10%);
 			}
 
 			&:active {
-				background-color: darken(#ff3b30, 20%); // Even darker red when clicked
+				background-color: darken(#ff3b30, 20%);
 			}
 		}
 	}
