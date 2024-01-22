@@ -34,6 +34,8 @@
 	"dependencies": {
 		"@azure/msal-browser": "^3.5.0",
 		"antlr4": "4.13.1-patch-1",
+		"crypto-js": "^4.2.0",
+		"hybrid-crypto-js": "^0.2.4",
 		"js-cookie": "^3.0.5",
 		"jszip": "^3.10.1",
 		"mermaid": "^10.6.1",

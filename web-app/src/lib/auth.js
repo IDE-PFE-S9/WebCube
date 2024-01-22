@@ -145,4 +145,4 @@ async function isResponseOk(response) {
 }
 
 
-export { login, getUserInformations, getPublicKeyTeacher, getPrivateKeyTeacher };
+export { login, isResponseOk, getUserInformations, getPublicKeyTeacher, getPrivateKeyTeacher };
