@@ -2,13 +2,12 @@
 	import { terminalOutput, openedArchive, cheerpjState, graphical, problems } from '$lib/stores.js';
 	import RunIcon from '../assets/TerminalNavbarIcons/RunIcon.svelte';
 	import Cookies from 'js-cookie';
-	import { getUserInformations } from '$lib/auth.js';
+	import { getUserInformations, isResponseOk } from '$lib/auth.js';
 	import {
 		workCompilePopup,
 		workCompileErrorPopup,
 		showLoginPopup
 	} from '/src/lib/PopUps/popup.js';
-	import { isResponseOk } from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 	let projectPath = process.env.PROJECT_PATH;
