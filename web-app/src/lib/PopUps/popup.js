@@ -87,6 +87,13 @@ export function workCompileErrorPopup() {
     });
 }
 
+export function nothingCompiled() {
+    Toast.fire({
+        icon: "error",
+        title: "Vous devez d'abord compiler votre code"
+    });
+}
+
 export function workTestErrorPopup() {
     Toast.fire({
         icon: "error",

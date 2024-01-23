@@ -40,6 +40,14 @@
 		return str.substring(lastIndex);
 	}
 
+	const updateTestingHistory = (completion) => {
+		$openedArchive.children.forEach((child) => {
+			if (child.name.endsWith('testingHistory.csv')) {
+				child.data = `${child.data}\n${new Date().toISOString()},${completion}`;
+			}
+		});
+	}
+
 	onMount(async () => {
 		await cheerpjInit();
 		let popup = document.getElementById('popup');
@@ -79,6 +87,7 @@
 							headers: headersList,
 							body: JSON.stringify(completion)
 						});
+						updateTestingHistory(completion);
 					}
 					updateCompletion();
 					cheerpjState.set({ showPopup: false, runTestJar: false, reloadTestJar: false });
