@@ -104,6 +104,10 @@
 
 		for (const [path, file] of Object.entries(loadedZip.files)) {
 			const isDir = file.dir;
+
+			// if (path === 'encryptedKey') {
+			// 	continue;
+			// }	
 			// Check the file extension to determine how to read the content
 			if (isDir) {
 				addToStructure(rootDirectory, path, isDir, '');
@@ -150,6 +154,7 @@
 			sortDirectoryStructure(archiveStructure);
 
 			openedArchive.set(archiveStructure);
+			console.log(archiveStructure)
 			archiveMode.set(true);
 
 			openLocalFilePopup();

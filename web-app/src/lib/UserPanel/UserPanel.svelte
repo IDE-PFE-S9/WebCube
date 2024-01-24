@@ -9,10 +9,10 @@
     import PageExamenPanel from './PageExamenPanel.svelte';
     import PageAvancementTeacherPanel from './PageAvancementTeacherPanel.svelte';
     import PageAvancementStudentPanel from './PageAvancementStudentPanel.svelte';
-    import PageAutresPanel from './PageAutresPanel.svelte';
     import ExamenPanelStudent from './ExamenPanelStudent.svelte';
+    import PageImportPanel from './PageImportPanel.svelte';
 
-    const navbarItemsTeacher = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Autres' }];
+    const navbarItemsTeacher = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Import' }];
     let navbarItemsStudent;
 
     // Reactive statement to update navbarItemsStudent based on examMode
@@ -22,7 +22,7 @@
         navbarItemsStudent = [{ text: 'Avancement' }];
     }
     let apiUrl = process.env.API_URL;
-    let isTeacher = false;
+    let isTeacher = true;
 
     function manageItemClick(itemText) {
 		adminNavbarActiveItem.set(itemText);

@@ -24,15 +24,19 @@
 			zipFile.file('encryptedKey', encryptedPassword);
 
 			async function createZipFromStructure(structure, parentZip) {
-			for (const item of structure.children) {
-				if (item.type === 'directory') {
-				const folder = parentZip.folder(item.name.split('/').pop());
-				await createZipFromStructure(item, folder);
-				} else if (item.type === 'file') {
-					const encryptedData = CryptoJS.AES.encrypt(item.data, password).toString();
-					parentZip.file(item.name.split('/').pop(), encryptedData);
+				for (const item of structure.children) {
+					if (item.type === 'directory') {
+						const folder = parentZip.folder(item.name.split('/').pop());
+						await createZipFromStructure(item, folder);
+					} else if (item.type === 'file') {
+						try {
+							const encryptedData = CryptoJS.AES.encrypt(item.data, password).toString();
+							parentZip.file(item.name.split('/').pop(), encryptedData);
+						} catch {
+							console.error('Patatra:', item.name);
+						}
+					}
 				}
-			}
 			}
 
 			// Get the current value of the openedArchive store
@@ -75,8 +79,13 @@
 		var rsa = new RSA({
 			entropy: entropy
 		});
-		let encrypted = crypt.encrypt(publicKey, message);
-		return encrypted;
+		try {
+			let encrypted = crypt.encrypt(publicKey, message);
+			console.log('Encrypted:', encrypted);
+			return encrypted;
+		} catch (error) {
+			console.error('Encryption error:', error);
+		}
 	}
 
 </script>
