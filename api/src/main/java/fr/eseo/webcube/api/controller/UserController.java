@@ -1,5 +1,7 @@
 package fr.eseo.webcube.api.controller;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,11 +94,18 @@ public class UserController {
 
     private boolean isMicrosoftTokenValid(String accessToken){
         try{
-            RestTemplate restTemplate = new RestTemplate();
+            // Create a SimpleClientHttpRequestFactory object
+            SimpleClientHttpRequestFactory clientHttpReq = new SimpleClientHttpRequestFactory();
+
+            // Set the proxy
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("192.168.4.8", 3128));
+            clientHttpReq.setProxy(proxy);
+
+            // Initialize RestTemplate with the clientHttpReq
+            RestTemplate restTemplate = new RestTemplate(clientHttpReq);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-
             headers.set("Authorization", accessToken);
 
             HttpEntity<String> entity = new HttpEntity<>(null, headers);

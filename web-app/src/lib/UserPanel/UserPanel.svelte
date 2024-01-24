@@ -11,7 +11,8 @@
     import PageAvancementStudentPanel from './PageAvancementStudentPanel.svelte';
     import PageAutresPanel from './PageAutresPanel.svelte';
 
-    const navbarItems = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Autres' }];
+    const navbarItemsTeacher = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Autres' }];
+    const navbarItemsStudent = [{ text: 'Avancement' }];
     let apiUrl = process.env.API_URL;
     let isTeacher = false;
 
@@ -32,6 +33,7 @@
         userJson.roles.forEach(roles => {
             if(roles.role == 'ROLE_TEACHER'){
                 isTeacher = true;
+                $adminNavbarActiveItem = 'Général';
             }
         });
         
@@ -41,9 +43,15 @@
 <div class="container">
     <div class="navbar">
         <div class="navbar-buttons">
-            {#each navbarItems as { text }}
-                <UserPanelNavItem {text} onClick={() => manageItemClick(text)} />
-            {/each}
+            {#if isTeacher}
+                {#each navbarItemsTeacher as { text }}
+                    <UserPanelNavItem {text} onClick={() => manageItemClick(text)} />
+                {/each}
+            {:else}
+                {#each navbarItemsStudent as { text }}
+                    <UserPanelNavItem {text} onClick={() => manageItemClick(text)} />
+                {/each}
+            {/if}
         </div>
     </div>
 

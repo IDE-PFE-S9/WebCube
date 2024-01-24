@@ -11,12 +11,12 @@ export const openedCodes = writable([]);
 export const openedTabs = writable([]);
 
 // terminal stores
-export const terminalNavbarActiveItem = writable('Problèmes');
+export const terminalNavbarActiveItem = writable('Sortie');
 export const terminalOutput = writable([]);
 export const problems = writable([]);
 
 // user panel stores
-export const adminNavbarActiveItem = writable('Général');
+export const adminNavbarActiveItem = writable('Avancement');
 
 // editor store
 export const editorUpdateTrigger = writable(null);

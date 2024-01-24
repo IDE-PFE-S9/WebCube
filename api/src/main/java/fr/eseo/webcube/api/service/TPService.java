@@ -167,7 +167,8 @@ public class TPService {
 			String firstname = (String) result[1];
 			String surname = (String) result[2];
 			Integer completion = (Integer) result[3];
-			String rolesString = (String) result[4];
+			Integer timeElapsed = (Integer) result[4];
+			String rolesString = (String) result[5];
 
 			// Diviser la chaîne des rôles en utilisant la virgule
 			String[] rolesArray = rolesString.split(",");
@@ -176,7 +177,7 @@ public class TPService {
 			Set<String> rolesSet = new HashSet<>(Arrays.asList(rolesArray));
 
 			// Ajouter l'instance à la liste
-			tpResponseList.add(new TpResponse(uniqueName, firstname, surname, completion, rolesSet));
+			tpResponseList.add(new TpResponse(uniqueName, firstname, surname, completion, timeElapsed, rolesSet));
 		}
 		return tpResponseList;
 	}

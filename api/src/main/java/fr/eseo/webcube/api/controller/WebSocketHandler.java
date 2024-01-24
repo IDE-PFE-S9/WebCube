@@ -153,11 +153,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private String getClientIpAddress(WebSocketSession session) {
-        InetSocketAddress remoteAddress = session.getRemoteAddress();
-        if (remoteAddress != null) {
-            return remoteAddress.getAddress().getHostAddress();
+        String clientIp = session.getHandshakeHeaders().getFirst("X-Real-IP");
+        if (clientIp == null) {
+            clientIp = session.getHandshakeHeaders().getFirst("X-Forwarded-For");
         }
-        return null;
+        return clientIp != null ? clientIp : session.getRemoteAddress().getAddress().getHostAddress();
     }
 
     // Helper method to construct a JSON message

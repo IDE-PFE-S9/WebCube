@@ -9,7 +9,6 @@
 
     <ExamModeToggle />
     <ConnectedUsers />
-    <h2>More Features Coming Soon...</h2>
 </div>
 
 <style lang="scss">

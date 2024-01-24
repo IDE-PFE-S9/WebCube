@@ -1,7 +1,28 @@
 <script>
     import { userDetails } from "../stores";
-    
-    console.log($userDetails);
+  
+    // Function to filter out duplicate username/IP pairs
+    function filterUniqueUserDetails(userDetails) {
+        const unique = new Map();
+        userDetails.forEach(user => {
+            const key = `${user.username}-${user.ip}`;
+            if (!unique.has(key)) {
+                unique.set(key, user);
+            }
+        });
+        return Array.from(unique.values());
+    }
+
+
+    // check for potential frauds
+    function isDuplicateConnection(user, userDetails) {
+        return userDetails.some(otherUser => 
+            (otherUser.username === user.username && otherUser.ip !== user.ip) ||
+            (otherUser.ip === user.ip && otherUser.username !== user.username));
+    }
+
+    // Use a reactive statement to update when userDetails changes
+    $: uniqueUserDetails = filterUniqueUserDetails($userDetails);
 </script>
 
 <h2>Utilisateurs connectés</h2>
@@ -13,11 +34,11 @@
         </tr>
     </thead>
     <tbody>
-        {#each $userDetails as user}
-        <tr>
-            <td>{user.username}</td>
-            <td>{user.ip}</td>
-        </tr>
+        {#each uniqueUserDetails as user}
+            <tr class:is-duplicate={isDuplicateConnection(user, $userDetails)}>
+                <td>{user.username}</td>
+                <td>{user.ip}</td>
+            </tr>
         {/each}
     </tbody>
 </table>

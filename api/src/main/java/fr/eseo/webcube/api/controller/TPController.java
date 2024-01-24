@@ -164,7 +164,8 @@ public class TPController {
     }
 
     @PutMapping("/tp/timeElapsed/{id}")
-    public ResponseEntity<Void> putMethodName(@PathVariable Integer id, @RequestHeader(name = "Authorization-API") String tokenApi, @RequestBody Integer timeElasped) {
+    public ResponseEntity<Void> updateTimeElapsed(@PathVariable Integer id,
+            @RequestHeader(name = "Authorization-API") String tokenApi, @RequestBody Integer timeElasped) {
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
         String uniqueName = claims.get("unique_name").toString();
