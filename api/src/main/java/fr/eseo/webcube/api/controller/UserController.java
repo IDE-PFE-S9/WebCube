@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +29,7 @@ import com.nimbusds.jwt.JWTParser;
 import fr.eseo.webcube.api.Response.UserResponse;
 import fr.eseo.webcube.api.model.Role;
 import fr.eseo.webcube.api.model.User;
+import fr.eseo.webcube.api.request.UpdateRoleRequest;
 import fr.eseo.webcube.api.security.AuthResponse;
 import fr.eseo.webcube.api.security.JwtTokenUtil;
 import fr.eseo.webcube.api.service.UserService;
@@ -43,12 +46,7 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/auth")
-    public ResponseEntity<?> azureAuth(@RequestHeader("Authorization-Azure") String token, HttpServletRequest request) {
-        String realIp = request.getHeader("X-Forwarded-For");
-        if (realIp == null) {
-            realIp = request.getRemoteAddr();
-        }
-        System.out.println("IP: " + realIp);
+    public ResponseEntity<?> azureAuth(@RequestHeader("Authorization-Azure") String token) {
         if (!isMicrosoftTokenValid(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
         }
@@ -102,13 +100,23 @@ public class UserController {
 
             String result = restTemplate.exchange("https://graph.microsoft.com/v1.0/me", HttpMethod.GET,
                     entity, String.class).getBody();
-
             return true;        
         }
         catch (Exception e) {
             System.out.println(e);
             return false;
-        }   
+        }
+    }
+
+    @PutMapping("/update/role")
+    public ResponseEntity<?> updateRoleUser(@RequestHeader(name = "Authorization-API") String tokenApi, 
+                                            @RequestBody UpdateRoleRequest updateRoleRequest) {
+        try {
+            userService.updateRoles(updateRoleRequest.getUniqueName(), updateRoleRequest.getRole());
+            return ResponseEntity.ok().body("Rôles mis à jour");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur lors de la mise à jour des rôles");
+        }
     }
 
 }

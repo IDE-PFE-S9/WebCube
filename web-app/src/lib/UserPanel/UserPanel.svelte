@@ -9,9 +9,9 @@
     import PageExamenPanel from './PageExamenPanel.svelte';
     import PageAvancementTeacherPanel from './PageAvancementTeacherPanel.svelte';
     import PageAvancementStudentPanel from './PageAvancementStudentPanel.svelte';
-    import PageAutresPanel from './PageAutresPanel.svelte';
+    import PageImportPanel from './PageImportPanel.svelte';
 
-    const navbarItems = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Autres' }];
+    const navbarItems = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Import' }];
     let apiUrl = process.env.API_URL;
     let isTeacher = false;
 
@@ -64,8 +64,8 @@
             {/if}
         {/if}
 
-        {#if $adminNavbarActiveItem === 'Autres'}
-            <PageAutresPanel />
+        {#if $adminNavbarActiveItem === 'Import'}
+            <PageImportPanel />
         {/if}
     </div>
 </div>
