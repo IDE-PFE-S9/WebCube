@@ -20,6 +20,7 @@
 		"d3": "^7.8.5",
 		"d3-cloud": "^1.2.7",
 		"d3-sankey": "^0.12.3",
+		"esbuild": "^0.19.11",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte": "^2.30.0",
@@ -33,6 +34,8 @@
 	"dependencies": {
 		"@azure/msal-browser": "^3.5.0",
 		"antlr4": "4.13.1-patch-1",
+		"crypto-js": "^4.2.0",
+		"hybrid-crypto-js": "^0.2.4",
 		"js-cookie": "^3.0.5",
 		"jszip": "^3.10.1",
 		"mermaid": "^10.6.1",

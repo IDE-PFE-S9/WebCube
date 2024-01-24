@@ -43,6 +43,7 @@
 	on:mouseout={handleMouseOut}
 	on:click={handleClick}
 	class:selected={$currentTab === text}
+	id={text}
 >
 	<div class="indicator" class:selected={$currentTab === text} />
 	{#if showText}

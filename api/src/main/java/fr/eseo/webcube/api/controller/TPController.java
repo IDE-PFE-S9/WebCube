@@ -162,4 +162,15 @@ public class TPController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/tp/timeElapsed/{id}")
+    public ResponseEntity<Void> putMethodName(@PathVariable Integer id, @RequestHeader(name = "Authorization-API") String tokenApi, @RequestBody Integer timeElasped) {
+        tokenApi = tokenApi.substring(7);
+        Claims claims = jwtTokenUtil.parseClaims(tokenApi);
+        String uniqueName = claims.get("unique_name").toString();
+
+        tpService.updateTimeElapsed(uniqueName, id, timeElasped);
+
+        return ResponseEntity.noContent().build();
+    }
 }

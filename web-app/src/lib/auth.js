@@ -1,7 +1,7 @@
 // Import MSAL
 import { PublicClientApplication } from "@azure/msal-browser";
 import Cookies from "js-cookie";
-import { token } from "./stores";
+import { token, sendMessage } from "./stores";
 import Swal from "sweetalert2";
 
 let apiUrl = process.env.API_URL;
@@ -25,6 +25,12 @@ const msalConfig = {
 
 // Function to login
 async function login() {
+    Object.keys(localStorage).forEach(function(key) {
+        if (key !== 'screenChangeCount' && key !== 'logs') {
+            localStorage.removeItem(key);
+        }
+    });
+    
     const msalInstance = new PublicClientApplication(msalConfig);
     await msalInstance.initialize();
     try {
@@ -65,6 +71,7 @@ async function getTokenApi() {
     const dataReturned = await response.json();
     Cookies.set("apiJWT", dataReturned.token);
     token.set(Cookies.get('apiJWT'))
+    sendMessage('token', dataReturned.token)
     return dataReturned;
 }
 
@@ -79,6 +86,34 @@ async function getUserInformations() {
         return dataReturned;
     } else {
         return null;
+    }
+}
+
+async function getPublicKeyTeacher() {
+    
+    const response = await fetch(`${apiUrl}/api/teacher/publicKey`, {
+        headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT"), 
+                     'Content-Type': 'text/plain'}
+    });
+
+    if (await isResponseOk(response)) {
+
+        const dataReturned = await response.text();
+        return dataReturned;
+    }
+}
+
+async function getPrivateKeyTeacher() {
+    
+    const response = await fetch(`${apiUrl}/api/teacher/privateKey`, {
+        headers: { 'Authorization-API': 'Bearer ' + Cookies.get("apiJWT"),
+                    'Content-Type': 'text/plain' }
+    });
+
+    if (await isResponseOk(response)) {
+
+        const dataReturned = await response.text();
+        return dataReturned;
     }
 }
 
@@ -110,5 +145,4 @@ async function isResponseOk(response) {
 }
 
 
-// Export the login function to use in your components
-export { login, getUserInformations, isResponseOk };
+export { login, isResponseOk, getUserInformations, getPublicKeyTeacher, getPrivateKeyTeacher };

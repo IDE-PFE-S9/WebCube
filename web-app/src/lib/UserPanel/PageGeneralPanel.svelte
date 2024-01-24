@@ -1,5 +1,6 @@
 <script>
-	import ExamModeToggle from './ExamModeToggle.svelte';
+	import ConnectedUsers from './ConnectedUsers.svelte';
+    import ExamModeToggle from './ExamModeToggle.svelte';
     import UserCount from './UserCount.svelte';
 </script>
 
@@ -7,7 +8,7 @@
     <h1>Dashboard administateur</h1>
 
     <ExamModeToggle />
-    <UserCount />
+    <ConnectedUsers />
     <h2>More Features Coming Soon...</h2>
 </div>
 

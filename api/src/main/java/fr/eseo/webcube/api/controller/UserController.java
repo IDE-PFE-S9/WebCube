@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +47,6 @@ public class UserController {
 
     @GetMapping("/auth")
     public ResponseEntity<?> azureAuth(@RequestHeader("Authorization-Azure") String token) {
-
         if (!isMicrosoftTokenValid(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
         }
@@ -99,9 +100,10 @@ public class UserController {
 
             String result = restTemplate.exchange("https://graph.microsoft.com/v1.0/me", HttpMethod.GET,
                     entity, String.class).getBody();
-
-            return true;
-        } catch (Exception e) {
+            return true;        
+        }
+        catch (Exception e) {
+            System.out.println(e);
             return false;
         }
     }

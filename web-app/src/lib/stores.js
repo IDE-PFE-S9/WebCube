@@ -32,6 +32,7 @@ export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
 export const archiveHandle = writable(null);
 export const tpId = writable(null);
+export const dateOpened = writable(null);
 
 // modelling stores
 export const entitiesList = writable([]);
@@ -42,7 +43,10 @@ export const cheerpjState = writable({
     showPopup: false,
     runJar: false,
     reloadJar: true,
+    runTestJar: false,
+    reloadTestJar: true,
 });
+
 export const cheerpjWidth = writable(500)
 export const cheerpjHeight = writable(400)
 export const graphical = writable(false)
@@ -69,6 +73,8 @@ let socket;
 export const examMode = writable(false);
 export const isConnected = writable(false);
 export const userCount = writable(0);
+export const userDetails = writable({});
+
 
 if (typeof window !== 'undefined') {
     socket = setupWebSocket();
@@ -90,6 +96,7 @@ function setupWebSocket() {
     socket.onopen = () => {
         console.log('WebSocket connection established');
         isConnected.set(true);
+        userDetails.subscribe(value => console.log(value))
     };
 
     socket.onmessage = (event) => {
@@ -100,9 +107,13 @@ function setupWebSocket() {
                 examMode.set(message.data);
                 break;
             case 'userCount':
-                userCount.set(message.data)
+                userCount.set(message.data);
                 break;
-                // Add more cases as needed for different message types
+            case 'userDetails':
+                userDetails.set(message.data);
+                // userDetails.subscribe(value => console.log(value))
+                break;
+            // Add more cases as needed for different message types
         }
     };
 

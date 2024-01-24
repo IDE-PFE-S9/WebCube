@@ -87,6 +87,13 @@ export function workCompileErrorPopup() {
     });
 }
 
+export function nothingCompiled() {
+    Toast.fire({
+        icon: "error",
+        title: "Vous devez d'abord compiler votre code"
+    });
+}
+
 export function workTestErrorPopup() {
     Toast.fire({
         icon: "error",
@@ -98,5 +105,19 @@ export function workTestPopup() {
     Toast.fire({
         icon: "success",
         title: "Code testé !"
+    });
+}
+
+export function openLocalFilePopup() {
+    Toast.fire({
+        icon: "success",
+        title: "Archive ouverte !"
+    });
+}
+
+export function openLocalFileErrorPopup() {
+    Toast.fire({
+        icon: "error",
+        title: "Archive non valide"
     });
 }

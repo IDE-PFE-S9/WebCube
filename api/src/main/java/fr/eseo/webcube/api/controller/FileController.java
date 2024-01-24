@@ -93,7 +93,6 @@ public class FileController {
                 e.printStackTrace();
                 // Handle exceptions
             }
-            System.out.println("yes");
             return "File uploaded and extracted successfully!";
         } catch (IOException e) {
             e.printStackTrace();
