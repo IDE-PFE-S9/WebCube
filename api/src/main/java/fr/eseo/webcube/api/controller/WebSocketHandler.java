@@ -89,15 +89,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
         try {
             JSONObject jsonObject = (JSONObject) parser.parse(payload);
             String type = (String) jsonObject.get("type");
-
             switch (type) {
-                case "userDetails": {
+                case "token": {
                     String token = (String) jsonObject.get("data");
-
                     if (token != null && !token.isEmpty()) {
                         // Extract username from the JWT token
                         String username = extractUsernameFromJwt(token);
-
                         // Update the session details with the username
                         UserSessionDetails details = userSessionDetailsMap.get(session.getId());
                         if (details != null) {
