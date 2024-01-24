@@ -45,8 +45,7 @@ async function login() {
             });
 
             // Use response.accessToken to make your API calls
-            Cookies.set("azureJWT", response.accessToken);
-            await getTokenApi();
+            await getTokenApi(response.accessToken);
             Swal.close();
         }
     } catch (error) {
@@ -54,9 +53,9 @@ async function login() {
     }
 }
 
-async function getTokenApi() {
+async function getTokenApi(azureJWT) {
     const response = await fetch(`${apiUrl}/api/auth`, {
-        headers: { 'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT") }
+        headers: { 'Authorization-Azure': 'Bearer ' + azureJWT }
     });
 
     if (!response.ok) {

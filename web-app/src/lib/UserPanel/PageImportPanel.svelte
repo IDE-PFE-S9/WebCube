@@ -540,5 +540,3 @@ async function update() {
     color: red; // Couleur pour le bouton de suppression
   }
 </style>
-
-

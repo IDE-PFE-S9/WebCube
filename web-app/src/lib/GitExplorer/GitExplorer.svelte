@@ -12,7 +12,6 @@
 	onMount(async () => {
 		let headersList = {
 			Accept: '*/*',
-			'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 			'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 		};
 		const tpResponse = await fetch(`${apiUrl}/api/tp`, {

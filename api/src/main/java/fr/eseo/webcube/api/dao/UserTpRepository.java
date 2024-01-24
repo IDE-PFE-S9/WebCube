@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import fr.eseo.webcube.api.Details.TpDetails;
-import fr.eseo.webcube.api.Response.TpResponse;
 import fr.eseo.webcube.api.model.UserTP;
 import fr.eseo.webcube.api.model.UserTpKey;
 
