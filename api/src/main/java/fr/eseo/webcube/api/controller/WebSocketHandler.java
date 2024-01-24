@@ -86,19 +86,36 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         // Use a JSON parser to parse the payload
         JSONParser parser = new JSONParser();
+
         try {
             JSONObject jsonObject = (JSONObject) parser.parse(payload);
-            String token = (String) jsonObject.get("data");
+            String type = (String) jsonObject.get("type");
 
-            if (token != null && !token.isEmpty()) {
-                // Extract username from the JWT token
-                String username = extractUsernameFromJwt(token);
-                
-                // Update the session details with the username
-                UserSessionDetails details = userSessionDetailsMap.get(session.getId());
-                if (details != null) {
-                    details.setUsername(username); // Make sure setUsername method exists in UserSessionDetails class
-                    broadcastUserDetails(); // Update all clients with the new user details
+            switch (type) {
+                case "userDetails": {
+                    String token = (String) jsonObject.get("data");
+
+                    if (token != null && !token.isEmpty()) {
+                        // Extract username from the JWT token
+                        String username = extractUsernameFromJwt(token);
+
+                        // Update the session details with the username
+                        UserSessionDetails details = userSessionDetailsMap.get(session.getId());
+                        if (details != null) {
+                            details.setUsername(username); // Make sure setUsername method exists in UserSessionDetails class
+                            broadcastUserDetails(); // Update all clients with the new user details
+                        }
+                    }
+                    break;
+                }
+                case "examMode": {
+                    List<String> groups = (List<String>) jsonObject.get("data");
+                    for (WebSocketSession webSocketSession : sessions) {
+                        if (webSocketSession.isOpen()) {
+                            sendMessage(webSocketSession, new TextMessage(constructJsonMessage("examMode", groups)));
+                        }
+                    }
+                    break;
                 }
             }
         } catch (ParseException e) {
@@ -153,11 +170,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private String getClientIpAddress(WebSocketSession session) {
-        InetSocketAddress remoteAddress = session.getRemoteAddress();
-        if (remoteAddress != null) {
-            return remoteAddress.getAddress().getHostAddress();
+        String clientIp = session.getHandshakeHeaders().getFirst("X-Real-IP");
+        if (clientIp == null) {
+            clientIp = session.getHandshakeHeaders().getFirst("X-Forwarded-For");
         }
-        return null;
+        return clientIp != null ? clientIp : session.getRemoteAddress().getAddress().getHostAddress();
     }
 
     // Helper method to construct a JSON message

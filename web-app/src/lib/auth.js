@@ -20,9 +20,6 @@ const msalConfig = {
     },
 };
 
-// Create an instance of PublicClientApplication with the config
-
-
 // Function to login
 async function login() {
     Object.keys(localStorage).forEach(function(key) {
@@ -53,7 +50,7 @@ async function login() {
             Swal.close();
         }
     } catch (error) {
-        console.error(error);
+        console.log(error);
     }
 }
 

@@ -22,6 +22,8 @@ public class TpResponse {
 
     private int completion;
 
+    private int timeElapsed;
+
     private List<TpDetails> tpDetails;
 
     private Set<String> roles;
@@ -50,6 +52,15 @@ public class TpResponse {
         this.firstname = firstname;
         this.surname = surname;
         this.completion = completion;
+        this.roles = roles;
+    }
+
+    public TpResponse(String uniqueName, String firstname, String surname, Integer completion, Integer timeElapsed, Set<String> roles) {
+        this.uniqueName = uniqueName;
+        this.firstname = firstname;
+        this.surname = surname;
+        this.completion = completion;
+        this.timeElapsed = timeElapsed;
         this.roles = roles;
     }
 }

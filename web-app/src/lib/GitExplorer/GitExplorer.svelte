@@ -3,6 +3,7 @@
 	import TpButton from './TpButton.svelte';
 	import {isResponseOk} from '$lib/auth.js';
 	import Cookies from 'js-cookie';
+	import { examMode } from '$lib/stores.js';
 
 	let apiUrl = process.env.API_URL;
 
@@ -19,24 +20,10 @@
 			headers: headersList
 		});
 		if(isResponseOk(tpResponse)) {
-			tpJson = await tpResponse.json();
+			let data = await tpResponse.json();
+			tpJson = data.filter(tp => $examMode ? tp.type === 'examen' : tp.type === 'TP');
 		}
 	});
-
-	// 1 - recuperer la liste de tous les TPs
-	// 2 - les afficher
-	// 3 - utilisateur clique sur un TP
-	// 4 - recuperer le TP
-	// 4.1 - Git clone le TP
-	// 4.2 - créer une archive du TP
-	// 4.3 - envoyer cette archive
-	// 5 - afficher les fichiers du TP dans le treeview
-	// 6 - réaliser le TP
-	// 7 - enregistrer l'archive
-	// 8 - envoyer l'archive
-	// 8.1 - décompresser l'archive
-	// 8.2 - git commit
-	// 8.3 - git push
 </script>
 
 <div class="tp-explorer">
