@@ -20,7 +20,7 @@
 			tpJson = await tpResponse.json();
 			console.log(tpJson)
 			// keep only the TP with type 'TP'
-			tpJson.tpDetails = tpJson.tpDetails.filter(tp => tp.type === 'TP');
+			tpJson.tpDetails = tpJson.tpDetails.filter(tp => tp.type === 'examen');
 		}
 	});
 </script>

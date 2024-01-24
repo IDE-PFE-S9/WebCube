@@ -1,6 +1,6 @@
 <script>
     import UserPanelNavItem from './UserPanelNavItem.svelte';
-    import { adminNavbarActiveItem, terminalOutput, archiveMode } from '$lib/stores.js';
+    import { adminNavbarActiveItem, examMode } from '$lib/stores.js';
 
     import Cookies from 'js-cookie';
     import { onMount } from 'svelte';
@@ -10,9 +10,17 @@
     import PageAvancementTeacherPanel from './PageAvancementTeacherPanel.svelte';
     import PageAvancementStudentPanel from './PageAvancementStudentPanel.svelte';
     import PageAutresPanel from './PageAutresPanel.svelte';
+    import ExamenPanelStudent from './ExamenPanelStudent.svelte';
 
     const navbarItemsTeacher = [{ text: 'Général' }, { text: 'Examen' }, { text: 'Avancement' }, { text: 'Autres' }];
-    const navbarItemsStudent = [{ text: 'Avancement' }];
+    let navbarItemsStudent;
+
+    // Reactive statement to update navbarItemsStudent based on examMode
+    $: if ($examMode) {
+        navbarItemsStudent = [{ text: 'Examen' }];
+    } else {
+        navbarItemsStudent = [{ text: 'Avancement' }];
+    }
     let apiUrl = process.env.API_URL;
     let isTeacher = false;
 
@@ -61,7 +69,11 @@
         {/if}
 
         {#if $adminNavbarActiveItem === 'Examen'}
-            <PageExamenPanel />
+            {#if isTeacher}
+                <PageExamenPanel />
+            {:else}
+                <ExamenPanelStudent />
+            {/if}
         {/if}
 
         {#if $adminNavbarActiveItem === 'Avancement'}

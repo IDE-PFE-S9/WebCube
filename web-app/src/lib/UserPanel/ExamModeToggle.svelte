@@ -1,84 +1,97 @@
 <script>
-	import { sendMessage, examMode } from '../stores'; // Assuming sendExamStatus can toggle the exam mode
+	import { sendMessage, examGroups } from '../stores'; // Assuming sendExamStatus can toggle the exam mode
 	
-	function toggleExamMode() {
-		sendMessage('examMode', $examMode);
+	function toggleExamMode(group) {
+		if ($examGroups.includes(group))
+			$examGroups = $examGroups.filter((g) => g !== group);
+		else if (!$examGroups.includes(group)) {
+			$examGroups = [...$examGroups, group];
+		}
+		sendMessage('examMode', $examGroups);
 	}
+
+	const groups = ['ROLE_GROUP_A', 'ROLE_GROUP_B', 'ROLE_RATTRAPAGE'];
 </script>
 
-<div class="toggle-container">
-	<span class="toggle-label">Mode Examen</span>
-	<label class="toggle-switch">
-		<input type="checkbox" bind:checked={$examMode} on:change={toggleExamMode} />
-		<span class="slider" />
-	</label>
+<div class="config-panel">
+	<h2 id="title">Mode examen</h2>
+	<div class="checkboxes">
+		{#each groups as group}
+			<label class:checked={$examGroups.includes(group)}>
+				<input
+					type="checkbox"
+					checked={$examGroups.includes(group)}
+					on:change={() => toggleExamMode(group)}
+				/>
+				{group.substring(5)}
+			</label>
+		{/each}
+	</div>
 </div>
 
 <style lang="scss">
-	$slider-off-background: #a6a6a6;
-	$slider-on-background: rgb(52, 120, 198);
-	$slider-handle: #ffffff;
-	$slider-handle-shadow: rgba(0, 0, 0, 0.2);
-	$text-color: #ffffff;
+	.config-panel {
 
-	.toggle-container {
-		display: flex;
-		align-items: center;
-		color: $text-color;
-	}
+		h2 {
+			text-align: center;
+			color: white;
+			margin-bottom: 1rem;
+		}
 
-	.toggle-label {
-		margin-right: 10px;
-		font-size: 16px;
-	}
+		.checkboxes {
+			display: flex;
+			flex-direction: row;
+			padding: 1rem;
+			padding-top: 0;
+			padding-bottom: 0;
+			flex-grow: 1;
+			color: white;
+			gap: 20px;
 
-	.toggle-switch {
-		position: relative;
-		display: inline-block;
-		width: 50px;
-		height: 28px;
-	}
+			// Hide the default checkbox
+			input[type='checkbox'] {
+				display: none;
+			}
 
-	.toggle-switch input {
-		opacity: 0;
-		width: 0;
-		height: 0;
-	}
+			// Style the label to look like a button
+			label {
+				display: inline-block;
+				background-color: rgb(52, 52, 52); // Button background color
+				color: white; // Text color
+				cursor: pointer;
+				padding: 0.5rem 1rem;
+				margin-bottom: 0.5rem; // Space between buttons
+				border: none;
+				text-align: center;
+				text-decoration: none;
+				font-size: 1rem;
+				transition: background-color 0.3s ease;
+				border-radius: 5px; // Rounded corners
 
-	.slider {
-		position: absolute;
-		cursor: pointer;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-color: $slider-off-background;
-		transition: 0.4s;
-		border-radius: 28px;
+				// Checkbox checked state styles
+				&.checked {
+					background-color: darken(#3498db, 10%); // Darker background for checked state
 
-		&:before {
-			position: absolute;
-			content: '';
-			height: 24px;
-			width: 24px;
-			left: 2px;
-			bottom: 2px;
-			background-color: $slider-handle;
-			transition: 0.4s;
-			border-radius: 50%;
-			box-shadow: 0 2px 4px $slider-handle-shadow;
+					&:hover {
+						background-color: lighten(#3498db, 10%);
+					}
+				}
+
+				// Hover effect
+				&:hover {
+					background-color: lighten(rgb(52, 52, 52), 10%);
+				}
+			}
+
+			// Visually indicate the checked state when the checkbox is checked
+			input[type='checkbox']:checked + label {
+				background-color: darken(#3498db, 10%);
+				&:after {
+					content: '✓'; // Checkmark symbol
+					padding-left: 0.5rem;
+				}
+			}
 		}
 	}
-
-	input:checked + .slider {
-		background-color: $slider-on-background;
-	}
-
-	input:focus + .slider {
-		box-shadow: 0 0 1px $slider-on-background;
-	}
-
-	input:checked + .slider:before {
-		transform: translateX(22px);
-	}
 </style>
+

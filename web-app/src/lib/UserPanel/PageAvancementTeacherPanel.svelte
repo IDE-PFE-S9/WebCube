@@ -24,9 +24,11 @@
 			}
 		});
 		if (isResponseOk(tpResponse)){
-			console.log(tpResponse);
 			tpJson = await tpResponse.json();
+			// keep only the TP with type 'TP'
+			tpJson = tpJson.filter(tp => tp.type === 'TP');
 			tpJson.sort((a, b) => a.name.localeCompare(b.name));
+			selectedTp = tpJson[0].id;
 		}
 	});
 

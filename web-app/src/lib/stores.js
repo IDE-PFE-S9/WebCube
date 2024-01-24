@@ -1,6 +1,7 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import Cookies from "js-cookie"
+import { getUserInformations } from './auth.js';
 
 let wsUrl = process.env.WS_URL;
 
@@ -60,6 +61,8 @@ export const screenChangeCount = persist('screenChangeCount', 0);
 
 export const logs = persist('logs', [])
 
+export const examGroups = persist('examGroups', [])
+
 // connection
 export const token = writable(checkToken());
 
@@ -84,6 +87,7 @@ if (typeof window !== 'undefined') {
 export function sendMessage(type, data) {
     if (socket && socket.readyState === WebSocket.OPEN) {
         const message = JSON.stringify({ type, data });
+        console.log(message)
         socket.send(message);
     } else {
         console.error('WebSocket is not open.');
@@ -96,15 +100,26 @@ function setupWebSocket() {
     socket.onopen = () => {
         console.log('WebSocket connection established');
         isConnected.set(true);
-        userDetails.subscribe(value => console.log(value))
     };
 
-    socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
+    socket.onmessage = async (event) => {
+        const message = JSON.parse(event.data); 
 
         switch (message.type) {
             case 'examMode':
-                examMode.set(message.data);
+                // get the group of the current user
+                if (Cookies.get('apiJWT')) {
+                    let info = await getUserInformations();
+
+                    const roles = Array.isArray(info.roles) ? info.roles : [info.roles];
+                    console.log(message.data)
+                    console.log(roles)
+                    // Check if at least one role from info.roles is contained in message.data
+                    const isRoleInExamMode = roles.some(role => message.data.includes(role.role));
+                    
+                    // Set examMode accordingly
+                    examMode.set(isRoleInExamMode);
+                }
                 break;
             case 'userCount':
                 userCount.set(message.data);
