@@ -10,7 +10,6 @@
 		const tpResponse = await fetch(`${apiUrl}/api/tp/myCompletion`, {
 			method: 'GET',
 			headers: {
-				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			}
 		});

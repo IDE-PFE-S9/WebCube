@@ -23,7 +23,6 @@
 		const userResponse = await fetch(`${apiUrl}/api/user`, {
 			method: 'GET',
 			headers: {
-				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			}
 		});

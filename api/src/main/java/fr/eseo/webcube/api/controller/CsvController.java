@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +27,7 @@ public class CsvController {
     private CsvService csvService;
 
     @PostMapping("/import")
-    public ResponseEntity<String> importCsv(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> importCsv(@RequestHeader(name = "Authorization-API") String tokenApi, @RequestParam("file") MultipartFile file) {
         try {
             // Vérifier si le fichier a l'extension CSV
             if (!file.getOriginalFilename().endsWith(".csv")) {

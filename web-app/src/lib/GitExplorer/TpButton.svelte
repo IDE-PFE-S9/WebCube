@@ -28,7 +28,6 @@
 
 		let headersList = {
 			Accept: '*/*',
-			'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 			'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 		};
 		let archiveResponse = await fetch(`${apiUrl}/api/tp/archive/${tp.id}`, {

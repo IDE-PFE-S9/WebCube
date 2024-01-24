@@ -47,7 +47,6 @@ public class TPController {
 
     @GetMapping("/tp/{id}")
     public ResponseEntity<?> getTPById(@PathVariable Integer id,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
         Optional<TP> tpOptional = tpService.getTp(id);
 
@@ -61,7 +60,6 @@ public class TPController {
     @GetMapping("/tp/archive/{id}")
     public ResponseEntity<Resource> getArchiveById(
             @PathVariable Integer id,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
         try {
             tokenApi = tokenApi.substring(7);
@@ -84,7 +82,6 @@ public class TPController {
 
     @GetMapping("tp/myCompletion")
     public ResponseEntity<TpResponse> getMyListCompletion(
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
 
         tokenApi = tokenApi.substring(7);
@@ -107,7 +104,6 @@ public class TPController {
     @GetMapping("tp/myCompletion/{id}")
     public ResponseEntity<TpResponse> getMyCompletion(
             @PathVariable Integer id,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
 
         tokenApi = tokenApi.substring(7);
@@ -130,7 +126,6 @@ public class TPController {
     @GetMapping("tp/completion/etudiants/{id}")
     public ResponseEntity<List<TpResponse>> getCompletionMyTp(
             @PathVariable Integer id,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
 
         // TODO : check if the user has the right of a teacher
@@ -150,7 +145,6 @@ public class TPController {
     @PutMapping("/tp/myCompletion/{id}")
     public ResponseEntity<Void> updateMyCompletion(
             @PathVariable Integer id,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi,
             @RequestBody Integer updatedCompletion) {
 

@@ -32,7 +32,6 @@ public class FileController {
     public String uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("directory") String directory,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
         try {
             // Validate the directory path

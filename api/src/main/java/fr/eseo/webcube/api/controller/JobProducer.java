@@ -38,7 +38,6 @@ public class JobProducer {
 
     @GetMapping("/compileAndRun")
     public String compileAndRun(@RequestParam String projectPath,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
         sendJob(projectPath, requestId, "run");
@@ -47,7 +46,6 @@ public class JobProducer {
 
     @GetMapping("/compileAndTest")
     public ResponseEntity<?> compileAndTest(@RequestParam String projectPath,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) throws Exception {
         String requestId = UUID.randomUUID().toString(); // Generate a unique request ID
         sendJob(projectPath, requestId, "test");

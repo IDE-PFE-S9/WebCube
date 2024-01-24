@@ -16,7 +16,6 @@
 			let headersList = {
 				Accept: '*/*',
 				'Content-Type': 'application/json',
-				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 

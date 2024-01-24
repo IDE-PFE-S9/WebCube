@@ -17,7 +17,6 @@
 		const tpResponse = await fetch(`${apiUrl}/api/tp`, {
 			method: 'GET',
 			headers: {
-				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			}
 		});
@@ -31,7 +30,6 @@
 	async function getAdvancementTp(tpId) {
 		const response = await fetch(`${apiUrl}/api/tp/completion/etudiants/${tpId}`, {
 			headers: {
-				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			}
 		});

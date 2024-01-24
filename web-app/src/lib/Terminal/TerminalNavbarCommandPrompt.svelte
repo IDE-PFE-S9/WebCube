@@ -15,7 +15,6 @@
 			if (true) {  // change the condition to handle the reloading of the jar
 				let headersList = {
 					Accept: '*/*',
-					'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 					'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 				};
 
@@ -129,7 +128,6 @@
 
 			let headersList = {
 				Accept: '*/*',
-				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
