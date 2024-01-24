@@ -5,17 +5,20 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class User implements Serializable {
 
     @Id
@@ -28,7 +31,7 @@ public class User implements Serializable {
     @Column(name = "firstname")
     private String firstname;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "uniqueName"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 }

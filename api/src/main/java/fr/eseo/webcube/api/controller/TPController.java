@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,8 +47,7 @@ public class TPController {
 
     @GetMapping("/tp/{id}")
     public ResponseEntity<?> getTPById(@PathVariable Integer id,
-    @RequestHeader(name = "Authorization-Azure") String tokenAzure,
-    @RequestHeader(name = "Authorization-API") String tokenApi) {
+            @RequestHeader(name = "Authorization-API") String tokenApi) {
         Optional<TP> tpOptional = tpService.getTp(id);
 
         if (tpOptional.isPresent()) {
@@ -59,12 +60,11 @@ public class TPController {
     @GetMapping("/tp/archive/{id}")
     public ResponseEntity<Resource> getArchiveById(
             @PathVariable Integer id,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
         try {
             tokenApi = tokenApi.substring(7);
             Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-            String uniqueName = claims.get("uniqueName").toString();
+            String uniqueName = claims.get("unique_name").toString();
 
             Resource archive = tpService.getArchive(id, uniqueName);
 
@@ -82,12 +82,11 @@ public class TPController {
 
     @GetMapping("tp/myCompletion")
     public ResponseEntity<TpResponse> getMyListCompletion(
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
 
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-        String uniqueName = claims.get("uniqueName").toString();
+        String uniqueName = claims.get("unique_name").toString();
         String firstname = claims.get("firstname").toString();
         String surname = claims.get("surname").toString();
 
@@ -105,12 +104,11 @@ public class TPController {
     @GetMapping("tp/myCompletion/{id}")
     public ResponseEntity<TpResponse> getMyCompletion(
             @PathVariable Integer id,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
 
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-        String uniqueName = claims.get("uniqueName").toString();
+        String uniqueName = claims.get("unique_name").toString();
         String firstname = claims.get("firstname").toString();
         String surname = claims.get("surname").toString();
 
@@ -128,14 +126,13 @@ public class TPController {
     @GetMapping("tp/completion/etudiants/{id}")
     public ResponseEntity<List<TpResponse>> getCompletionMyTp(
             @PathVariable Integer id,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
 
         // TODO : check if the user has the right of a teacher
 
         tokenApi = tokenApi.substring(7);
         Claims claims = jwtTokenUtil.parseClaims(tokenApi);
-            
+
         List<TpResponse> tpResponses = tpService.getCompletionsByTpId(id);
 
         if (tpResponses != null && !tpResponses.isEmpty()) {
@@ -145,4 +142,30 @@ public class TPController {
         }
     }
 
+    @PutMapping("/tp/myCompletion/{id}")
+    public ResponseEntity<Void> updateMyCompletion(
+            @PathVariable Integer id,
+            @RequestHeader(name = "Authorization-API") String tokenApi,
+            @RequestBody Integer updatedCompletion) {
+
+        tokenApi = tokenApi.substring(7);
+        Claims claims = jwtTokenUtil.parseClaims(tokenApi);
+        String uniqueName = claims.get("unique_name").toString();
+
+        tpService.updateCompletion(uniqueName, id, updatedCompletion);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/tp/timeElapsed/{id}")
+    public ResponseEntity<Void> updateTimeElapsed(@PathVariable Integer id,
+            @RequestHeader(name = "Authorization-API") String tokenApi, @RequestBody Integer timeElasped) {
+        tokenApi = tokenApi.substring(7);
+        Claims claims = jwtTokenUtil.parseClaims(tokenApi);
+        String uniqueName = claims.get("unique_name").toString();
+
+        tpService.updateTimeElapsed(uniqueName, id, timeElasped);
+
+        return ResponseEntity.noContent().build();
+    }
 }

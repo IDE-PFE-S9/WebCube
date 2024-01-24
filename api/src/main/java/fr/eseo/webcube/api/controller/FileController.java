@@ -32,7 +32,6 @@ public class FileController {
     public String uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("directory") String directory,
-            @RequestHeader(name = "Authorization-Azure") String tokenAzure,
             @RequestHeader(name = "Authorization-API") String tokenApi) {
         try {
             // Validate the directory path
@@ -83,17 +82,16 @@ public class FileController {
                 git.commit().setMessage("test commit message").call();
 
                 // Push the commit to the branch
-                // TODO: CHANGE THE PASSWORD WITH A TOKEN FOR THE ACCOUNT !!!
+                // TODO: GET ANOTHER GITLAB ACCOUNT
                 git.push()
                         .setCredentialsProvider(
-                                new UsernamePasswordCredentialsProvider("arthur.meyniel@icloud.com", "your_token_here"))
+                                new UsernamePasswordCredentialsProvider("meyniear", "glpat-REWFnLwzzczXAstaQGNU"))
                         .setRefSpecs(new RefSpec(branchName))
                         .call();
             } catch (IOException | GitAPIException e) {
                 e.printStackTrace();
                 // Handle exceptions
             }
-            System.out.println("yes");
             return "File uploaded and extracted successfully!";
         } catch (IOException e) {
             e.printStackTrace();

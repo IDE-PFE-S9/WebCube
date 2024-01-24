@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-
   nginx:
     build:
       context: ./nginx
@@ -14,7 +13,9 @@ services:
     dns:
       - IP_DNS
       - webcube.pfe.dns
-      
+    networks:
+      web-app_network:
+
   web-app:
     build:
       context: ./web-app
@@ -30,13 +31,15 @@ services:
     dns:
       - IP_DNS
       - webcube.pfe.dns
+    networks:
+      web-app_network:
 
   api:
     build:
       context: ./api
+      dockerfile: Dockerfile
       args:
         - MAVEN_OPTS=-DproxySet=true -DproxyHost=192.168.4.8 -DproxyPort=3128
-      dockerfile: Dockerfile
     ports:
       - "4444:4444"
     container_name: api
@@ -44,5 +47,14 @@ services:
       - IP_DNS
       - webcube.pfe.dns
     volumes:
-      - /code:/code
-    
+      - /code:/api/code
+    networks:
+      web-app_network:
+
+networks:
+  web-app_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.101.0.0/16"

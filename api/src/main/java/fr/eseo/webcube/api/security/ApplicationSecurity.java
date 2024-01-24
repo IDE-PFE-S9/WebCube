@@ -1,12 +1,23 @@
 package fr.eseo.webcube.api.security;
 
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import fr.eseo.webcube.api.dao.UserRepository;
+import fr.eseo.webcube.api.model.CustomUserDetails;
+import fr.eseo.webcube.api.model.User;
 
 
 @Configuration
@@ -17,7 +28,10 @@ public class ApplicationSecurity {
     UserTokenAzure userDetailsResponse;
 
     @Autowired
-    private JwtTokenUtil jwtUtil;
+    private JwtTokenFilter jwtTokenFilter;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -25,44 +39,35 @@ public class ApplicationSecurity {
         http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers("/**").permitAll() ; // Endpoint public accessible sans authentification
-               // .anyRequest().authenticated()
-            //.and()
-            //.oauth2ResourceServer()
-              //  .jwt();
-                   //.jwtAuthenticationConverter(jwtAuthenticationConverter());
+                .antMatchers("/api/auth").permitAll() // Endpoint public accessible sans authentification
+                //.antMatchers("/**").permitAll()
+                .antMatchers("/ws/**").permitAll()
+                .antMatchers("/api/tp").permitAll()
+                .anyRequest().authenticated();
 
+        http
+                .rememberMe()
+                .rememberMeCookieName("monCookie")
+                .tokenValiditySeconds(86400);
+
+        http.exceptionHandling()
+                .authenticationEntryPoint(
+                        (request, response, ex) -> response.sendError(
+                                HttpServletResponse.SC_UNAUTHORIZED,
+                                ex.getMessage()
+                        )
+                );
+        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    /*@Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-
-        // Ajouter un convertisseur pour extraire des informations spécifiques du token
-        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            jwt.getClaims().forEach((key, value) -> {
-                // Extraitz les informations nécessaires, par exemple, le nom de la personne (given_name, family_name)
-                if ("given_name".equals(key)) {
-                    // Faites quelque chose avec le prénom
-                    String firstName = (String) value;
-                    userDetailsResponse.setGiven_name(firstName);
-
-                } else if ("family_name".equals(key)) {
-                    // Faites quelque chose avec le nom de famille
-                    String lastName = (String) value;
-                    userDetailsResponse.setFamily_name(lastName);
-                }
-            });
-
-            return jwtGrantedAuthoritiesConverter.convert(jwt);
-        });
-
-        return converter;
-    }*/
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+                Optional<User> optionalUser = userRepository.findByUniqueName(username);
+                User user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
+                return new CustomUserDetails(user);
+    };
+}
 
 }

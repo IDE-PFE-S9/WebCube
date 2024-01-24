@@ -2,7 +2,7 @@
 	import TabManager from '$lib/TabManager/TabManager.svelte';
 	import Navbar from '$lib/Navbar/Navbar.svelte';
 	import MonacoEditor from '$lib/MonacoEditor/MonacoEditor.svelte';
-	import Terminal from '$lib/Terminal/Terminal.svelte';
+	import Terminal from '$lib/Terminal/NonMagicalTerminal.svelte';
 	import StructureParser from '$lib/StructureParser/StructureParser.svelte';
 	import WcArchiveExplorer from '$lib/ArchiveExplorer/WCArchiveExplorer.svelte';
 	import ArchiveTabManager from '$lib/TabManager/ArchiveTabManager.svelte';
@@ -13,6 +13,7 @@
 	import ConfigPanel from '$lib/Modeling/ConfigPanel.svelte';
 
 	import { markdownMode, currentTab } from '$lib/stores.js';
+	import CheerpJDisplay from '../../lib/CheerpJ/CheerpJDisplay.svelte';
 
 	let startX;
 	let startWidth;
@@ -79,6 +80,7 @@
 			{/if}
 		</div>
 	{/if}
+	<CheerpJDisplay />
 	<slot />
 </div>
 

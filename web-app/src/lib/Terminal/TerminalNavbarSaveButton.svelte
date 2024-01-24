@@ -1,11 +1,14 @@
 <script>
-	import { openedCodes, openedArchive } from '$lib/stores.js';
+	import { openedCodes, openedArchive, cheerpjState, tpId, dateOpened } from '$lib/stores.js';
 	import SaveIcon from '$lib/assets/TerminalNavbarIcons/SaveIcon.svelte';
 	import { workSavePopup, workSaveErrorPopup } from '/src/lib/PopUps/popup.js';
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
+	import { getUserInformations } from '$lib/auth.js';
+	import {isResponseOk} from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
+	let projectPath = process.env.PROJECT_PATH;
 
 	async function createZip(directoryStructure) {
 		const zip = new JSZip();
@@ -51,23 +54,33 @@
 
 			let headersList = {
 				Accept: '*/*',
-				'Authorization-Azure': 'Bearer ' + Cookies.get('azureJWT'),
 				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
 			};
 
-			const userRes = await fetch(`${apiUrl}/api/user`, {
-				method: 'GET',
-				headers: headersList
+			let headersList2 = {
+				Accept: '*/*',
+				'Content-Type': 'application/json',
+				'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+			};
+
+			const now = new Date();
+			const timeElapsedInMilliseconds = now - $dateOpened;
+			const timeElapsedInMinutes = Math.floor(timeElapsedInMilliseconds / 60000);
+			
+			await fetch(`${apiUrl}/api/tp/timeElapsed/${$tpId}`, {
+				method: 'PUT',
+				headers: headersList2,
+				body: JSON.stringify(timeElapsedInMinutes)
 			});
 
-			const user = await userRes.json();
+			const user = await getUserInformations();
 
 			let username = user.uniqueName.split('@')[0].replace('.', '-');
 
 			const formData = new FormData();
 			formData.append(
 				'directory',
-				`/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/${username}/${$openedArchive.name}`
+				`${projectPath}/${username}/${$openedArchive.name}`
 			);
 			formData.append('file', zipBlob, 'archive.zip');
 
@@ -76,8 +89,9 @@
 				headers: headersList,
 				body: formData
 			});
-
-			const responseData = await response.text();
+			if (isResponseOk(response)) {
+				const responseData = await response.text();
+			}
 
 			// traverse the $openedArchive and change all the modified fields to false
 			function resetModified(node) {
@@ -87,6 +101,9 @@
 					node.children.forEach(resetModified); // Recurse into directories
 				}
 			}
+
+			$cheerpjState.reloadJar = true; 
+			$cheerpjState.reloadTestJar = true; 
 
 			workSavePopup();
 		} catch (error) {

@@ -1,6 +1,7 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import Cookies from "js-cookie"
+import { getUserInformations } from './auth.js';
 
 let wsUrl = process.env.WS_URL;
 
@@ -11,16 +12,19 @@ export const openedCodes = writable([]);
 export const openedTabs = writable([]);
 
 // terminal stores
-export const terminalNavbarActiveItem = writable('Problèmes');
+export const terminalNavbarActiveItem = writable('Sortie');
 export const terminalOutput = writable([]);
+export const problems = writable([]);
 
 // user panel stores
-export const adminNavbarActiveItem = writable('Général');
+export const adminNavbarActiveItem = writable('Avancement');
 
 // editor store
 export const editorUpdateTrigger = writable(null);
 export const readOnly = writable(false);
 export const markdownMode = writable(false);
+export const goToLineTrigger = writable({ file: null, line: null });
+export const goToLineColumnTrigger = writable({ file: null, line: null, column: null });
 
 // archive explorer stores
 export const archiveMode = writable(false);
@@ -28,10 +32,25 @@ export const openedArchive = writable(null);
 export const selectedArchiveFile = writable(null);
 export const openedArchiveTabs = writable([]);
 export const archiveHandle = writable(null);
+export const tpId = writable(null);
+export const dateOpened = writable(null);
 
 // modelling stores
 export const entitiesList = writable([]);
 export const showedEntities = writable([]);
+
+// CheerpJ stores
+export const cheerpjState = writable({
+    showPopup: false,
+    runJar: false,
+    reloadJar: true,
+    runTestJar: false,
+    reloadTestJar: true,
+});
+
+export const cheerpjWidth = writable(500)
+export const cheerpjHeight = writable(400)
+export const graphical = writable(false)
 
 // navbar stores
 export const currentTab = writable("Explorer");
@@ -41,6 +60,8 @@ export const screenChangeCount = persist('screenChangeCount', 0);
 
 
 export const logs = persist('logs', [])
+
+export const examGroups = persist('examGroups', [])
 
 // connection
 export const token = writable(checkToken());
@@ -55,6 +76,8 @@ let socket;
 export const examMode = writable(false);
 export const isConnected = writable(false);
 export const userCount = writable(0);
+export const userDetails = writable({});
+
 
 if (typeof window !== 'undefined') {
     socket = setupWebSocket();
@@ -64,6 +87,7 @@ if (typeof window !== 'undefined') {
 export function sendMessage(type, data) {
     if (socket && socket.readyState === WebSocket.OPEN) {
         const message = JSON.stringify({ type, data });
+        console.log(message)
         socket.send(message);
     } else {
         console.error('WebSocket is not open.');
@@ -78,17 +102,33 @@ function setupWebSocket() {
         isConnected.set(true);
     };
 
-    socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
+    socket.onmessage = async (event) => {
+        const message = JSON.parse(event.data); 
 
         switch (message.type) {
             case 'examMode':
-                examMode.set(message.data);
+                // get the group of the current user
+                if (Cookies.get('apiJWT')) {
+                    let info = await getUserInformations();
+
+                    const roles = Array.isArray(info.roles) ? info.roles : [info.roles];
+                    console.log(message.data)
+                    console.log(roles)
+                    // Check if at least one role from info.roles is contained in message.data
+                    const isRoleInExamMode = roles.some(role => message.data.includes(role.role));
+                    
+                    // Set examMode accordingly
+                    examMode.set(isRoleInExamMode);
+                }
                 break;
             case 'userCount':
-                userCount.set(message.data)
+                userCount.set(message.data);
                 break;
-                // Add more cases as needed for different message types
+            case 'userDetails':
+                userDetails.set(message.data);
+                // userDetails.subscribe(value => console.log(value))
+                break;
+            // Add more cases as needed for different message types
         }
     };
 

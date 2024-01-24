@@ -34,4 +34,7 @@ public class UserTP implements Serializable {
 
     @Column(name = "completion")
     private Integer completion;
+
+    @Column(name = "time_elapsed")
+    private Integer timeElapsed;
 }

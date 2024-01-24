@@ -2,6 +2,7 @@ package fr.eseo.webcube.api.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,8 +18,15 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.transaction.Transactional;
+
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.storage.file.FileBasedConfig;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.util.FS;
+import org.eclipse.jgit.util.SystemReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -35,6 +43,9 @@ import fr.eseo.webcube.api.model.UserTpKey;
 
 @Service
 public class TPService {
+
+	@Value("${project.path}")
+	private String projectPath;
 
 	@Autowired
 	private TpRepository tpRepository;
@@ -64,34 +75,46 @@ public class TPService {
 
 		User user = userRepository.findByUniqueName(uniqueName).get();
 
-		// TODO: fix the path to use the token.
-		Path permDir = Paths.get(
-				"/Users/arthur/Library/Mobile Documents/com~apple~CloudDocs/Documents/ESEO/Cours-i3/S9/PFE/WebCube/api/src/main/java/fr/eseo/webcube/api/workers/code/"
-						+ username + "/" + name);
+		Path permDir = Paths.get(projectPath + "/" + username + "/" + name);
 
 		// Check if the directory already exists
 		if (!Files.exists(permDir)) {
 			// If it does not exist, create it and clone the repo
+
 			Files.createDirectories(permDir);
+
+			URI gitServer = URI.create(gitLink);
+			
+			if (gitServer.getScheme().equals("https")) {
+				FileBasedConfig config = SystemReader.getInstance().openUserConfig(null, FS.DETECTED);
+				synchronized (config) {
+					config.load();
+					config.setBoolean(
+							"http",
+							"https://" + gitServer.getHost() + ':'
+									+ (gitServer.getPort() == -1 ? 443 : gitServer.getPort()),
+							"sslVerify", false);
+					config.save();
+				}
+			}
+
 			Git.cloneRepository()
 					.setURI(gitLink)
 					.setDirectory(permDir.toFile())
+					.setCredentialsProvider(
+							new UsernamePasswordCredentialsProvider("meyniear", "glpat-REWFnLwzzczXAstaQGNU"))
 					.call();
 
-			// Store the TP in database
-			// here i want to create an entry inside the userTP table with the id of the tp,
-			// the uniqueName of the user and the completion set to 0
-			// Create and store the UserTP in database
 			UserTpKey userTPKey = new UserTpKey(uniqueName, tp.getId());
 			UserTP userTP = new UserTP();
 			userTP.setId(userTPKey);
 			userTP.setUser(user);
 			userTP.setTp(tp);
-			userTP.setCompletion(0); // Assuming completion is a String
+			userTP.setCompletion(0);
+			userTP.setTimeElapsed(0);
 			userTpRepository.save(userTP);
 		}
 
-		
 		Path zipPath = Files.createTempFile("archive", ".wc");
 		zipFolder(permDir, zipPath);
 
@@ -126,8 +149,8 @@ public class TPService {
 	public TpResponse getCompletionByUniqueName(String uniqueName) {
 		List<TpDetails> tpDetails = userTpRepository.findDetailsByUniqueName(uniqueName);
 		TpResponse tpResponse = new TpResponse(uniqueName, tpDetails);
-        return tpResponse;
-    }
+		return tpResponse;
+	}
 
 	public TpResponse getCompletionByUniqueNameAndTpId(String uniqueName, Integer tpId) {
 		List<TpDetails> tpDetails = userTpRepository.findDetailsByUniqueNameAndTpId(uniqueName, tpId);
@@ -144,17 +167,28 @@ public class TPService {
 			String firstname = (String) result[1];
 			String surname = (String) result[2];
 			Integer completion = (Integer) result[3];
-			String rolesString = (String) result[4];
+			Integer timeElapsed = (Integer) result[4];
+			String rolesString = (String) result[5];
 
 			// Diviser la chaîne des rôles en utilisant la virgule
 			String[] rolesArray = rolesString.split(",");
 
 			// Convertir le tableau de chaînes en un ensemble de rôles (de type String)
 			Set<String> rolesSet = new HashSet<>(Arrays.asList(rolesArray));
-			
+
 			// Ajouter l'instance à la liste
-			tpResponseList.add(new TpResponse(uniqueName, firstname, surname, completion, rolesSet));
+			tpResponseList.add(new TpResponse(uniqueName, firstname, surname, completion, timeElapsed, rolesSet));
 		}
-        return tpResponseList;
-    }
+		return tpResponseList;
+	}
+
+	@Transactional
+	public void updateCompletion(String uniqueName, Integer tpId, Integer completion) {
+		userTpRepository.updateCompletion(uniqueName, tpId, completion);
+	}
+
+	@Transactional
+	public void updateTimeElapsed(String uniqueName, Integer tpId, Integer timeElapsed) {
+		userTpRepository.updateTimeElapsed(uniqueName, tpId, timeElapsed);
+	}
 }

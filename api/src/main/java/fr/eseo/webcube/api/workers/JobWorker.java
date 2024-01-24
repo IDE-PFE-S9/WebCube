@@ -67,7 +67,7 @@ public class JobWorker {
 
                     if (action != null) {
                         if (action.equals("test")) {
-                            compileAndTest(projectPath, requestId, channel);
+                            compileAndJarTest(projectPath, requestId, channel);
                         } else if (action.equals("jar")) {
                             compileAndJar(projectPath, requestId, channel);
                         } else if (action.equals("run")) {
@@ -199,19 +199,48 @@ public class JobWorker {
             File srcDir = new File(projectDir, SRC_DIR);
             File libDir = new File(projectDir, LIB_DIR);
             File classesDir = new File(projectDir, CLASSES_DIR);
-            File classesSrcDir = new File(classesDir, SRC_DIR);
-            File classesTestDir = new File(classesDir, TEST_DIR);
+            File classesSrcDir = new File(classesDir, "main");
+            File classesTestDir = new File(classesDir, "test");
             classesSrcDir.mkdirs(); // Create classes/src directory
             classesTestDir.mkdirs(); // Create classes/test directory
 
-            String classpath = buildClasspath(libDir, classesSrcDir, classesTestDir);
+            String classpath = buildClasspath(libDir, classesDir, classesTestDir);
 
             // compile sources
-            compileJavaFiles(srcDir, classesSrcDir, classpath, projectDir);
+            compileJavaFiles(srcDir, classesDir, classpath, projectDir, requestId, channel);
 
-            createJarFile(classesSrcDir, projectDir, srcDir, libDir);
+            createJarFile(classesDir, projectDir, srcDir, libDir);
 
             sendOutput(projectDir.getAbsolutePath() + "/output.jar", requestId, channel);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle exceptions
+        }
+    }
+
+    private static void compileAndJarTest(String projectPath, String requestId, Channel channel) {
+        try {
+            File projectDir = new File(projectPath);
+            File srcDir = new File(projectDir, SRC_DIR);
+            File testDir = new File(projectDir, TEST_DIR);
+            File libDir = new File(projectDir, LIB_DIR);
+            File classesDir = new File(projectDir, CLASSES_DIR);
+            File classesSrcDir = new File(classesDir, "main");
+            File classesTestDir = new File(classesDir, "test");
+            classesSrcDir.mkdirs(); // Create classes/src directory
+            classesTestDir.mkdirs(); // Create classes/test directory
+
+            String classpath = buildClasspath(libDir, classesDir, classesTestDir);
+
+            // compile sources
+            compileJavaFiles(srcDir, classesDir, classpath, projectDir, requestId, channel);
+
+            compileJavaFiles(testDir, classesDir, classpath, projectDir, requestId, channel);
+
+            createJarFileForTesting(classesDir, projectDir, srcDir, libDir);
+
+            sendOutput(projectDir.getAbsolutePath() + "/outputTest.jar", requestId, channel);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -235,10 +264,10 @@ public class JobWorker {
             String classpath = buildClasspath(libDir, classesSrcDir, classesTestDir);
 
             // compile sources
-            compileJavaFiles(srcDir, classesSrcDir, classpath, projectDir);
+            compileJavaFiles(srcDir, classesSrcDir, classpath, projectDir, requestId, channel);
 
             // compile tests
-            compileJavaFiles(testDir, classesTestDir, classpath, projectDir);
+            compileJavaFiles(testDir, classesTestDir, classpath, projectDir, requestId, channel);
 
             // run the tests
             List<TestResult> results = runTests(classesTestDir, classesSrcDir);
@@ -307,10 +336,16 @@ public class JobWorker {
         }
     }
 
-    private static void compileJavaFiles(File sourceDir, File outputDir, String classpath, File projectDir)
-            throws IOException, InterruptedException {
+    private static void compileJavaFiles(File sourceDir, File outputDir, String classpath, File projectDir, String requestId, Channel channel)
+            throws Exception {
+
+        long startTime = System.currentTimeMillis();
         List<String> command = new ArrayList<>();
         command.add("javac");
+        command.add("-source");
+        command.add("1.8"); // Specify source compatibility
+        command.add("-target");
+        command.add("1.8"); // Specify target compatibility
         command.add("-d");
         command.add(outputDir.getAbsolutePath());
         command.add("-cp");
@@ -320,25 +355,32 @@ public class JobWorker {
                     .filter(path -> path.toString().endsWith(".java"))
                     .map(Path::toString)
                     .forEach(command::add);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.directory(projectDir);
         Process compileProcess = processBuilder.start();
         int compileExitCode = compileProcess.waitFor();
-        logProcessOutput("Compilation", compileProcess);
+        long endTime = System.currentTimeMillis();
+        long compilationTime = endTime - startTime;
+        String compilationErrors = logProcessOutput("Compilation", compileProcess);
         if (compileExitCode != 0) {
-            System.err.println("Compilation failed with exit code " + compileExitCode);
-            // Handle compilation failure
+            String result = "Compilation failed with exit code " + compileExitCode + "\n"
+                    + "Output: \n" + compilationErrors + "\n"
+                    + "Total execution time: " + compilationTime + " ms";
+            sendOutput(result, requestId, channel);
+            return;
         }
     }
 
-    private static File createJarFile(File classesDir, File projectDir, File srcDir, File libDir)
+    private static File createJarFileForTesting(File classesDir, File projectDir, File srcDir, File libDir)
             throws IOException, InterruptedException {
 
         Path mainJavaPath = Files.walk(srcDir.toPath())
-                .filter(path -> path.getFileName().toString().equals("Main.java"))
+                .filter(path -> path.getFileName().toString().equals("MainTest.java"))
                 .findFirst()
-                .orElseThrow(() -> new FileNotFoundException("Main.java not found"));
+                .orElseThrow(() -> new FileNotFoundException("MainTest.java not found"));
 
         // Derive the main class name from mainJavaPath
         String mainClass = mainJavaPath.toString()
@@ -347,12 +389,12 @@ public class JobWorker {
                 .replace(File.separator, ".");
 
         // Define the path of the JAR file
-        File jarFile = new File(projectDir, "output.jar");
+        File jarFile = new File(projectDir, "outputTest.jar");
 
         // Create a manifest with the main class
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-        manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, mainClass);
+        manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "main." + mainClass);
 
         // Create the JAR file
         try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarFile), manifest)) {
@@ -383,6 +425,63 @@ public class JobWorker {
         return jarFile;
     }
 
+    private static File createJarFile(File classesDir, File projectDir, File srcDir, File libDir)
+            throws IOException, InterruptedException {
+
+        Path mainJavaPath = Files.walk(srcDir.toPath())
+                .filter(path -> path.getFileName().toString().equals("Main.java"))
+                .findFirst()
+                .orElseThrow(() -> new FileNotFoundException("Main.java not found"));
+
+        // Derive the main class name from mainJavaPath
+        String mainClass = mainJavaPath.toString()
+                .substring(srcDir.getAbsolutePath().length() + 1)
+                .replace(".java", "")
+                .replace(File.separator, ".");
+
+        // Define the path of the JAR file
+        File jarFile = new File(projectDir, "output.jar");
+
+        // Create a manifest with the main class
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "main." + mainClass);
+
+        // Create the JAR file
+        try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarFile), manifest)) {
+            addDirectoryToJar(classesDir, jos, classesDir.getAbsolutePath().length() + 1);
+
+            for (File file : libDir.listFiles()) {
+                if (file.getName().endsWith(".jar")) {
+                    try (JarFile libraryJar = new JarFile(file)) {
+                        Enumeration<JarEntry> entries = libraryJar.entries();
+                        while (entries.hasMoreElements()) {
+                            JarEntry entry = entries.nextElement();
+                            if (!entry.isDirectory() && !entry.getName().equalsIgnoreCase("META-INF/MANIFEST.MF")) {
+                                jos.putNextEntry(new JarEntry(entry.getName()));
+                                try (InputStream is = libraryJar.getInputStream(entry)) {
+                                    byte[] buffer = new byte[1024];
+                                    int bytesRead;
+                                    while ((bytesRead = is.read(buffer)) != -1) {
+                                        jos.write(buffer, 0, bytesRead);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                jos.closeEntry();
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jarFile;
+    }
+
     private static void addDirectoryToJar(File directory, JarOutputStream jos, int prefixLength)
             throws IOException {
         File[] files = directory.listFiles();
@@ -401,6 +500,8 @@ public class JobWorker {
                             jos.write(buffer, 0, bytesRead);
                         }
                         jos.closeEntry();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }

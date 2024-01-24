@@ -1,10 +1,17 @@
 <script>
 	import ArchiveDirectoryItem from './ArchiveDirectoryItem.svelte';
-	import { openedArchive, archiveMode, archiveHandle } from '$lib/stores.js';
+	import { openedArchive, archiveMode, archiveHandle, graphical } from '$lib/stores.js';
 
 	$: directoryObject = {};
 
 	import JSZip from 'jszip';
+	import TpButton from '../GitExplorer/TpButton.svelte';
+	import CryptoJS from 'crypto-js';
+	import { getUserInformations, getPrivateKeyTeacher } from '$lib/auth.js';
+	import { RSA, Crypt } from 'hybrid-crypto-js';
+	import { openLocalFileErrorPopup, openLocalFilePopup} from '/src/lib/PopUps/popup.js';
+
+
 
 	/*
         A WebCube Archive must contain different things:
@@ -25,65 +32,92 @@
 		const zip = new JSZip();
 		const data = await file.arrayBuffer();
 		const loadedZip = await zip.loadAsync(data);
-
-		// Recursive function to extract files from the ZIP archive, including nested directories
-		async function extractToDirectoryObject(zipObject, path = '') {
-			const directoryObject = {
+		const user = await getUserInformations();
+		const key = await loadedZip.files.encryptedKey.async('text');
+		let password;
+		const hasTeacherRole = user.roles.some(role => role.role === 'ROLE_TEACHER');
+		if (hasTeacherRole) {
+			const privateKey = await getPrivateKeyTeacher();
+			let symetricKey = Decryption(key, privateKey);
+			password = symetricKey.message;
+		} else {
+			password = 'pfe_webcube_user_' + user.uniqueName;
+		}
+		const rootDirectoryName = file.name.replace(/\.[^/.]+$/, ''); // Supprime l'extension du fichier
+		const rootDirectory = {
 				type: 'directory',
-				name: path ? path.slice(0, -1).split('/').pop() : 'root',
-				visible: false,
+				name: rootDirectoryName,
+				visible: true,
 				children: []
 			};
 
-			for (const [name, content] of Object.entries(zipObject.files)) {
-				if (!name.startsWith(path)) {
-					continue; // Skip files and directories not under the current path
+			function addToStructure(parent, path, isDir, content) {
+				const parts = path.split('/').filter(Boolean);
+				let current = parent;
+				
+
+				for (let i = 0; i < parts.length; i++) {
+					const part = parts[i];
+					const isLast = i === parts.length - 1;
+					// Construct the full path based on the parent's name and the relative path
+					const currentPath =
+						(parent.name ? parent.name + '/' : '') + parts.slice(0, i + 1).join('/');
+
+					if (isLast && !isDir) {
+						try {
+							const decryptedData = CryptoJS.AES.decrypt(content, password).toString(CryptoJS.enc.Utf8);
+							// Traitement supplémentaire si le déchiffrement réussit
+							current.children.push({
+								type: 'file',
+								name: currentPath, // Use the constructed full path
+								data: decryptedData, // Content will be text or Uint8Array depending on file type
+								visible: false,
+								write: false,
+								modified: false
+							});
+							
+						} catch (error) {
+							openLocalFileErrorPopup();
+							if (error.message === 'Malformed UTF-8 data') {
+								console.error('La clé de déchiffrement est incorrecte.');
+								// Ajoutez ici le code à exécuter en cas de clé incorrecte
+							} else {
+								console.error('Erreur pendant le déchiffrement :', error);
+								// Autre gestion d'erreur pour d'autres types d'erreurs possibles
+							}
+						}						
+					} else {
+						let dir = current.children.find((c) => c.type === 'directory' && c.name === currentPath);
+						if (!dir) {
+							dir = {
+								type: 'directory',
+								name: currentPath, // Use the constructed full path
+								visible: false,
+								children: []
+							};
+							current.children.push(dir);
+						}
+						current = dir;
+					}
 				}
-
-				const relativeName = name.substring(path.length);
-
-				// We only want to process files and directories directly inside the current path, not nested ones
-				if (
-					relativeName.split('/').length > 2 ||
-					(relativeName.split('/').length > 1 && !relativeName.endsWith('/'))
-				) {
-					continue;
-				}
-
-				if (relativeName.endsWith('/')) {
-					// It's a directory, so we recursively extract its contents
-					const childDirectoryObject = await extractToDirectoryObject(
-						zipObject,
-						`${path}${relativeName}`
-					);
-					directoryObject.children.push(childDirectoryObject);
-				} else if (relativeName !== '') {
-					// Ensure the name is not empty
-					// It's a file
-					directoryObject.children.push({
-						type: 'file',
-						name: name,
-						data: await zipObject.files[name].async('text'), // Change "text" to other types as needed
-						visible: false,
-						write: false
-					});
-				}
-			}
-
-			directoryObject.children.sort((a, b) => {
-				// If both are the same type, compare by name
-				if (a.type === b.type) {
-					return a.name.localeCompare(b.name);
-				}
-				// Otherwise, directories come first
-				return a.type === 'directory' ? -1 : 1;
-			});
-
-			return directoryObject;
 		}
 
-		const archiveDirectoryObject = await extractToDirectoryObject(loadedZip);
-		return archiveDirectoryObject;
+		for (const [path, file] of Object.entries(loadedZip.files)) {
+			const isDir = file.dir;
+
+			// if (path === 'encryptedKey') {
+			// 	continue;
+			// }	
+			// Check the file extension to determine how to read the content
+			if (isDir) {
+				addToStructure(rootDirectory, path, isDir, '');
+			} else {
+				const content = await file.async('text');
+				addToStructure(rootDirectory, path, isDir, content);
+			}
+		}
+
+		return rootDirectory;
 	}
 
 	async function openArchive() {
@@ -115,12 +149,15 @@
 				return;
 			}
 
-			const description = parseXMLToJson(xmlDescriptorString);
-			directoryObject = mergeObjects(description, archiveStructure.children[0]);
-			openedArchive.set(directoryObject);
+			const parsedXml = parseXml(xmlDescriptorString);
+			updateFromDescriptor(archiveStructure, parsedXml.documentElement);
+			sortDirectoryStructure(archiveStructure);
+
+			openedArchive.set(archiveStructure);
+			console.log(archiveStructure)
 			archiveMode.set(true);
 
-			console.log($openedArchive)
+			openLocalFilePopup();
 		} catch (err) {
 			console.error('Error reading file:', err);
 		}
@@ -136,63 +173,84 @@
 				if (descriptor) return descriptor;
 			}
 		}
-		return null;
+		return null
 	}
 
-	const parseXMLToJson = (xmlString) => {
+	// Fonction pour déchiffrer le mot de passe avec la clé privée
+	function Decryption(encryptedKey, privateKey) {
+		var entropy = 'Testing of RSA algorithm in javascript.';
+		
+		var crypt = new Crypt({
+			rsaStandard: 'RSA-OAEP',
+			entropy: entropy
+		});
+		var rsa = new RSA({
+			entropy: entropy
+		});
+		var decrypted = crypt.decrypt(privateKey, encryptedKey);
+		return decrypted;
+	}
+	
+
+	function parseXml(xml) {
 		const parser = new DOMParser();
-		const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+		const xmlDoc = parser.parseFromString(xml, 'text/xml');
+		graphical.set(xmlDoc.documentElement.getElementsByTagName('Parameters')[0].attributes.getNamedItem("graphical").value);
+		// TODO: ADD USER SIGNATURE
+		return xmlDoc;
+	}
 
-		const traverseNode = (node, path) => {
-			let result = {};
-			let nodeName = node.nodeName;
-			let nameAttr = node.getAttribute('name');
-			let visibleAttr = node.getAttribute('visible') === 'true';
-			let writeAttr = node.getAttribute('write') === 'true';
+	const updateFromDescriptor = (jsObject, xmlElement) => {
+		const updateChildren = (jsChildren, xmlChildren) => {
+			for (const xmlChild of xmlChildren) {
+				const xmlName = xmlChild.getAttribute('name');
 
-			if (nodeName === 'Folder') {
-				result.type = 'directory';
-				result.name = nameAttr;
-				result.visible = visibleAttr;
-				result.children = [];
+				const jsChild = jsChildren.find((child) => child.name.endsWith('/' + xmlName));
+				if (jsChild) {
+					jsChild.visible = xmlChild.getAttribute('visible') === 'true';
+					if (jsChild.type === 'file') {
+						jsChild.write = xmlChild.getAttribute('write') === 'true';
+					}
 
-				for (let i = 0; i < node.childNodes.length; i++) {
-					let child = node.childNodes[i];
-					if (child.nodeType === 1) {
-						// Check if node is an Element node
-						result.children.push(traverseNode(child, path ? path + '/' + nameAttr : nameAttr));
+					if (jsChild.type === 'directory') {
+						const xmlFolders = Array.from(xmlChild.getElementsByTagName('Folder'));
+						const xmlFiles = Array.from(xmlChild.getElementsByTagName('File'));
+
+						const directXmlFolders = xmlFolders.filter((folder) => folder.parentNode === xmlChild);
+						const directXmlFiles = xmlFiles.filter((file) => file.parentNode === xmlChild);
+
+						updateChildren(jsChild.children, [...directXmlFolders, ...directXmlFiles]);
 					}
 				}
-			} else if (nodeName === 'File') {
-				result.type = 'file';
-				result.name = (path ? path + '/' : '') + nameAttr;
-				result.data = 'test'; // Placeholder as specific data for each file isn't provided in XML
-				result.visible = visibleAttr;
-				result.write = writeAttr;
 			}
-
-			return result;
 		};
-		return traverseNode(xmlDoc.childNodes[0], '');
+
+		const rootFolders = Array.from(xmlElement.getElementsByTagName('Folder'));
+		const rootFiles = Array.from(xmlElement.getElementsByTagName('File'));
+		
+		const directRootFolders = rootFolders.filter((folder) => folder.parentNode === xmlElement);
+		const directRootFiles = rootFiles.filter((file) => file.parentNode === xmlElement);
+
+		updateChildren(jsObject.children, [...directRootFolders, ...directRootFiles]);
 	};
 
-	function mergeObjects(obj1, obj2) {
-		for (let key in obj1) {
-			if (obj1.hasOwnProperty(key)) {
-				if (
-					obj2.hasOwnProperty(key) &&
-					typeof obj1[key] === 'object' &&
-					typeof obj2[key] === 'object'
-				) {
-					mergeObjects(obj1[key], obj2[key]);
-				} else if (key === 'write' || key === 'visible') {
-					obj2[key] = obj1[key];
-				} else if (!obj2.hasOwnProperty(key)) {
-					obj2[key] = obj1[key];
-				}
-			}
+	function sortDirectoryStructure(directory) {
+		if (!directory.children || directory.children.length === 0) {
+			return;
 		}
-		return obj2;
+
+		directory.children.sort((a, b) => {
+			if (a.type === b.type) {
+				return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+			}
+			return a.type === 'directory' ? -1 : 1;
+		});
+
+		directory.children.forEach((child) => {
+			if (child.type === 'directory') {
+				sortDirectoryStructure(child);
+			}
+		});
 	}
 </script>
 

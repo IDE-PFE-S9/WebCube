@@ -3,44 +3,72 @@
 
 	import JSZip from 'jszip';
 	import Cookies from 'js-cookie';
-	import { openedArchive, archiveMode, currentTab } from '$lib/stores.js';
+	import {
+		openedArchive,
+		archiveMode,
+		currentTab,
+		graphical,
+		tpId,
+		openedArchiveTabs,
+		openedCodes,
+		selectedArchiveFile,
+		cheerpjState,
+		problems,
+		terminalOutput,
+		markdownMode, 
+		editorUpdateTrigger,
+		dateOpened
+	} from '$lib/stores.js';
+	import { isResponseOk } from '$lib/auth.js';
 
 	let apiUrl = process.env.API_URL;
 
-	let headersList = {
-		Accept: '*/*',
-		'Authorization-Azure': 'Bearer ' + Cookies.get("azureJWT"),
-		'Authorization-API': 'Bearer ' + Cookies.get("apiJWT")
-	};
-
 	const getArchive = async () => {
-		console.log(headersList);
+		dateOpened.set(new Date());
 
+		let headersList = {
+			Accept: '*/*',
+			'Authorization-API': 'Bearer ' + Cookies.get('apiJWT')
+		};
 		let archiveResponse = await fetch(`${apiUrl}/api/tp/archive/${tp.id}`, {
 			method: 'GET',
 			headers: headersList
 		});
+		if (isResponseOk(archiveResponse)) {
+			let archive = await archiveResponse.blob();
 
-		let archive = await archiveResponse.blob();
+			let archiveStructure = await handleArchive(archive);
 
-		let archiveStructure = await handleArchive(archive);
+			console.log(archiveStructure);
 
-		console.log(archiveStructure);
+			const xmlDescriptorString = findDescriptor(archiveStructure);
 
-		const xmlDescriptorString = findDescriptor(archiveStructure);
+			const parsedXml = parseXml(xmlDescriptorString);
 
-		const parsedXml = parseXml(xmlDescriptorString);
+			updateFromDescriptor(archiveStructure, parsedXml.documentElement);
 
-		updateFromDescriptor(archiveStructure, parsedXml.documentElement);
+			sortDirectoryStructure(archiveStructure);
 
-		sortDirectoryStructure(archiveStructure);
+			openedArchive.set(archiveStructure);
+			archiveMode.set(true);
 
-		openedArchive.set(archiveStructure);
-		archiveMode.set(true);
+			console.log($openedArchive);
 
-		console.log($openedArchive);
-
-		currentTab.set('Archive');
+			tpId.set(tp.id);
+			currentTab.set('Archive');
+			openedArchiveTabs.set([]);
+			selectedArchiveFile.set(null);
+			cheerpjState.set({
+				showPopup: false,
+				runJar: false,
+				reloadJar: true
+			});
+			problems.set([]);
+			terminalOutput.set([]);
+			markdownMode.set(false);
+			openedCodes.set([]);
+			editorUpdateTrigger.set(null);
+		}
 	};
 
 	async function handleArchive(file) {
@@ -122,6 +150,12 @@
 	function parseXml(xml) {
 		const parser = new DOMParser();
 		const xmlDoc = parser.parseFromString(xml, 'application/xml');
+		graphical.set(
+			xmlDoc.documentElement
+				.getElementsByTagName('Parameters')[0]
+				.attributes.getNamedItem('graphical').value
+		);
+		// TODO: ADD USER SIGNATURE
 		return xmlDoc;
 	}
 
@@ -185,7 +219,7 @@
 	class:selected={$openedArchive?.name === tp.name}
 	on:click={getArchive}
 >
-	{tp.name}: 76% complété
+	{tp.name}
 </button>
 
 <style lang="scss">

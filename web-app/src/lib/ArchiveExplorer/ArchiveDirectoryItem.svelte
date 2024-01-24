@@ -4,7 +4,7 @@
 	import DirectoryIcon from '$lib/assets/FileExplorerIcons/DirectoryIcon.svelte';
 
 	export let directory;
-	let expanded = false;
+	let expanded = directory.children && directory.children.length === 1 && directory.children[0].type === 'directory';
 
 	let relativeName = directory.name.split('/').pop();
 
