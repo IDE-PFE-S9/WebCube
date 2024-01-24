@@ -22,7 +22,7 @@
         navbarItemsStudent = [{ text: 'Avancement' }];
     }
     let apiUrl = process.env.API_URL;
-    let isTeacher = true;
+    let isTeacher = false;
 
     function manageItemClick(itemText) {
 		adminNavbarActiveItem.set(itemText);
