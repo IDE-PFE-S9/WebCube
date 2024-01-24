@@ -84,8 +84,8 @@
             {/if}
         {/if}
 
-        {#if $adminNavbarActiveItem === 'Autres'}
-            <PageAutresPanel />
+        {#if $adminNavbarActiveItem === 'Import'}
+            <PageImportPanel />
         {/if}
     </div>
 </div>

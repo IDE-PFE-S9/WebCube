@@ -1,6 +1,7 @@
 package fr.eseo.webcube.api.model;
 
 import java.util.Set;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,4 +37,17 @@ public class Role implements java.io.Serializable{
         return role;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Role role = (Role) o;
+        return Objects.equals(idRole, role.idRole) &&
+            Objects.equals(role, role.role);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idRole, role);
+    }
 }
