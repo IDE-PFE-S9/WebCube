@@ -36,8 +36,8 @@ You can preview the production build with `npm run preview`.
 
 ## Versions
  
-**Dernière version stable :** 1.0  
-**Dernière version :** 1.0  
+**Dernière version stable :** 1.5  
+**Dernière version :** 1.5
 Liste des versions : [Cliquer pour afficher](https://github.com/IDE-PFE-S9/WebCube/releases)
 
 ## Auteurs
