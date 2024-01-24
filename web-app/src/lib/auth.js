@@ -60,7 +60,6 @@ async function getTokenApi(azureJWT) {
 
     if (!response.ok) {
         const errorData = await response.json();
-        alert('Une erreur est survenue lors de la requête API : ' + errorData.error);
         return null;
     }
 
@@ -134,7 +133,6 @@ async function isResponseOk(response) {
     }
     else if (!response.ok) {
         const errorData = await response.json();
-        alert('Une erreur est survenue lors de la requête API : ' + errorData.error);
         return false;
     }
     return true;
