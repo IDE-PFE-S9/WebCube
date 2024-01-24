@@ -123,6 +123,7 @@ async function uploadFile() {
         // Réinitialiser la variable uploadedFile après l'envoi du fichier si nécessaire
         uploadedFile = null;
         uploader.value = null; 
+        update();
     }
 }
 
@@ -211,6 +212,10 @@ async function saveChanges() {
         if (await isResponseOk(response)) {
             console.log('Modifications enregistrées avec succès');
 
+            // Mettez à jour la liste des étudiants filtrés
+            students = await getStudents();
+            update();
+            
             // Forcer la mise à jour de selectedStudent après la sauvegarde
             selectedStudent = { ...selectedStudent };
 
@@ -222,6 +227,50 @@ async function saveChanges() {
         console.error('Erreur lors de l\'enregistrement des modifications:', error);
     }
 }
+
+// Fonction pour mettre à jour la liste des étudiants filtrés
+async function update() {
+    filteredStudents = [];
+    students = [];
+    studentsByRole = [];
+    students = await getStudents();
+        console.log('students', students);
+
+        // Récupérer tous les rôles uniques
+        roles = [];
+        if (students) {
+            students.forEach(student => {
+                student.roles.forEach(role => {
+                    const roleId = role.idRole; // Obtenir l'ID du rôle
+                    const roleName = role.role; // Obtenir le nom du rôle
+
+                    // Ajouter le rôle à la liste si ce n'est pas déjà présent
+                    const roleObject = { idRole: roleId, role: roleName };
+                    if (!roles.some(existingRole => existingRole.idRole === roleId)) {
+                        roles.push(roleObject);
+                    }
+
+                    // Ajouter l'étudiant au tableau du rôle correspondant
+                    if (!studentsByRole[roleObject.role]) {
+                        studentsByRole[roleObject.role] = [];
+                        showStudentsByRole[roleObject.role] = true; // Initialiser à true pour afficher par défaut
+                        showTableByRole[roleObject.role] = true; // Initialiser à true pour afficher par défaut
+                    }
+                    studentsByRole[roleObject.role].push(student);
+                });
+            });
+        }
+        console.log('roles', roles);   
+
+        // Initialiser filteredStudents avec tous les étudiants par rôle
+        filteredStudents = { ...studentsByRole };
+
+        // Définir un ordre personnalisé pour les rôles
+        const customRoleOrder = ['ROLE_GROUP_A', 'ROLE_GROUP_B', 'ROLE_RATTRAPAGE', 'ROLE_TEACHER'];
+
+        // Tri des rôles selon l'ordre personnalisé
+        roles = roles.sort((a, b) => customRoleOrder.indexOf(a.role) - customRoleOrder.indexOf(b.role));
+    }
 </script>
 
 <div class="import-container">
