@@ -48,5 +48,5 @@ Liste des versions : [Cliquer pour afficher](https://github.com/IDE-PFE-S9/WebCu
 
 * **Ronan M.** _alias_ [@Warfird](https://github.com/Warfird)
 
-* **Théo L.** _alias_ [@theolurat](https://github.com/theolurat)
+* **Théo L.** _alias_ [@atfops](https://github.com/atfops)
 
